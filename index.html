@@ -323,15 +323,26 @@
       renderPackages(); 
     }
 
+    // ====== PERUBAHAN: FITUR AUTO SCROLL ======
     function selectPackage(months, pkgName) {
       selectedMonths = months;
+      
+      // Hapus efek aktif dari paket lain, tambahkan ke yang dipilih
       document.querySelectorAll('.pkg-card').forEach(card => card.classList.remove('active', 'scale-[1.02]'));
       event.currentTarget.classList.add('active', 'scale-[1.02]');
       
+      // Tampilkan Formulir Aktivasi
       document.getElementById('selected-package-label').innerText = `${activeProduct} (${months} Bulan)`;
-      document.getElementById('activation-section').classList.remove('hidden');
-      setTimeout(() => document.getElementById('activation-section').classList.remove('translate-y-4'), 50);
+      const actSection = document.getElementById('activation-section');
+      actSection.classList.remove('hidden');
+      
+      // Memberi sedikit jeda agar transisi CSS berjalan, lalu Scroll Otomatis!
+      setTimeout(() => { 
+          actSection.classList.remove('translate-y-4'); 
+          actSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); // <--- INI KUNCI AUTO SCROLL-NYA
+      }, 50);
     }
+    // ==========================================
 
     async function submitActivation() {
       const email = document.getElementById('buyer-email').value.trim();
