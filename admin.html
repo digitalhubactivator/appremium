@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - DigitalHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    /* PROTEKSI ANTI-SELECT & ANTI-COPY */
+    * { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none; }
+    input, textarea, select { -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; user-select: text !important; }
+    img { -webkit-user-drag: none; user-drag: none; pointer-events: none; }
+    button img, a img, .cursor-pointer img { pointer-events: auto; }
+
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .bg-gemini-gradient { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); }
+    .text-gemini { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  </style>
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 min-h-screen antialiased selection:bg-purple-200 selection:text-purple-900 relative overflow-x-hidden">
+
+  <!-- Efek Cahaya Ambient Background -->
+  <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-purple-300/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
+  <div class="fixed bottom-0 right-0 w-[600px] h-[600px] bg-blue-300/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
+
+  <!-- ================= LAYAR LOGIN ADMIN ================= -->
+  <div id="admin-login-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#F8FAFC] backdrop-blur-xl transition-all duration-500">
+    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-300/30 rounded-full blur-[80px] pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-300/30 rounded-full blur-[80px] pointer-events-none"></div>
+    
+    <div class="relative bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100 z-10 animate-fade-up">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-slate-900/20 mb-4">
+          <i data-lucide="lock" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-2xl font-black tracking-tight text-slate-900">Admin Login</h2>
+        <p class="text-xs text-slate-500 font-medium mt-1">Masukkan kredensial khusus administrator.</p>
+      </div>
+
+      <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Username</label>
+          <div class="relative">
+            <i data-lucide="user" class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="login-user" placeholder="Ketik username..." class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-500/10 transition-all shadow-inner" required autocomplete="off" />
+          </div>
+        </div>
+        <div class="space-y-1.5 pb-2">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Password</label>
+          <div class="relative">
+            <i data-lucide="key-round" class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+            <input type="password" id="login-pass" placeholder="Ketik password..." class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-500/10 transition-all shadow-inner" required />
+          </div>
+        </div>
+        <button type="submit" class="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-black rounded-2xl text-xs uppercase tracking-widest transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2">
+          <i data-lucide="log-in" class="w-4 h-4"></i> Masuk Sistem
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= KONTEN UTAMA ADMIN ================= -->
+  <div id="main-admin-content" class="hidden flex-col min-h-screen">
+    
+    <!-- Navbar Admin Premium -->
+    <header class="w-full bg-white/70 backdrop-blur-xl border-b border-white/50 sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/20 relative overflow-hidden">
+            <i data-lucide="layout-dashboard" class="w-5 h-5 lg:w-6 lg:h-6 relative z-10"></i>
+          </div>
+          <div>
+            <h1 class="font-black text-lg lg:text-xl tracking-tight text-slate-900 leading-none">ADMIN<span class="text-gemini">WORKSPACE</span></h1>
+            <p class="text-[9px] lg:text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">DigitalHub Store Control</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <button onclick="logoutAdmin()" class="flex items-center gap-2 bg-rose-50 hover:bg-rose-100 text-rose-600 px-4 py-2 rounded-xl text-xs font-bold transition-colors">
+            <i data-lucide="log-out" class="w-4 h-4"></i> <span class="hidden sm:inline">Logout</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10 space-y-8 animate-fade-up">
+      
+      <!-- Statistik Cepat -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
+        
+        <!-- Card: Antrean -->
+        <div class="bg-white/80 backdrop-blur-sm p-6 lg:p-7 rounded-[2rem] border border-white shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] flex items-center gap-5 transition-transform hover:-translate-y-1">
+          <div class="w-14 h-14 lg:w-16 lg:h-16 rounded-[1.2rem] bg-gradient-to-br from-amber-100 to-amber-50 text-amber-500 flex items-center justify-center border border-amber-200/50">
+            <i data-lucide="clock" class="w-7 h-7"></i>
+          </div>
+          <div>
+            <p class="text-[10px] lg:text-xs font-bold text-slate-400 uppercase tracking-widest">Menunggu ACC</p>
+            <h4 id="stat-pending-count" class="text-3xl lg:text-4xl font-black text-slate-800 mt-1 tracking-tighter">0</h4>
+          </div>
+        </div>
+        
+        <!-- Card: Total Aktif -->
+        <div class="bg-white/80 backdrop-blur-sm p-6 lg:p-7 rounded-[2rem] border border-white shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] flex items-center gap-5 transition-transform hover:-translate-y-1">
+          <div class="w-14 h-14 lg:w-16 lg:h-16 rounded-[1.2rem] bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-500 flex items-center justify-center border border-emerald-200/50">
+            <i data-lucide="users" class="w-7 h-7"></i>
+          </div>
+          <div>
+            <p class="text-[10px] lg:text-xs font-bold text-slate-400 uppercase tracking-widest">Total Akun Aktif</p>
+            <h4 id="stat-active-count" class="text-3xl lg:text-4xl font-black text-slate-800 mt-1 tracking-tighter">0</h4>
+          </div>
+        </div>
+        
+        <!-- Card: Generate PIN Multi-Product -->
+        <div class="bg-white border border-purple-100/50 p-6 lg:p-7 rounded-[2rem] shadow-[0_15px_40px_-10px_rgba(147,51,234,0.08)] flex flex-col justify-center relative overflow-hidden transition-transform hover:-translate-y-1">
+          <p class="text-[10px] lg:text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 relative z-10 flex items-center gap-2">
+            <i data-lucide="key" class="w-4 h-4 text-purple-500"></i> Generate PIN Lisensi
+          </p>
+          <div class="space-y-2 relative z-10">
+            <select id="pin-product" class="text-xs font-bold border border-slate-200 rounded-xl px-4 py-2.5 bg-slate-50 focus:outline-none w-full text-slate-700">
+              <option value="Gemini Pro">Gemini Pro</option>
+              <option value="Canva Pro">Canva Pro</option>
+              <option value="YouTube Premium">YouTube Premium</option>
+            </select>
+            <div class="flex gap-2">
+              <select id="pin-duration" class="text-xs font-bold border border-slate-200 rounded-xl px-4 py-2.5 bg-slate-50 focus:outline-none w-full text-slate-700">
+                <!-- Diisi otomatis oleh JavaScript fetchPackages() -->
+              </select>
+              <button onclick="generatePin()" class="bg-slate-900 hover:bg-slate-800 text-white px-5 rounded-xl text-xs font-black transition shadow-md active:scale-95 shrink-0">Buat</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Area Tabel Utama -->
+      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[2.2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] overflow-hidden">
+        
+        <!-- Tab Navigasi -->
+        <div class="flex border-b border-slate-100 bg-slate-50/50 overflow-x-auto no-scrollbar p-3 gap-2.5 lg:p-4 lg:gap-3">
+          <button id="tab-antrean" onclick="switchTab('antrean')" class="px-6 py-3.5 text-sm font-black text-purple-700 bg-white rounded-[1.2rem] shadow-sm border border-purple-100 flex items-center gap-2.5 transition-all whitespace-nowrap">
+            <i data-lucide="inbox" class="w-4 h-4"></i> Antrean Validasi <span id="badge-antrean" class="bg-rose-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm">0</span>
+          </button>
+          <button id="tab-database" onclick="switchTab('database')" class="px-6 py-3.5 text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-white/80 rounded-[1.2rem] transition-all flex items-center gap-2.5 whitespace-nowrap">
+            <i data-lucide="database" class="w-4 h-4"></i> Database Aktif
+          </button>
+          <button id="tab-head-accounts" onclick="switchTab('head-accounts')" class="px-6 py-3.5 text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-white/80 rounded-[1.2rem] transition-all flex items-center gap-2.5 whitespace-nowrap">
+            <i data-lucide="users" class="w-4 h-4"></i> Kelola Head Account
+          </button>
+          <button id="tab-paket" onclick="switchTab('paket')" class="px-6 py-3.5 text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-white/80 rounded-[1.2rem] transition-all flex items-center gap-2.5 whitespace-nowrap sm:ml-auto">
+            <i data-lucide="package" class="w-4 h-4"></i> Manajemen Paket
+          </button>
+        </div>
+
+        <!-- SECTION ANTREAN -->
+        <div id="section-antrean" class="overflow-x-auto block">
+          <table class="w-full text-left text-sm text-slate-600">
+            <thead class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-black border-b border-slate-100 tracking-[0.2em]">
+              <tr>
+                <th class="px-6 py-5">Waktu Masuk</th>
+                <th class="px-6 py-5">Info Pelanggan</th>
+                <th class="px-6 py-5">Layanan & Durasi</th>
+                <th class="px-6 py-5">Kode PIN</th>
+                <th class="px-6 py-5 text-center">Tindakan Admin</th>
+              </tr>
+            </thead>
+            <tbody id="table-antrean-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+
+        <!-- SECTION DATABASE AKTIF -->
+        <div id="section-database" class="overflow-x-auto hidden">
+          <table class="w-full text-left text-sm text-slate-600">
+            <thead class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-black border-b border-slate-100 tracking-[0.2em]">
+              <tr>
+                <th class="px-6 py-5">Pelanggan Aktif</th>
+                <th class="px-6 py-5">Durasi & Layanan</th>
+                <th class="px-6 py-5">Sisa Waktu</th>
+                <th class="px-6 py-5 text-center">Kelola</th>
+              </tr>
+            </thead>
+            <tbody id="table-database-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+
+        <!-- SECTION HEAD ACCOUNT -->
+        <div id="section-head-accounts" class="hidden p-8 lg:p-10">
+          <div class="flex justify-between items-center mb-8">
+             <div>
+                <h3 class="font-black text-slate-900 text-xl">Head Account (Gemini/Canva)</h3>
+                <p class="text-xs text-slate-500 mt-1">Akun induk / tim untuk invite member.</p>
+             </div>
+             <button onclick="document.getElementById('modal-add-head').classList.remove('hidden')" class="bg-purple-100 text-purple-700 px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Tambah Akun</button>
+          </div>
+          <div id="head-accounts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+
+        <!-- SECTION MANAJEMEN PAKET (BARU) -->
+        <div id="section-paket" class="hidden p-8 lg:p-10 bg-slate-50/30">
+          <div class="flex justify-between items-center mb-8">
+             <div>
+                <h3 class="font-black text-slate-900 text-xl">Manajemen Paket Dinamis</h3>
+                <p class="text-xs text-slate-500 mt-1">Tambahkan paket baru agar otomatis muncul di halaman depan website pembeli.</p>
+             </div>
+          </div>
+          
+          <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm mb-8 flex flex-col sm:flex-row gap-3">
+             <input type="text" id="new-pkg-name" placeholder="Nama Paket (cth: Paket Promo Tahunan)" class="flex-1 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-purple-400">
+             <input type="number" id="new-pkg-duration" placeholder="Durasi (Bulan)" class="w-full sm:w-40 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-purple-400">
+             <button onclick="addPackage()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl text-sm font-black shadow-lg shadow-emerald-500/20 whitespace-nowrap active:scale-95 transition-all">Tambah Paket</button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4" id="packages-list-grid">
+             <!-- Daftar paket dimuat via JS -->
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- HAK CIPTA -->
+    <div id="digitalhub-copyright" style="text-align:center; padding:15px; font-size:11px; color:#94a3b8; border-top:1px solid #e2e8f0; margin-top:auto;">
+      &copy; 2026 <b>DigitalHub Store Manager</b>. All Rights Reserved. Protected System.
+    </div>
+  </div>
+
+  <!-- MODALS -->
+  <div id="pin-result-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onclick="closePinModal()"></div>
+      <div class="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm p-8 text-center space-y-6">
+          <div class="w-16 h-16 mx-auto bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center border-4 border-emerald-100/50"><i data-lucide="check-circle-2" class="w-8 h-8"></i></div>
+          <div><h3 class="font-black text-xl">PIN Dibuat!</h3><p id="pin-duration-label" class="text-xs font-bold text-slate-500 mt-1">...</p></div>
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 cursor-pointer shadow-inner" onclick="copyPin()">
+              <p id="generated-pin" class="text-xl font-mono font-black text-purple-600 tracking-widest">GEM-...</p>
+          </div>
+          <p id="copy-status" class="text-[10px] text-emerald-600 font-black opacity-0 uppercase">Disalin!</p>
+          <button onclick="closePinModal()" class="w-full py-3 bg-slate-100 text-slate-700 font-black rounded-xl text-sm uppercase">Tutup</button>
+      </div>
+  </div>
+
+  <!-- Modal Tambah Head -->
+  <div id="modal-add-head" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="document.getElementById('modal-add-head').classList.add('hidden')"></div>
+    <div class="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 space-y-6">
+      <h3 class="font-black text-xl">Tambah Akun Head</h3>
+      <input type="email" id="new-head-email" placeholder="email_head@gmail.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none" />
+      <div class="flex gap-2">
+        <button onclick="document.getElementById('modal-add-head').classList.add('hidden')" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-xs uppercase">Batal</button>
+        <button id="btn-save-head" onclick="addHeadAccount()" class="w-full py-3 bg-slate-900 text-white font-black rounded-xl text-xs uppercase">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal ACC -->
+  <div id="modal-select-head" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeAccModal()"></div>
+    <div class="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 space-y-5">
+      <h3 class="font-black text-xl">ACC Pesanan</h3>
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+        <p class="text-[10px] font-bold text-slate-400 uppercase">Pelanggan & Produk</p>
+        <p id="modal-target-email" class="font-black text-slate-800 text-sm mt-1"></p>
+        <p id="modal-target-paket" class="text-xs text-purple-600 font-black mt-1 uppercase"></p>
+      </div>
+      
+      <div>
+        <label class="text-[10px] font-bold text-slate-700 block uppercase mb-1">Gunakan Head Account</label>
+        <select id="select-head-account" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none"></select>
+      </div>
+      
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeAccModal()" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-xs uppercase">Batal</button>
+        <button id="btn-confirm-acc" onclick="confirmAcc()" class="w-full py-3 bg-emerald-500 text-white font-black rounded-xl text-xs flex justify-center items-center gap-2 uppercase"><i data-lucide="check" class="w-4 h-4"></i> ACC & Buka Gmail</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT UTAMA -->
+  <script>
+    // Koneksi ke API Worker Baru
+    const encodedApi = btoa("https://api-activator.achachelsea58.workers.dev");
+    const API_URL = atob(encodedApi);
+    
+    let headAccounts = [];
+    let packagesList = [];
+    let currentEmailToApprove = null;
+    let currentProdToApprove = "";
+    let currentDurationToApprove = 0;
+    let dashboardInterval = null;
+    let isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
+
+    window.onload = function() {
+      if(typeof lucide !== 'undefined') lucide.createIcons();
+      if (isLoggedIn) showDashboard();
+    };
+
+    function copyToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).catch(()=>{});
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text; document.body.appendChild(textArea); textArea.select();
+        try { document.execCommand('copy'); } catch (err) {} textArea.remove();
+      }
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('login-user').value.trim();
+      const pass = document.getElementById('login-pass').value.trim();
+      if (user === 'admin' && pass === 'superadmin') {
+        sessionStorage.setItem('admin_logged_in', 'true');
+        isLoggedIn = true; showDashboard();
+      } else { alert("Akses Ditolak!"); }
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem('admin_logged_in'); isLoggedIn = false;
+      if (dashboardInterval) clearInterval(dashboardInterval);
+      document.getElementById('main-admin-content').classList.add('hidden');
+      document.getElementById('main-admin-content').classList.remove('flex');
+      document.getElementById('admin-login-screen').classList.remove('hidden');
+      document.getElementById('admin-login-screen').classList.add('flex');
+    }
+
+    function showDashboard() {
+      document.getElementById('admin-login-screen').classList.add('hidden');
+      document.getElementById('admin-login-screen').classList.remove('flex');
+      document.getElementById('main-admin-content').classList.remove('hidden');
+      document.getElementById('main-admin-content').classList.add('flex');
+
+      fetchHeadAccounts(); 
+      fetchPackages(); 
+      fetchAdminData();
+      if (dashboardInterval) clearInterval(dashboardInterval);
+      dashboardInterval = setInterval(fetchAdminData, 5000); 
+    }
+
+    // --- MANAJEMEN PAKET (DINAMIS) ---
+    async function fetchPackages() {
+      if(!isLoggedIn) return;
+      try {
+        const res = await fetch(`${API_URL}/api/gemini/packages`);
+        const result = await res.json();
+        if (result.success) {
+          packagesList = result.data || [];
+          renderPackages();
+          
+          // Update opsi durasi di form Generate PIN
+          const pinSelect = document.getElementById('pin-duration');
+          pinSelect.innerHTML = packagesList.map(p => `<option value="${p.duration}">${p.name} (${p.duration} Bln)</option>`).join('');
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    function renderPackages() {
+      const grid = document.getElementById('packages-list-grid');
+      if (packagesList.length === 0) { grid.innerHTML = `<p class="text-sm text-slate-400">Belum ada paket.</p>`; return; }
+      grid.innerHTML = packagesList.map(p => `
+        <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm relative flex flex-col">
+           <button onclick="deletePackage('${p.id}')" class="absolute top-2 right-2 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+           <p class="font-black text-sm text-slate-800 pr-8">${p.name}</p>
+           <p class="text-xs text-purple-600 font-bold mt-1">${p.duration} Bulan</p>
+        </div>
+      `).join('');
+      if(typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    async function addPackage() {
+      const name = document.getElementById('new-pkg-name').value.trim();
+      const duration = document.getElementById('new-pkg-duration').value.trim();
+      if (!name || !duration) { alert("Isi nama dan durasi paket!"); return; }
+      
+      try {
+        await fetch(`${API_URL}/api/gemini/admin/packages`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, duration })
+        });
+        document.getElementById('new-pkg-name').value = '';
+        document.getElementById('new-pkg-duration').value = '';
+        fetchPackages();
+      } catch(e) { alert("Error menyimpan paket."); }
+    }
+
+    async function deletePackage(id) {
+      if(confirm("Hapus paket ini dari daftar?")) {
+        await fetch(`${API_URL}/api/gemini/admin/packages`, {
+          method: "DELETE", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id })
+        });
+        fetchPackages();
+      }
+    }
+
+    // --- PENGAMBILAN DATA ANTREAN ---
+    async function fetchAdminData() {
+      if(!isLoggedIn) return;
+      try {
+        const response = await fetch(`${API_URL}/api/gemini/admin/requests`); // Endpoint semua request
+        const result = await response.json();
+        if (result.success) {
+          const allData = result.data || [];
+          const pending = allData.filter(d => d.status === "PENDING");
+          const active = allData.filter(d => d.status === "ACCEPTED");
+          
+          renderAntrean(pending);
+          renderDatabase(active);
+          
+          document.getElementById('stat-pending-count').innerText = pending.length;
+          document.getElementById('badge-antrean').innerText = pending.length;
+          document.getElementById('stat-active-count').innerText = active.length;
+        }
+      } catch (e) {}
+    }
+
+    function renderAntrean(list) {
+      const tbody = document.getElementById('table-antrean-body');
+      if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400">Tidak ada antrean validasi.</td></tr>`; return; }
+      tbody.innerHTML = list.map(item => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-6 py-4 text-xs font-bold text-slate-400">${new Date(item.createdAt).toLocaleDateString()}</td>
+          <td class="px-6 py-4">
+            <div class="font-black text-slate-800">${item.email}</div>
+            <a href="https://wa.me/${item.wa}" target="_blank" class="text-[10px] text-emerald-600 font-bold"><i data-lucide="phone" class="w-3 h-3 inline"></i> ${item.wa}</a>
+          </td>
+          <td class="px-6 py-4">
+            <span class="bg-purple-50 text-purple-700 font-black px-3 py-1 rounded text-[10px] uppercase">${item.productName || 'Gemini Pro'} - ${item.durationMonths} Bln</span>
+          </td>
+          <td class="px-6 py-4"><span class="font-mono text-xs font-black bg-slate-100 px-2 py-1 rounded">${item.pin}</span></td>
+          <td class="px-6 py-4 flex gap-2 justify-center">
+            <button onclick="openAccModal('${item.email}', '${item.productName || 'Gemini Pro'}', ${item.durationMonths})" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-black">ACC</button>
+            <button onclick="rejectAction('${item.email}')" class="bg-white border border-rose-200 text-rose-500 px-4 py-2 rounded-lg text-xs font-black">Tolak</button>
+          </td>
+        </tr>
+      `).join('');
+      if(typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function renderDatabase(list) {
+      const tbody = document.getElementById('table-database-body');
+      if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-10 text-center text-slate-400">Belum ada pelanggan aktif.</td></tr>`; return; }
+      tbody.innerHTML = list.map(item => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-6 py-4 font-black text-slate-800">${item.email}</td>
+          <td class="px-6 py-4 text-xs font-bold">${item.productName || 'Gemini Pro'} (${item.durationMonths} Bln)</td>
+          <td class="px-6 py-4 text-[10px] font-black text-emerald-600">AKTIF</td>
+          <td class="px-6 py-4 text-center">
+             <button onclick="rejectAction('${item.email}')" class="text-rose-500 text-[10px] font-bold px-3 py-1 bg-rose-50 rounded">Hapus</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // --- ACC & BUKA GMAIL ---
+    function openAccModal(email, product, duration) {
+      if(headAccounts.length === 0) { alert("Tambah Akun Head dulu di Tab Kelola Head Account!"); return; }
+      currentEmailToApprove = email;
+      currentProdToApprove = product;
+      currentDurationToApprove = duration;
+      
+      document.getElementById('modal-target-email').innerText = email;
+      document.getElementById('modal-target-paket').innerText = `${product} - ${duration} BULAN`;
+      
+      document.getElementById('select-head-account').innerHTML = headAccounts.map(h => `<option value="${h.email}">${h.email}</option>`).join('');
+      document.getElementById('modal-select-head').classList.remove('hidden');
+    }
+
+    function closeAccModal() { document.getElementById('modal-select-head').classList.add('hidden'); }
+
+    async function confirmAcc() {
+      const btn = document.getElementById('btn-confirm-acc');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Memproses...`; btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_URL}/api/gemini/admin/accept`, { 
+            method: "POST", headers: { "Content-Type": "application/json" }, 
+            body: JSON.stringify({ email: currentEmailToApprove }) 
+        });
+        const result = await res.json();
+        
+        if (result.success) {
+          closeAccModal();
+          fetchAdminData();
+          copyToClipboard(currentEmailToApprove);
+          
+          // Format Link Buka Gmail Otomatis
+          const subject = encodeURIComponent(`Aktivasi ${currentProdToApprove} DigitalHub`);
+          const body = encodeURIComponent(`Halo Kak,\n\nPesanan Aktivasi ${currentProdToApprove} untuk durasi ${currentDurationToApprove} Bulan telah kami ACC.\n\nSilakan terima undangan (invite) dari kami untuk mulai menggunakan fitur premium.\n\nTerima kasih!`);
+          const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${currentEmailToApprove}&su=${subject}&body=${body}`;
+          
+          alert(`✅ BERHASIL DI-ACC!\n\nEmail pelanggan: ${currentEmailToApprove}\n\nSilakan cek pesan masuk di tab Gmail yang akan terbuka untuk mengirim undangan (Invite).`);
+          
+          window.open(gmailUrl, '_blank');
+        } else { alert(result.message); }
+      } catch (e) { alert("Error koneksi jaringan."); } 
+      finally { btn.innerHTML = originalText; btn.disabled = false; if(typeof lucide !== 'undefined') lucide.createIcons(); }
+    }
+
+    async function rejectAction(email) {
+      if(confirm('Hapus/Tolak pesanan ini?')) {
+        await fetch(`${API_URL}/api/gemini/admin/reject`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+        fetchAdminData();
+      }
+    }
+
+    // --- TAB NAVIGASI ---
+    function switchTab(tabName) {
+      ['antrean', 'database', 'head-accounts', 'paket'].forEach(tab => {
+          const btn = document.getElementById('tab-' + tab);
+          const sec = document.getElementById('section-' + tab);
+          if (tab === tabName) {
+              btn.className = "px-6 py-3.5 text-sm font-black text-purple-700 bg-white rounded-[1.2rem] shadow-sm border border-purple-100 flex items-center gap-2.5 transition-all whitespace-nowrap" + (tab === 'paket' || tab === 'head-accounts' ? " sm:ml-auto" : "");
+              sec.classList.remove('hidden');
+          } else {
+              btn.className = "px-6 py-3.5 text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-white/80 rounded-[1.2rem] transition-all flex items-center gap-2.5 whitespace-nowrap" + (tab === 'paket' || tab === 'head-accounts' ? " sm:ml-auto" : "");
+              sec.classList.add('hidden');
+          }
+      });
+    }
+
+    // --- GENERATE PIN ---
+    async function generatePin() {
+      const prodSelect = document.getElementById('pin-product');
+      const durationSelect = document.getElementById('pin-duration');
+      
+      const product = prodSelect.value;
+      const duration = durationSelect.value;
+      const durationLabel = durationSelect.options[durationSelect.selectedIndex]?.text || `${duration} Bulan`;
+      
+      const randomString = Math.random().toString(36).substring(2, 6).toUpperCase();
+      // Prefix disesuaikan agar mudah dibaca: GEM, CNV, YTB
+      const prefix = product === 'Canva Pro' ? 'CNV' : (product === 'YouTube Premium' ? 'YTB' : 'GEM');
+      const newPin = `${prefix}${duration}-${randomString}`;
+      
+      try {
+          await fetch(`${API_URL}/api/gemini/admin/generate-pin`, { 
+              method: "POST", headers: { "Content-Type": "application/json" }, 
+              body: JSON.stringify({ pin: newPin, durationMonths: duration, productName: product }) 
+          });
+          document.getElementById('pin-duration-label').innerText = `Paket: ${product} (${durationLabel})`;
+          document.getElementById('generated-pin').innerText = newPin;
+          document.getElementById('pin-result-modal').classList.remove('hidden');
+          document.getElementById('copy-status').classList.remove('opacity-100');
+      } catch (e) { alert("Gagal menyimpan PIN ke database."); }
+    }
+    function closePinModal() { document.getElementById('pin-result-modal').classList.add('hidden'); }
+    function copyPin() {
+        copyToClipboard(document.getElementById('generated-pin').innerText);
+        document.getElementById('copy-status').classList.add('opacity-100');
+        setTimeout(() => { document.getElementById('copy-status').classList.remove('opacity-100'); }, 2000);
+    }
+
+    // --- KELOLA HEAD (Simulasi/Mock) ---
+    async function fetchHeadAccounts() { headAccounts = [{ email: "head1@gmail.com", activeCount: 2 }]; renderHeadAccounts(); }
+    function renderHeadAccounts() {
+      const grid = document.getElementById('head-accounts-grid');
+      grid.innerHTML = headAccounts.map(h => `<div class="bg-white border border-slate-200 p-5 rounded-xl shadow-sm"><p class="font-black">${h.email}</p></div>`).join('');
+    }
+    async function addHeadAccount() { alert("Fitur Head tersimpan."); document.getElementById('modal-add-head').classList.add('hidden'); }
+
+  </script>
+
+  <!-- SKRIP PROTEKSI -->
+  <script>
+    document.addEventListener('contextmenu', e => e.preventDefault()); 
+    document.addEventListener('keydown', function(e) {
+      if (e.keyCode===123 || (e.ctrlKey && e.shiftKey && (e.keyCode===73||e.keyCode===74||e.keyCode===67)) || (e.ctrlKey && (e.keyCode===85||e.keyCode===83))) {
+        e.preventDefault(); window.location.href="about:blank"; return false;
+      }
+    });
+  </script>
+</body>
+</html>
