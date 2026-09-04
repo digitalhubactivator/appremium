@@ -128,6 +128,7 @@
           </button>
         </div>
 
+        <!-- TAB ANTREAN -->
         <div id="section-antrean" class="overflow-x-auto block">
           <table class="w-full text-left text-sm text-slate-600">
             <thead class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-black border-b border-slate-100 tracking-[0.2em]">
@@ -143,6 +144,7 @@
           </table>
         </div>
 
+        <!-- TAB DATABASE (SISA HARI) -->
         <div id="section-database" class="overflow-x-auto hidden">
           <table class="w-full text-left text-sm text-slate-600">
             <thead class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-black border-b border-slate-100 tracking-[0.2em]">
@@ -175,7 +177,6 @@
                 <p class="text-xs text-slate-500 mt-1">Tambahkan paket baru beserta harganya agar otomatis muncul di halaman depan.</p>
              </div>
           </div>
-          
           <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm mb-8 flex flex-col sm:flex-row gap-3">
              <input type="hidden" id="edit-pkg-id" value="">
              <select id="new-pkg-product" class="w-full sm:w-48 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
@@ -210,13 +211,20 @@
       </div>
   </div>
 
+  <!-- MODAL ACC PESANAN (TOMBOL COPY KECIL) -->
   <div id="modal-select-head" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeAccModal()"></div>
     <div class="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 space-y-5">
       <h3 class="font-black text-xl">ACC Pesanan</h3>
       <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
         <p class="text-[10px] font-bold text-slate-400 uppercase">Pelanggan & Produk</p>
-        <p id="modal-target-email" class="font-black text-slate-800 text-sm mt-1"></p>
+        <div class="flex items-center gap-2 mt-1">
+          <p id="modal-target-email" class="font-black text-slate-800 text-sm"></p>
+          <!-- TOMBOL COPY KECIL MANUAL -->
+          <button onclick="copyToClipboard(currentEmailToApprove); alert('Email berhasil disalin!');" class="p-1 bg-purple-100 text-purple-600 rounded hover:bg-purple-200 transition" title="Copy Email">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
         <p id="modal-target-paket" class="text-xs text-purple-600 font-black mt-1 uppercase"></p>
       </div>
       <div>
@@ -256,6 +264,16 @@
         textArea.value = text; document.body.appendChild(textArea); textArea.select();
         try { document.execCommand('copy'); } catch (err) {} textArea.remove();
       }
+    }
+
+    function hitungSisaHari(acceptedAt, durationMonths) {
+        if (!acceptedAt) return durationMonths * 30; // Fallback jika data lama
+        const start = new Date(acceptedAt);
+        const end = new Date(start.getTime());
+        end.setMonth(end.getMonth() + parseInt(durationMonths));
+        const diffTime = end - new Date();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays > 0 ? diffDays : 0;
     }
 
     function handleAdminLogin(e) {
@@ -413,17 +431,20 @@
       if(typeof lucide !== 'undefined') lucide.createIcons();
     }
 
+    // PERUBAHAN: Render Sisa Waktu di Database (Hitung Mundur Angka)
     function renderDatabase(list) {
       const tbody = document.getElementById('table-database-body');
       if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-10 text-center text-slate-400">Belum ada pelanggan aktif.</td></tr>`; return; }
-      tbody.innerHTML = list.map(item => `
+      tbody.innerHTML = list.map(item => {
+        const sisaHari = hitungSisaHari(item.acceptedAt, item.durationMonths);
+        return `
         <tr class="hover:bg-slate-50 transition">
           <td class="px-6 py-4 font-black text-slate-800">${item.email}</td>
           <td class="px-6 py-4 text-xs font-bold">${item.productName || 'Gemini Pro'} (${item.durationMonths} Bln)</td>
-          <td class="px-6 py-4 text-[10px] font-black text-emerald-600">AKTIF</td>
-          <td class="px-6 py-4 text-center"><button onclick="rejectAction('${item.email}')" class="text-rose-500 text-[10px] font-bold px-3 py-1 bg-rose-50 rounded">Hapus</button></td>
+          <td class="px-6 py-4 text-xs font-black text-emerald-600 bg-emerald-50 rounded-lg text-center w-24">${sisaHari} Hari</td>
+          <td class="px-6 py-4 text-center"><button onclick="rejectAction('${item.email}')" class="text-rose-500 text-[10px] font-bold px-3 py-1 bg-rose-50 rounded hover:bg-rose-100">Hapus</button></td>
         </tr>
-      `).join('');
+      `}).join('');
     }
 
     function openAccModal(email, product, duration) {
@@ -438,11 +459,14 @@
 
     function closeAccModal() { document.getElementById('modal-select-head').classList.add('hidden'); }
 
-    // ====== PERUBAHAN UTAMA: Fungsi Konfirmasi ACC ======
+    // PERUBAHAN: Bypass Popup Blocker & Jangan Copy Otomatis
     async function confirmAcc() {
       const btn = document.getElementById('btn-confirm-acc');
       const originalText = btn.innerHTML;
       btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Memproses...`; btn.disabled = true;
+
+      // BYPASS POPUP BLOCKER: Buka tab kosong dulu saat tombol diklik
+      const newTab = window.open("about:blank", "_blank");
 
       try {
         const res = await fetch(`${API_URL}/api/gemini/admin/accept`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: currentEmailToApprove }) });
@@ -451,20 +475,20 @@
         if (result.success) {
           closeAccModal(); fetchAdminData(); 
           
-          // 1. Copy Email Pelanggan Secara Otomatis
-          copyToClipboard(currentEmailToApprove);
-          
-          // 2. Redirect cerdas berdasarkan Produk
           let inviteLink = "https://myaccount.google.com/family/details";
-          if(currentProdToApprove.toLowerCase().includes("canva")) {
-              inviteLink = "https://www.canva.com/settings/members";
-          }
+          if(currentProdToApprove.toLowerCase().includes("canva")) inviteLink = "https://www.canva.com/settings/members";
           
-          alert(`✅ BERHASIL DI-ACC!\n\nEmail pelanggan: ${currentEmailToApprove}\n(Telah disalin otomatis ke clipboard HP/Laptop Anda).\n\nSilakan tekan CTRL+V atau Paste di halaman yang akan terbuka untuk mengirim undangan.`);
-          window.open(inviteLink, '_blank');
+          // Arahkan tab kosong ke link asli
+          if(newTab) newTab.location.href = inviteLink;
 
-        } else { alert(result.message); }
-      } catch (e) { alert("Error koneksi jaringan."); } 
+        } else { 
+          if(newTab) newTab.close();
+          alert(result.message); 
+        }
+      } catch (e) { 
+        if(newTab) newTab.close();
+        alert("Error koneksi jaringan."); 
+      } 
       finally { btn.innerHTML = originalText; btn.disabled = false; if(typeof lucide !== 'undefined') lucide.createIcons(); }
     }
 
@@ -517,7 +541,6 @@
         setTimeout(() => { document.getElementById('copy-status').classList.remove('opacity-100'); }, 2000);
     }
 
-    // --- KELOLA HEAD (Mock) ---
     async function fetchHeadAccounts() { headAccounts = [{ email: "head1@gmail.com", activeCount: 2 }]; renderHeadAccounts(); }
     function renderHeadAccounts() { document.getElementById('head-accounts-grid').innerHTML = headAccounts.map(h => `<div class="bg-white border border-slate-200 p-5 rounded-xl shadow-sm"><p class="font-black">${h.email}</p></div>`).join(''); }
   </script>
