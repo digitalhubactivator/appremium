@@ -69,9 +69,43 @@
     </div>
   </header>
 
-  <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 space-y-8 sm:space-y-12 animate-fade-up">
+  <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 space-y-8 animate-fade-up">
     
-    <div class="text-center space-y-4 sm:space-y-6 w-full max-w-3xl mx-auto mt-2 px-2">
+    <!-- ========================================== -->
+    <!-- ADSTERRA SLOT 1 (BANNER ATAS SMART/RESPONSIVE) -->
+    <!-- ========================================== -->
+    <div class="w-full flex justify-center mb-4 sm:mb-6">
+        <!-- Tampil HANYA di PC/Tablet (Ukuran 728x90) -->
+        <div class="hidden md:flex flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-2 rounded-xl shadow-sm border border-slate-200/50">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '9bf61f68ebce3a8e4d015c67c59f19c1',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="https://www.highrevenueformat.com/9bf61f68ebce3a8e4d015c67c59f19c1/invoke.js"></script>
+        </div>
+
+        <!-- Tampil HANYA di HP (Ukuran 320x50) -->
+        <div class="flex md:hidden flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-1.5 rounded-lg shadow-sm border border-slate-200/50">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '453e0b2e0d1c62e5be6eaed0235e474d',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="https://www.highrevenueformat.com/453e0b2e0d1c62e5be6eaed0235e474d/invoke.js"></script>
+        </div>
+    </div>
+    <!-- ========================================== -->
+
+    <div class="text-center space-y-4 sm:space-y-6 w-full max-w-3xl mx-auto px-2 mt-0">
       <span class="inline-flex items-center gap-1.5 bg-white text-slate-800 border border-slate-200 text-[9px] sm:text-[10px] lg:text-xs font-black px-3 sm:px-4 py-1 sm:py-1.5 lg:py-2 rounded-full uppercase tracking-widest shadow-sm">
         <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-slate-800 animate-pulse"></div>
         Aktivasi Lintas Layanan
@@ -106,10 +140,44 @@
       <div id="packages-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 w-full max-w-lg md:max-w-none mx-auto">
         <div class="col-span-full py-10 flex flex-col items-center justify-center text-slate-400">
             <i data-lucide="loader-2" class="w-8 h-8 animate-spin mb-2"></i>
-            <span class="text-xs font-bold">Memuat daftar harga...</span>
+            <span class="text-xs font-bold mt-2">Memuat daftar harga...</span>
         </div>
       </div>
     </div>
+
+    <!-- ========================================== -->
+    <!-- ADSTERRA SLOT 2 (BANNER BAWAH SMART/RESPONSIVE) -->
+    <!-- ========================================== -->
+    <div class="w-full flex justify-center mt-10 mb-4">
+        <!-- Tampil HANYA di PC/Tablet (Ukuran 728x90) -->
+        <div class="hidden md:flex flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-2 rounded-xl shadow-sm border border-slate-200/50">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '9bf61f68ebce3a8e4d015c67c59f19c1',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="https://www.highrevenueformat.com/9bf61f68ebce3a8e4d015c67c59f19c1/invoke.js"></script>
+        </div>
+
+        <!-- Tampil HANYA di HP (Ukuran 320x50) -->
+        <div class="flex md:hidden flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-1.5 rounded-lg shadow-sm border border-slate-200/50">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '453e0b2e0d1c62e5be6eaed0235e474d',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="https://www.highrevenueformat.com/453e0b2e0d1c62e5be6eaed0235e474d/invoke.js"></script>
+        </div>
+    </div>
+    <!-- ========================================== -->
 
     <!-- FORM AKTIVASI -->
     <div id="activation-section" class="bg-white border border-slate-100 rounded-3xl p-5 sm:p-8 lg:p-10 w-full max-w-2xl mx-auto space-y-6 hidden shadow-2xl relative overflow-hidden transition-all duration-500 transform translate-y-4">
@@ -144,6 +212,11 @@
       </button>
     </div>
   </main>
+
+  <!-- HAK CIPTA -->
+  <div id="digitalhub-copyright" style="text-align:center; padding:15px; font-size:11px; color:#94a3b8; border-top:1px solid #e2e8f0; margin-top:auto;">
+    &copy; 2026 <b>DigitalHub Store Manager</b>. All Rights Reserved. Protected System.
+  </div>
 
   <script>
     const encodedApi = btoa("https://api-activator.achachelsea58.workers.dev");
@@ -183,8 +256,6 @@
 
     function renderPackages() {
       const grid = document.getElementById('packages-grid');
-      
-      // TAMBAHAN: Menyaring paket agar hanya muncul sesuai Tab yang sedang aktif
       const filteredPkgs = packagesData.filter(p => (p.product || 'Gemini Pro') === activeProduct);
 
       if(filteredPkgs.length === 0) {
@@ -248,8 +319,7 @@
       document.getElementById('activation-section').classList.add('hidden');
       document.querySelectorAll('.pkg-card').forEach(card => card.classList.remove('active', 'scale-[1.02]'));
       selectedMonths = 0;
-
-      // TAMBAHAN PENTING: Render ulang paket ketika tab diklik
+      
       renderPackages(); 
     }
 
@@ -294,6 +364,16 @@
       } catch (e) { showToast('Koneksi terputus. Pastikan internet stabil.', 'error'); } 
       finally { btn.innerHTML = origText; btn.disabled = false; if(typeof lucide !== 'undefined') lucide.createIcons(); }
     }
+  </script>
+
+  <!-- SKRIP PROTEKSI -->
+  <script>
+    document.addEventListener('contextmenu', e => e.preventDefault()); 
+    document.addEventListener('keydown', function(e) {
+      if (e.keyCode===123 || (e.ctrlKey && e.shiftKey && (e.keyCode===73||e.keyCode===74||e.keyCode===67)) || (e.ctrlKey && (e.keyCode===85||e.keyCode===83))) {
+        e.preventDefault(); window.location.href="about:blank"; return false;
+      }
+    });
   </script>
 </body>
 </html>
