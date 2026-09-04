@@ -6,22 +6,18 @@
   <title>Admin Panel - DigitalHub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
   <style>
     * { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none; }
     input, textarea, select { -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; user-select: text !important; }
     img { -webkit-user-drag: none; user-drag: none; pointer-events: none; }
     button img, a img, .cursor-pointer img { pointer-events: auto; }
-
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     .bg-gemini-gradient { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); }
     .text-gemini { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
-    
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
   </style>
@@ -40,20 +36,19 @@
         </div>
         <h2 class="text-2xl font-black tracking-tight text-slate-900">Admin Login</h2>
       </div>
-
       <form onsubmit="handleAdminLogin(event)" class="space-y-4">
         <div class="space-y-1.5">
           <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Username</label>
           <div class="relative">
             <i data-lucide="user" class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="login-user" class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-500/10 transition-all shadow-inner" required autocomplete="off" />
+            <input type="text" id="login-user" class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-800 focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-500/10 transition-all shadow-inner" required autocomplete="off" />
           </div>
         </div>
         <div class="space-y-1.5 pb-2">
           <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Password</label>
           <div class="relative">
             <i data-lucide="key-round" class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
-            <input type="password" id="login-pass" class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-500/10 transition-all shadow-inner" required />
+            <input type="password" id="login-pass" class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-800 focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-500/10 transition-all shadow-inner" required />
           </div>
         </div>
         <button type="submit" class="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-black rounded-2xl text-xs uppercase tracking-widest transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2">
@@ -68,7 +63,7 @@
     <header class="w-full bg-white/70 backdrop-blur-xl border-b border-white/50 sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-5 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/20 relative overflow-hidden">
+          <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-lg relative overflow-hidden">
             <i data-lucide="layout-dashboard" class="w-5 h-5 lg:w-6 lg:h-6 relative z-10"></i>
           </div>
           <div>
@@ -86,9 +81,7 @@
       
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
         <div class="bg-white/80 backdrop-blur-sm p-6 lg:p-7 rounded-[2rem] border border-white shadow-sm flex items-center gap-5 transition-transform hover:-translate-y-1">
-          <div class="w-14 h-14 lg:w-16 lg:h-16 rounded-[1.2rem] bg-gradient-to-br from-amber-100 to-amber-50 text-amber-500 flex items-center justify-center border border-amber-200/50">
-            <i data-lucide="clock" class="w-7 h-7"></i>
-          </div>
+          <div class="w-14 h-14 lg:w-16 lg:h-16 rounded-[1.2rem] bg-gradient-to-br from-amber-100 to-amber-50 text-amber-500 flex items-center justify-center border border-amber-200/50"><i data-lucide="clock" class="w-7 h-7"></i></div>
           <div>
             <p class="text-[10px] lg:text-xs font-bold text-slate-400 uppercase tracking-widest">Menunggu ACC</p>
             <h4 id="stat-pending-count" class="text-3xl lg:text-4xl font-black text-slate-800 mt-1 tracking-tighter">0</h4>
@@ -96,9 +89,7 @@
         </div>
         
         <div class="bg-white/80 backdrop-blur-sm p-6 lg:p-7 rounded-[2rem] border border-white shadow-sm flex items-center gap-5 transition-transform hover:-translate-y-1">
-          <div class="w-14 h-14 lg:w-16 lg:h-16 rounded-[1.2rem] bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-500 flex items-center justify-center border border-emerald-200/50">
-            <i data-lucide="users" class="w-7 h-7"></i>
-          </div>
+          <div class="w-14 h-14 lg:w-16 lg:h-16 rounded-[1.2rem] bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-500 flex items-center justify-center border border-emerald-200/50"><i data-lucide="users" class="w-7 h-7"></i></div>
           <div>
             <p class="text-[10px] lg:text-xs font-bold text-slate-400 uppercase tracking-widest">Total Akun Aktif</p>
             <h4 id="stat-active-count" class="text-3xl lg:text-4xl font-black text-slate-800 mt-1 tracking-tighter">0</h4>
@@ -106,9 +97,7 @@
         </div>
         
         <div class="bg-white border border-purple-100/50 p-6 lg:p-7 rounded-[2rem] shadow-sm flex flex-col justify-center relative overflow-hidden transition-transform hover:-translate-y-1">
-          <p class="text-[10px] lg:text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 relative z-10 flex items-center gap-2">
-            <i data-lucide="key" class="w-4 h-4 text-purple-500"></i> Generate PIN Lisensi
-          </p>
+          <p class="text-[10px] lg:text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 relative z-10 flex items-center gap-2"><i data-lucide="key" class="w-4 h-4 text-purple-500"></i> Generate PIN Lisensi</p>
           <div class="space-y-2 relative z-10">
             <select id="pin-product" class="text-xs font-bold border border-slate-200 rounded-xl px-4 py-2.5 bg-slate-50 focus:outline-none w-full text-slate-700">
               <option value="Gemini Pro">Gemini Pro</option>
@@ -179,7 +168,6 @@
           <div id="head-accounts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </div>
 
-        <!-- MANAJEMEN PAKET (DENGAN HARGA & EDIT) -->
         <div id="section-paket" class="hidden p-8 lg:p-10 bg-slate-50/30">
           <div class="flex justify-between items-center mb-8">
              <div>
@@ -190,15 +178,19 @@
           
           <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm mb-8 flex flex-col sm:flex-row gap-3">
              <input type="hidden" id="edit-pkg-id" value="">
-             <input type="text" id="new-pkg-name" placeholder="Nama Paket (cth: Paket Promo)" class="flex-1 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
+             <select id="new-pkg-product" class="w-full sm:w-48 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
+               <option value="Gemini Pro">Gemini Pro</option>
+               <option value="Canva Pro">Canva Pro</option>
+               <option value="YouTube Premium">YouTube Premium</option>
+             </select>
+             <input type="text" id="new-pkg-name" placeholder="Nama Paket" class="flex-1 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
              <input type="number" id="new-pkg-duration" placeholder="Durasi (Bln)" class="w-full sm:w-32 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
              <input type="number" id="new-pkg-price" placeholder="Harga (Rp)" class="w-full sm:w-40 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
              <div class="flex gap-2">
                <button id="btn-cancel-edit" onclick="cancelEdit()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-3 rounded-xl text-sm font-black transition-all">Batal</button>
-               <button id="btn-save-pkg" onclick="savePackage()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl text-sm font-black shadow-lg shadow-emerald-500/20 whitespace-nowrap active:scale-95 transition-all">Tambah Paket</button>
+               <button id="btn-save-pkg" onclick="savePackage()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl text-sm font-black shadow-lg shadow-emerald-500/20 whitespace-nowrap active:scale-95 transition-all">Simpan</button>
              </div>
           </div>
-
           <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4" id="packages-list-grid"></div>
         </div>
 
@@ -212,9 +204,7 @@
       <div class="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm p-8 text-center space-y-6">
           <div class="w-16 h-16 mx-auto bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center border-4 border-emerald-100/50"><i data-lucide="check-circle-2" class="w-8 h-8"></i></div>
           <div><h3 class="font-black text-xl">PIN Dibuat!</h3><p id="pin-duration-label" class="text-xs font-bold text-slate-500 mt-1">...</p></div>
-          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 cursor-pointer shadow-inner" onclick="copyPin()">
-              <p id="generated-pin" class="text-xl font-mono font-black text-purple-600 tracking-widest">GEM-...</p>
-          </div>
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 cursor-pointer shadow-inner" onclick="copyPin()"><p id="generated-pin" class="text-xl font-mono font-black text-purple-600 tracking-widest">GEM-...</p></div>
           <p id="copy-status" class="text-[10px] text-emerald-600 font-black opacity-0 uppercase">Disalin!</p>
           <button onclick="closePinModal()" class="w-full py-3 bg-slate-100 text-slate-700 font-black rounded-xl text-sm uppercase">Tutup</button>
       </div>
@@ -235,7 +225,7 @@
       </div>
       <div class="flex gap-2 pt-2">
         <button onclick="closeAccModal()" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-xs uppercase">Batal</button>
-        <button id="btn-confirm-acc" onclick="confirmAcc()" class="w-full py-3 bg-emerald-500 text-white font-black rounded-xl text-xs flex justify-center items-center gap-2 uppercase"><i data-lucide="check" class="w-4 h-4"></i> ACC & Buka Gmail</button>
+        <button id="btn-confirm-acc" onclick="confirmAcc()" class="w-full py-3 bg-emerald-500 text-white font-black rounded-xl text-xs flex justify-center items-center gap-2 uppercase"><i data-lucide="check" class="w-4 h-4"></i> ACC Sekarang</button>
       </div>
     </div>
   </div>
@@ -292,15 +282,12 @@
       document.getElementById('admin-login-screen').classList.remove('flex');
       document.getElementById('main-admin-content').classList.remove('hidden');
       document.getElementById('main-admin-content').classList.add('flex');
-
-      fetchHeadAccounts(); 
-      fetchPackages(); 
-      fetchAdminData();
+      fetchHeadAccounts(); fetchPackages(); fetchAdminData();
       if (dashboardInterval) clearInterval(dashboardInterval);
       dashboardInterval = setInterval(fetchAdminData, 5000); 
     }
 
-    // --- MANAJEMEN PAKET (DENGAN HARGA & EDIT) ---
+    // --- MANAJEMEN PAKET ---
     async function fetchPackages() {
       if(!isLoggedIn) return;
       try {
@@ -321,9 +308,10 @@
       grid.innerHTML = packagesList.map(p => `
         <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm relative flex flex-col group">
            <div class="absolute top-2 right-2 flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-             <button onclick="editPackage('${p.id}', '${p.name}', ${p.duration}, ${p.price || 0})" class="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded transition" title="Edit"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+             <button onclick="editPackage('${p.id}', '${p.name}', ${p.duration}, ${p.price || 0}, '${p.product || 'Gemini Pro'}')" class="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded transition" title="Edit"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
              <button onclick="deletePackage('${p.id}')" class="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded transition" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
            </div>
+           <span class="text-[8px] bg-slate-100 text-slate-500 px-2 py-1 rounded mb-2 inline-block w-max uppercase font-bold">${p.product || 'Gemini Pro'}</span>
            <p class="font-black text-sm text-slate-800 pr-16 truncate">${p.name}</p>
            <p class="text-xs text-purple-600 font-bold mt-1">${p.duration} Bulan</p>
            <p class="text-sm text-emerald-600 font-black mt-1.5">Rp ${parseInt(p.price || 0).toLocaleString('id-ID')}</p>
@@ -334,6 +322,7 @@
 
     async function savePackage() {
       const id = document.getElementById('edit-pkg-id').value;
+      const product = document.getElementById('new-pkg-product').value;
       const name = document.getElementById('new-pkg-name').value.trim();
       const duration = document.getElementById('new-pkg-duration').value.trim();
       const price = document.getElementById('new-pkg-price').value.trim();
@@ -343,19 +332,19 @@
       try {
         await fetch(`${API_URL}/api/gemini/admin/packages`, {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id, name, duration, price })
+          body: JSON.stringify({ id, name, duration, price, product })
         });
-        cancelEdit(); 
-        fetchPackages(); 
+        cancelEdit(); fetchPackages(); 
       } catch(e) { alert("Error menyimpan paket."); }
     }
 
-    function editPackage(id, name, duration, price) {
+    function editPackage(id, name, duration, price, product) {
       document.getElementById('edit-pkg-id').value = id;
+      document.getElementById('new-pkg-product').value = product;
       document.getElementById('new-pkg-name').value = name;
       document.getElementById('new-pkg-duration').value = duration;
       document.getElementById('new-pkg-price').value = price;
-
+      
       const btnSave = document.getElementById('btn-save-pkg');
       btnSave.innerText = "Update Paket";
       btnSave.classList.replace("bg-emerald-500", "bg-blue-500");
@@ -366,10 +355,11 @@
 
     function cancelEdit() {
       document.getElementById('edit-pkg-id').value = "";
+      document.getElementById('new-pkg-product').value = "Gemini Pro";
       document.getElementById('new-pkg-name').value = "";
       document.getElementById('new-pkg-duration').value = "";
       document.getElementById('new-pkg-price').value = "";
-
+      
       const btnSave = document.getElementById('btn-save-pkg');
       btnSave.innerText = "Tambah Paket";
       btnSave.classList.replace("bg-blue-500", "bg-emerald-500");
@@ -380,10 +370,7 @@
 
     async function deletePackage(id) {
       if(confirm("Hapus paket ini dari daftar?")) {
-        await fetch(`${API_URL}/api/gemini/admin/packages`, {
-          method: "DELETE", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id })
-        });
+        await fetch(`${API_URL}/api/gemini/admin/packages`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
         fetchPackages();
       }
     }
@@ -451,6 +438,7 @@
 
     function closeAccModal() { document.getElementById('modal-select-head').classList.add('hidden'); }
 
+    // ====== PERUBAHAN UTAMA: Fungsi Konfirmasi ACC ======
     async function confirmAcc() {
       const btn = document.getElementById('btn-confirm-acc');
       const originalText = btn.innerHTML;
@@ -461,13 +449,20 @@
         const result = await res.json();
         
         if (result.success) {
-          closeAccModal(); fetchAdminData(); copyToClipboard(currentEmailToApprove);
-          const subject = encodeURIComponent(`Aktivasi ${currentProdToApprove} DigitalHub`);
-          const body = encodeURIComponent(`Halo Kak,\n\nPesanan Aktivasi ${currentProdToApprove} untuk durasi ${currentDurationToApprove} Bulan telah kami ACC.\n\nSilakan terima undangan (invite) dari kami.\n\nTerima kasih!`);
-          const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${currentEmailToApprove}&su=${subject}&body=${body}`;
+          closeAccModal(); fetchAdminData(); 
           
-          alert(`✅ BERHASIL DI-ACC!\n\nEmail pelanggan: ${currentEmailToApprove}\n\nSilakan cek pesan masuk di tab Gmail yang akan terbuka untuk mengirim undangan (Invite).`);
-          window.open(gmailUrl, '_blank');
+          // 1. Copy Email Pelanggan Secara Otomatis
+          copyToClipboard(currentEmailToApprove);
+          
+          // 2. Redirect cerdas berdasarkan Produk
+          let inviteLink = "https://myaccount.google.com/family/details";
+          if(currentProdToApprove.toLowerCase().includes("canva")) {
+              inviteLink = "https://www.canva.com/settings/members";
+          }
+          
+          alert(`✅ BERHASIL DI-ACC!\n\nEmail pelanggan: ${currentEmailToApprove}\n(Telah disalin otomatis ke clipboard HP/Laptop Anda).\n\nSilakan tekan CTRL+V atau Paste di halaman yang akan terbuka untuk mengirim undangan.`);
+          window.open(inviteLink, '_blank');
+
         } else { alert(result.message); }
       } catch (e) { alert("Error koneksi jaringan."); } 
       finally { btn.innerHTML = originalText; btn.disabled = false; if(typeof lucide !== 'undefined') lucide.createIcons(); }
@@ -497,7 +492,6 @@
     async function generatePin() {
       const prodSelect = document.getElementById('pin-product');
       const durationSelect = document.getElementById('pin-duration');
-      
       const product = prodSelect.value;
       const duration = durationSelect.value;
       const durationLabel = durationSelect.options[durationSelect.selectedIndex]?.text || `${duration} Bulan`;
@@ -526,16 +520,6 @@
     // --- KELOLA HEAD (Mock) ---
     async function fetchHeadAccounts() { headAccounts = [{ email: "head1@gmail.com", activeCount: 2 }]; renderHeadAccounts(); }
     function renderHeadAccounts() { document.getElementById('head-accounts-grid').innerHTML = headAccounts.map(h => `<div class="bg-white border border-slate-200 p-5 rounded-xl shadow-sm"><p class="font-black">${h.email}</p></div>`).join(''); }
-  </script>
-
-  <!-- SKRIP PROTEKSI -->
-  <script>
-    document.addEventListener('contextmenu', e => e.preventDefault()); 
-    document.addEventListener('keydown', function(e) {
-      if (e.keyCode===123 || (e.ctrlKey && e.shiftKey && (e.keyCode===73||e.keyCode===74||e.keyCode===67)) || (e.ctrlKey && (e.keyCode===85||e.keyCode===83))) {
-        e.preventDefault(); window.location.href="about:blank"; return false;
-      }
-    });
   </script>
 </body>
 </html>
