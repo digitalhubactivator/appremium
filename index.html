@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Portal Aktivasi Lisensi Digital</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; font-family: 'Plus Jakarta Sans', sans-serif; }
+    input, textarea, select { -webkit-user-select: text !important; user-select: text !important; }
+    img { -webkit-user-drag: none; user-drag: none; pointer-events: none; }
+    button img, a img, .cursor-pointer img { pointer-events: auto; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    
+    .bg-gemini-gradient { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); }
+    .text-gemini { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    .bg-canva-gradient { background: linear-gradient(135deg, #00C4CC 0%, #7D2AE8 100%); }
+    .bg-youtube-gradient { background: linear-gradient(135deg, #FF0000 0%, #990000 100%); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    /* SMART THEME */
+    .theme-gemini .pkg-card.active { border-color: #a855f7; box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.2); }
+    .theme-gemini .btn-pilih { background-color: #f3e8ff; color: #9333ea; }
+    .theme-gemini .pkg-card:hover .btn-pilih, .theme-gemini .pkg-card.active .btn-pilih { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); color: white; }
+    .theme-gemini .btn-submit { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); }
+
+    .theme-canva .pkg-card.active { border-color: #06b6d4; box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.2); }
+    .theme-canva .btn-pilih { background-color: #e0f2fe; color: #0284c7; }
+    .theme-canva .pkg-card:hover .btn-pilih, .theme-canva .pkg-card.active .btn-pilih { background: linear-gradient(135deg, #00C4CC 0%, #7D2AE8 100%); color: white; }
+    .theme-canva .btn-submit { background: linear-gradient(135deg, #00C4CC 0%, #7D2AE8 100%); }
+
+    .theme-youtube .pkg-card.active { border-color: #ef4444; box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.2); }
+    .theme-youtube .btn-pilih { background-color: #fee2e2; color: #dc2626; }
+    .theme-youtube .pkg-card:hover .btn-pilih, .theme-youtube .pkg-card.active .btn-pilih { background: linear-gradient(135deg, #FF0000 0%, #990000 100%); color: white; }
+    .theme-youtube .btn-submit { background: linear-gradient(135deg, #FF0000 0%, #990000 100%); }
+  </style>
+</head>
+<body id="app-body" class="theme-gemini bg-[#F8FAFC] text-slate-800 min-h-screen antialiased selection:bg-purple-200 selection:text-purple-900 relative overflow-x-hidden w-full flex flex-col transition-colors duration-500">
+
+  <div id="bg-glow" class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[400px] bg-purple-300/20 rounded-full blur-[100px] -z-10 pointer-events-none transition-colors duration-500"></div>
+  <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-[90%] max-w-xs"></div>
+
+  <header class="w-full bg-white/70 backdrop-blur-xl border-b border-white/50 p-3 sm:p-4 lg:py-5 sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-2 lg:px-4">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div id="header-icon" class="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl lg:rounded-2xl bg-gemini-gradient text-white flex items-center justify-center shadow-lg relative shrink-0 transition-all duration-500">
+          <i data-lucide="zap" class="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white relative z-10"></i>
+        </div>
+        <div>
+          <h1 class="font-black text-sm sm:text-base lg:text-xl tracking-tight text-slate-900 leading-none">DIGITAL<span class="text-gemini" id="header-title">HUB</span></h1>
+          <p class="text-[8px] sm:text-[10px] lg:text-xs text-slate-500 font-bold mt-0.5 sm:mt-1 tracking-wider sm:tracking-widest uppercase">Portal Aktivasi Lisensi</p>
+        </div>
+      </div>
+      <div>
+        <a href="cek-durasi.html" class="text-[10px] sm:text-xs lg:text-sm font-bold text-slate-600 hover:text-purple-700 bg-white border border-slate-200 hover:border-purple-200 px-3 sm:px-4 lg:px-5 py-2 lg:py-2.5 rounded-lg sm:rounded-xl transition-all flex items-center gap-1.5 sm:gap-2 shadow-sm whitespace-nowrap">
+          <i data-lucide="search" class="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-slate-400"></i>
+          <span>Cek Sisa Hari</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 space-y-8 sm:space-y-12 animate-fade-up">
+    
+    <div class="text-center space-y-4 sm:space-y-6 w-full max-w-3xl mx-auto mt-2 px-2">
+      <span class="inline-flex items-center gap-1.5 bg-white text-slate-800 border border-slate-200 text-[9px] sm:text-[10px] lg:text-xs font-black px-3 sm:px-4 py-1 sm:py-1.5 lg:py-2 rounded-full uppercase tracking-widest shadow-sm">
+        <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-slate-800 animate-pulse"></div>
+        Aktivasi Lintas Layanan
+      </span>
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter text-slate-900 drop-shadow-sm leading-tight">
+        Aktivasi Akun <br class="sm:hidden"><span id="hero-product-name" class="text-gemini transition-all duration-500">Gemini Pro</span>
+      </h2>
+      <p class="text-xs sm:text-sm lg:text-base text-slate-500 font-medium px-2 sm:px-4 max-w-2xl mx-auto">
+        Pilih layanan Anda, tentukan durasi, dan masukkan PIN aktivasi untuk mengaktifkan akun premium.
+      </p>
+    </div>
+
+    <!-- TABS PILIHAN PRODUK -->
+    <div class="flex justify-center w-full">
+      <div class="bg-white border border-slate-200 p-1.5 rounded-2xl sm:rounded-full shadow-sm flex flex-wrap sm:flex-nowrap gap-1.5 w-full sm:w-auto max-w-md">
+        <button onclick="setProduct('Gemini Pro')" id="tab-gemini" class="flex-1 px-4 py-3 rounded-xl sm:rounded-full text-xs font-black transition-all duration-300 bg-gemini-gradient text-white shadow-md">GEMINI PRO</button>
+        <button onclick="setProduct('Canva Pro')" id="tab-canva" class="flex-1 px-4 py-3 rounded-xl sm:rounded-full text-xs font-bold text-slate-500 hover:bg-slate-50 transition-all duration-300">CANVA PRO</button>
+        <button onclick="setProduct('YouTube Premium')" id="tab-youtube" class="flex-1 px-4 py-3 rounded-xl sm:rounded-full text-xs font-bold text-slate-500 hover:bg-slate-50 transition-all duration-300">YOUTUBE</button>
+      </div>
+    </div>
+
+    <div class="space-y-6 w-full">
+      <div class="flex items-center justify-center gap-3 mb-4 sm:mb-6">
+        <div class="h-[1px] w-8 sm:w-12 bg-gradient-to-r from-transparent to-slate-300"></div>
+        <h3 class="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5 whitespace-nowrap">
+          Pilih Durasi Paket
+        </h3>
+        <div class="h-[1px] w-8 sm:w-12 bg-gradient-to-l from-transparent to-slate-300"></div>
+      </div>
+      
+      <!-- GRID DURASI (DILOAD OTOMATIS OLEH JAVASCRIPT) -->
+      <div id="packages-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 w-full max-w-lg md:max-w-none mx-auto">
+        <!-- Loader Skeleton sebelum data ditarik -->
+        <div class="col-span-full py-10 flex flex-col items-center justify-center text-slate-400">
+            <i data-lucide="loader-2" class="w-8 h-8 animate-spin mb-2"></i>
+            <span class="text-xs font-bold">Memuat daftar paket dari server...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM AKTIVASI -->
+    <div id="activation-section" class="bg-white border border-slate-100 rounded-3xl p-5 sm:p-8 lg:p-10 w-full max-w-2xl mx-auto space-y-6 hidden shadow-2xl relative overflow-hidden transition-all duration-500 transform translate-y-4">
+      <div class="border-b border-slate-100 pb-4 flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-end">
+        <div>
+          <h3 class="font-black text-xl text-slate-900 tracking-tight">Detail Aktivasi</h3>
+          <p class="text-xs text-slate-500 font-medium">Lengkapi data untuk sinkronisasi pesanan.</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl text-center sm:text-right w-full sm:w-auto">
+          <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Aktivasi Untuk</span>
+          <span id="selected-package-label" class="text-xs sm:text-sm text-slate-800 font-black block mt-0.5">-</span>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="text-[10px] font-bold text-slate-700 uppercase tracking-widest mb-1.5 block">Email Pribadi</label>
+          <input type="email" id="buyer-email" placeholder="Contoh: emailkamu@gmail.com" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-slate-400 transition-all" />
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-700 uppercase tracking-widest mb-1.5 block">Nomor WhatsApp</label>
+          <input type="tel" id="buyer-wa" placeholder="Contoh: 081234567890" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-slate-400 transition-all" />
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-700 uppercase tracking-widest mb-1.5 block">PIN Aktivasi</label>
+          <input type="text" id="buyer-pin" placeholder="Contoh: GEM-XXXX-XXXX" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black uppercase tracking-wider focus:bg-white focus:outline-none focus:border-slate-400 transition-all" />
+        </div>
+      </div>
+
+      <button id="btn-submit" onclick="submitActivation()" class="btn-submit w-full py-4 text-white font-black uppercase tracking-widest rounded-xl shadow-lg text-sm transition-all duration-300 flex items-center justify-center gap-2">
+        <i data-lucide="zap" class="w-4 h-4"></i> Proses Sekarang
+      </button>
+    </div>
+  </main>
+
+  <script>
+    // API BARU Kakak
+    const encodedApi = btoa("https://api-activator.achachelsea58.workers.dev");
+    const API_URL = atob(encodedApi);
+
+    let activeProduct = 'Gemini Pro';
+    let selectedMonths = 0;
+    let packagesData = [];
+
+    window.onload = function() {
+      if(typeof lucide !== 'undefined') lucide.createIcons();
+      fetchPackages(); // Langsung tarik paket saat web dibuka
+    };
+
+    function showToast(msg, type='info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `${type === 'error' ? 'bg-rose-500' : 'bg-slate-800'} text-white text-xs font-bold px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 animate-fade-up w-full mx-auto z-50`;
+      toast.innerHTML = `<i data-lucide="${type === 'error' ? 'alert-circle' : 'check-circle'}" class="w-4 h-4"></i> <span>${msg}</span>`;
+      container.appendChild(toast);
+      if(typeof lucide !== 'undefined') lucide.createIcons();
+      setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
+    }
+
+    // FUNGSI MENGAMBIL PAKET DARI ADMIN
+    async function fetchPackages() {
+      try {
+        const res = await fetch(`${API_URL}/api/gemini/packages`);
+        const result = await res.json();
+        if(result.success) {
+            packagesData = result.data;
+            renderPackages();
+        }
+      } catch (e) {
+        document.getElementById('packages-grid').innerHTML = `<div class="col-span-full py-10 text-center text-rose-500 font-bold">Gagal memuat paket. Cek koneksi Anda.</div>`;
+      }
+    }
+
+    // FUNGSI MENAMPILKAN KOTAK PAKET KE LAYAR
+    function renderPackages() {
+      const grid = document.getElementById('packages-grid');
+      
+      if(packagesData.length === 0) {
+          grid.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 font-bold">Belum ada paket tersedia.</div>`;
+          return;
+      }
+
+      grid.innerHTML = packagesData.map((pkg, index) => `
+        <div onclick="selectPackage(${pkg.duration}, '${pkg.name}')" class="pkg-card relative bg-white/80 border-2 border-slate-100 rounded-2xl sm:rounded-3xl p-3 sm:p-5 cursor-pointer transition-all duration-300 text-center hover:-translate-y-1 flex flex-col justify-between h-full group">
+          <div>
+            <span class="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1 truncate">${pkg.name}</span>
+            <h4 class="text-2xl sm:text-3xl font-black text-slate-800 mt-1 mb-3">${pkg.duration} <span class="text-base sm:text-lg">Bln</span></h4>
+          </div>
+          <div class="mt-auto">
+            <span class="btn-pilih block w-full py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300">Pilih Paket</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // FUNGSI GANTI PRODUK (SMART THEME)
+    function setProduct(productName) {
+      activeProduct = productName;
+      
+      const appBody = document.getElementById('app-body');
+      appBody.classList.remove('theme-gemini', 'theme-canva', 'theme-youtube');
+
+      const tabGemini = document.getElementById('tab-gemini');
+      const tabCanva = document.getElementById('tab-canva');
+      const tabYoutube = document.getElementById('tab-youtube');
+      
+      [tabGemini, tabCanva, tabYoutube].forEach(tab => {
+        tab.className = "flex-1 px-4 py-3 rounded-xl sm:rounded-full text-xs font-bold text-slate-500 hover:bg-slate-50 transition-all duration-300";
+      });
+
+      const heroName = document.getElementById('hero-product-name');
+      const headerIcon = document.getElementById('header-icon');
+      const bgGlow = document.getElementById('bg-glow');
+
+      if (productName === 'Gemini Pro') {
+        appBody.classList.add('theme-gemini');
+        tabGemini.className = "flex-1 px-4 py-3 rounded-xl sm:rounded-full text-xs font-black bg-gemini-gradient text-white shadow-md transition-all duration-300";
+        heroName.className = "text-gemini transition-all duration-500";
+        headerIcon.className = "w-10 h-10 rounded-xl bg-gemini-gradient text-white flex items-center justify-center shadow-lg relative shrink-0 transition-colors duration-500";
+        bgGlow.className = "absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[400px] bg-purple-300/20 rounded-full blur-[100px] -z-10 transition-colors duration-500";
+      } else if (productName === 'Canva Pro') {
+        appBody.classList.add('theme-canva');
+        tabCanva.className = "flex-1 px-4 py-3 rounded-xl sm:rounded-full text-xs font-black bg-canva-gradient text-white shadow-md transition-all duration-300";
+        heroName.className = "text-transparent bg-clip-text bg-canva-gradient transition-all duration-500";
+        headerIcon.className = "w-10 h-10 rounded-xl bg-canva-gradient text-white flex items-center justify-center shadow-lg relative shrink-0 transition-colors duration-500";
+        bgGlow.className = "absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[400px] bg-cyan-300/20 rounded-full blur-[100px] -z-10 transition-colors duration-500";
+      } else if (productName === 'YouTube Premium') {
+        appBody.classList.add('theme-youtube');
+        tabYoutube.className = "flex-1 px-4 py-3 rounded-xl sm:rounded-full text-xs font-black bg-youtube-gradient text-white shadow-md transition-all duration-300";
+        heroName.className = "text-transparent bg-clip-text bg-youtube-gradient transition-all duration-500";
+        headerIcon.className = "w-10 h-10 rounded-xl bg-youtube-gradient text-white flex items-center justify-center shadow-lg relative shrink-0 transition-colors duration-500";
+        bgGlow.className = "absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[400px] bg-red-300/20 rounded-full blur-[100px] -z-10 transition-colors duration-500";
+      }
+
+      heroName.innerText = productName;
+      document.getElementById('activation-section').classList.add('hidden');
+      document.querySelectorAll('.pkg-card').forEach(card => card.classList.remove('active', 'scale-[1.02]'));
+      selectedMonths = 0;
+    }
+
+    // FUNGSI MEMILIH KOTAK
+    function selectPackage(months, pkgName) {
+      selectedMonths = months;
+      document.querySelectorAll('.pkg-card').forEach(card => {
+        card.classList.remove('active', 'scale-[1.02]');
+      });
+      event.currentTarget.classList.add('active', 'scale-[1.02]');
+      
+      document.getElementById('selected-package-label').innerText = `${activeProduct} (${months} Bulan)`;
+      document.getElementById('activation-section').classList.remove('hidden');
+      setTimeout(() => document.getElementById('activation-section').classList.remove('translate-y-4'), 50);
+    }
+
+    async function submitActivation() {
+      const email = document.getElementById('buyer-email').value.trim();
+      const wa = document.getElementById('buyer-wa').value.trim();
+      const pin = document.getElementById('buyer-pin').value.trim();
+
+      if (!email || !email.includes('@')) return showToast('Email Gmail tidak valid.', 'error');
+      if (!wa || wa.length < 9) return showToast('Nomor WhatsApp tidak valid.', 'error');
+      if (!pin) return showToast('PIN Aktivasi wajib diisi.', 'error');
+      if (selectedMonths === 0) return showToast('Pilih durasi paket terlebih dahulu.', 'error');
+
+      const btn = document.getElementById('btn-submit');
+      const origText = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Memproses...`; btn.disabled = true;
+      if(typeof lucide !== 'undefined') lucide.createIcons();
+
+      try {
+        const response = await fetch(`${API_URL}/api/gemini/request`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email, wa: wa, pin: pin, durationMonths: selectedMonths, productName: activeProduct })
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast(`Berhasil! Aktivasi ${activeProduct} sedang diproses.`);
+          setTimeout(() => window.location.href = `cek-durasi.html?email=${encodeURIComponent(email)}`, 1500);
+        } else {
+          showToast(result.message || 'Gagal memproses permintaan.', 'error');
+        }
+      } catch (e) {
+        showToast('Koneksi terputus. Pastikan internet stabil.', 'error');
+      } finally {
+        btn.innerHTML = origText; btn.disabled = false;
+        if(typeof lucide !== 'undefined') lucide.createIcons();
+      }
+    }
+  </script>
+</body>
+</html>

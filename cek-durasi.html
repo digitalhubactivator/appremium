@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cek Status Lisensi - DigitalHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; font-family: 'Plus Jakarta Sans', sans-serif; }
+    input, textarea, select { -webkit-user-select: text !important; user-select: text !important; }
+    img { -webkit-user-drag: none; user-drag: none; pointer-events: none; }
+    button img, a img, .cursor-pointer img { pointer-events: auto; }
+    
+    .bg-gemini-gradient { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); }
+    .text-gemini { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  </style>
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 min-h-screen antialiased relative overflow-x-hidden flex flex-col selection:bg-purple-200 selection:text-purple-900 w-full">
+
+  <div id="secure-app-content" style="display: flex; flex-direction: column; min-height: 100vh;">
+    
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[300px] sm:h-[400px] bg-purple-300/20 rounded-full blur-[80px] sm:blur-[100px] -z-10 pointer-events-none"></div>
+    <div class="absolute bottom-0 right-0 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-blue-300/20 rounded-full blur-[80px] sm:blur-[100px] -z-10 pointer-events-none"></div>
+
+    <header class="w-full bg-white/70 backdrop-blur-xl border-b border-white/50 p-3 sm:p-4 lg:py-5 sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
+      <div class="max-w-5xl mx-auto flex items-center justify-between px-2">
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl lg:rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-lg relative shrink-0">
+            <i data-lucide="radar" class="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white relative z-10"></i>
+          </div>
+          <div>
+            <h1 class="font-black text-sm sm:text-base lg:text-xl tracking-tight text-slate-900 leading-none">DIGITAL<span class="text-gemini">HUB</span></h1>
+            <p class="text-[8px] sm:text-[10px] lg:text-xs text-slate-500 font-bold mt-0.5 sm:mt-1 tracking-wider sm:tracking-widest uppercase">Status Tracker</p>
+          </div>
+        </div>
+        <a href="index.html" class="text-[10px] sm:text-xs lg:text-sm font-bold text-slate-600 hover:text-purple-700 bg-white border border-slate-200 hover:border-purple-200 px-3 sm:px-4 lg:px-5 py-2 lg:py-2.5 rounded-lg sm:rounded-xl transition-all flex items-center gap-1.5 sm:gap-2 shadow-sm whitespace-nowrap">
+          <i data-lucide="arrow-left" class="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-purple-600"></i>
+          <span class="hidden sm:inline">Portal Aktivasi</span><span class="sm:hidden">Kembali</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-start pt-8 sm:pt-12 pb-20 px-4 sm:px-6 animate-fade-up w-full">
+      <div class="w-full max-w-xl space-y-6 sm:space-y-8 mt-2 sm:mt-6">
+        
+        <div class="text-center space-y-3 sm:space-y-4 max-w-lg mx-auto px-2">
+          <h2 class="text-2xl sm:text-3xl lg:text-5xl font-black tracking-tighter text-slate-900 drop-shadow-sm leading-tight">Cek <span class="text-gemini">Status Akun</span></h2>
+          <p class="text-[11px] sm:text-xs lg:text-base text-slate-500 font-medium max-w-md mx-auto leading-relaxed">Masukkan email Google (Gmail) Anda untuk melihat status aktivasi dan sisa masa aktif langganan.</p>
+        </div>
+
+        <div class="bg-white/80 backdrop-blur-md p-2 sm:p-2.5 rounded-3xl lg:rounded-[2.5rem] border border-white shadow-[0_30px_70px_-15px_rgba(0,0,0,0.05)] flex items-center focus-within:ring-4 focus-within:ring-purple-500/10 focus-within:border-purple-300 transition-all w-full">
+          <div class="pl-3 sm:pl-4.5 pr-2 sm:pr-2.5 text-slate-400 flex items-center justify-center"><i data-lucide="search" class="w-5 h-5"></i></div>
+          <input type="email" id="search-email" placeholder="Ketik email Anda di sini..." class="w-full py-3 sm:py-3.5 lg:py-4 bg-transparent text-xs sm:text-sm lg:text-base font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none tracking-tight" onkeypress="handleEnter(event)">
+          <button onclick="checkStatus(false)" class="bg-gemini-gradient hover:opacity-90 text-white px-4 sm:px-7 py-3 sm:py-3.5 lg:px-9 lg:py-4 rounded-[1rem] sm:rounded-[1.5rem] lg:rounded-3xl text-xs sm:text-sm lg:text-base font-black transition-all shadow-md shadow-purple-500/30 whitespace-nowrap active:scale-95 flex items-center gap-1.5 sm:gap-2">
+            <span>Cek Data</span><i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div id="loading-state" class="hidden flex-col items-center justify-center py-8 sm:py-10 bg-white border border-slate-100 rounded-3xl shadow-sm relative overflow-hidden w-full">
+          <i data-lucide="loader-2" class="w-8 h-8 text-purple-500 animate-spin mb-3"></i>
+          <p class="text-xs sm:text-sm font-bold text-slate-500 animate-pulse tracking-wide">Mencari data di server...</p>
+        </div>
+
+        <!-- HASIL AKTIF -->
+        <div id="result-active" class="hidden bg-white/80 backdrop-blur-md border border-white rounded-3xl p-5 sm:p-7 shadow-xl relative overflow-hidden w-full">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-100/50 rounded-full blur-[40px] pointer-events-none -z-10"></div>
+          
+          <div class="flex flex-row items-center justify-between border-b border-slate-100 pb-4 relative z-10">
+            <div class="flex items-center gap-3 text-emerald-600">
+              <div class="bg-emerald-100 border border-emerald-200 p-2 rounded-xl"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
+              <span class="font-black text-sm uppercase tracking-widest text-emerald-600">Status: Aktif</span>
+            </div>
+            <span class="text-[10px] font-black bg-emerald-500 text-white px-4 py-1.5 rounded-full shadow-md uppercase">VERIFIED</span>
+          </div>
+
+          <div class="pt-5 space-y-4 relative z-10">
+            <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Email Terdaftar</p>
+              <p id="res-active-email" class="text-lg font-black text-slate-800 break-all tracking-tight">...</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-purple-50/50 border border-purple-100 rounded-2xl p-5">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Layanan</p>
+                <p id="res-active-paket" class="text-sm font-black text-purple-600 tracking-tight uppercase">...</p>
+              </div>
+              <div class="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-5">
+                <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Durasi Paket</p>
+                <p id="res-active-sisa" class="text-sm font-black text-emerald-600 tracking-tight uppercase">...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HASIL PENDING -->
+        <div id="result-pending" class="hidden bg-white/80 backdrop-blur-md border border-white rounded-3xl p-5 sm:p-7 shadow-xl relative overflow-hidden w-full">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-amber-100/50 rounded-full blur-[40px] pointer-events-none -z-10"></div>
+          
+          <div class="flex flex-row items-center justify-between border-b border-slate-100 pb-4 relative z-10">
+            <div class="flex items-center gap-3 text-amber-600">
+              <div class="bg-amber-100 border border-amber-200 p-2 rounded-xl"><i data-lucide="clock" class="w-5 h-5"></i></div>
+              <span class="font-black text-sm uppercase tracking-widest text-amber-600">Antrean</span>
+            </div>
+            <div class="flex items-center gap-2 bg-white border border-amber-200 text-amber-600 px-4 py-1.5 rounded-full shadow-sm">
+              <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
+              <span class="text-[10px] font-black uppercase">Menunggu Admin</span>
+            </div>
+          </div>
+          <div class="pt-5 space-y-4 relative z-10">
+            <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Email & Layanan</p>
+              <p id="res-pending-email" class="text-lg font-black text-slate-800 break-all tracking-tight mb-1">...</p>
+              <p id="res-pending-paket" class="text-xs font-bold text-purple-600 uppercase">...</p>
+            </div>
+            <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex gap-3 items-start">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-500 shrink-0 mt-0.5"></i>
+              <p class="text-xs text-amber-900 leading-relaxed font-medium">Aktivasi Anda sedang diproses. <b class="text-rose-700">Tolong jangan tutup halaman ini.</b> Layar otomatis berubah hijau begitu disetujui.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- HASIL NOT FOUND -->
+        <div id="result-notfound" class="hidden bg-white/80 backdrop-blur-md border border-white rounded-3xl p-8 shadow-xl relative overflow-hidden text-center w-full">
+          <div class="w-16 h-16 bg-rose-50 border border-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-3">
+            <i data-lucide="x-circle" class="w-8 h-8"></i>
+          </div>
+          <h3 class="font-black text-slate-900 text-xl tracking-tight">Data Tidak Ditemukan</h3>
+          <p class="text-xs text-slate-500 font-medium mt-2 max-w-sm mx-auto">Kami tidak dapat menemukan data aktivasi. Pastikan Anda mengetik email dengan benar.</p>
+        </div>
+
+      </div>
+    </main>
+    
+    <div id="digitalhub-copyright" style="text-align:center; padding:15px; font-size:11px; color:#94a3b8; border-top:1px solid #e2e8f0; margin-top:auto;">
+      &copy; 2026 <b>DigitalHub Store Manager</b>. All Rights Reserved. Protected System.
+    </div>
+  </div>
+
+  <script>
+    // API BARU 
+    const encodedApi = btoa("https://api-activator.achachelsea58.workers.dev");
+    const API_URL = atob(encodedApi);
+
+    let pollingInterval = null;
+
+    if(typeof lucide !== 'undefined') lucide.createIcons();
+
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const emailFromUrl = urlParams.get('email');
+      if (emailFromUrl) {
+        document.getElementById('search-email').value = emailFromUrl;
+        checkStatus(false);
+      }
+    };
+
+    function handleEnter(e) { if (e.key === 'Enter') checkStatus(false); }
+
+    function hideAllResults() {
+      ['result-active', 'result-pending', 'result-notfound'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+        document.getElementById(id).classList.remove('animate-fade-up');
+      });
+    }
+
+    async function checkStatus(isAuto = false) {
+      const emailInput = document.getElementById('search-email').value.trim().toLowerCase();
+      if (!emailInput || !emailInput.includes('@')) {
+        if(!isAuto) alert('Silakan masukkan alamat Gmail yang valid!');
+        return;
+      }
+
+      if (!isAuto) {
+        hideAllResults();
+        document.getElementById('loading-state').classList.remove('hidden');
+        document.getElementById('loading-state').classList.add('flex');
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/gemini/check?email=${encodeURIComponent(emailInput)}`);
+        const result = await response.json();
+
+        if (!isAuto) {
+          document.getElementById('loading-state').classList.add('hidden');
+          document.getElementById('loading-state').classList.remove('flex');
+        }
+
+        if (result.success) {
+          if (result.status === "ACTIVE" || result.data.status === "ACCEPTED") {
+            if (pollingInterval) { clearInterval(pollingInterval); pollingInterval = null; }
+            hideAllResults();
+            document.getElementById('res-active-email').innerText = result.data.email;
+            document.getElementById('res-active-paket').innerText = result.data.productName || "Gemini Pro";
+            document.getElementById('res-active-sisa').innerText = result.data.durationMonths + " Bulan";
+            
+            document.getElementById('result-active').classList.remove('hidden');
+            document.getElementById('result-active').classList.add('animate-fade-up');
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+          } 
+          else if (result.status === "PENDING" || result.data.status === "PENDING") {
+            hideAllResults();
+            document.getElementById('res-pending-email').innerText = result.data.email;
+            document.getElementById('res-pending-paket').innerText = `${result.data.productName || "Gemini Pro"} (${result.data.durationMonths} Bulan)`;
+            
+            document.getElementById('result-pending').classList.remove('hidden');
+            document.getElementById('result-pending').classList.add('animate-fade-up');
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+
+            if (!pollingInterval && !isAuto) {
+              pollingInterval = setInterval(() => checkStatus(true), 3000);
+            }
+          }
+        } else {
+          if (!isAuto) {
+            hideAllResults();
+            document.getElementById('result-notfound').classList.remove('hidden');
+            document.getElementById('result-notfound').classList.add('animate-fade-up');
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+          }
+        }
+      } catch (e) {
+        if (!isAuto) {
+          document.getElementById('loading-state').classList.add('hidden');
+          document.getElementById('loading-state').classList.remove('flex');
+        }
+      }
+    }
+  </script>
+  <!-- Proteksi keamanan dihapus sementara untuk menyingkat kode, pastikan script proteksi Kakak dipaste kembali di bagian bawah jika butuh -->
+</body>
+</html>
