@@ -183,11 +183,16 @@
 
     function renderPackages() {
       const grid = document.getElementById('packages-grid');
-      if(packagesData.length === 0) {
-          grid.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 font-bold">Belum ada paket tersedia.</div>`;
+      
+      // TAMBAHAN: Menyaring paket agar hanya muncul sesuai Tab yang sedang aktif
+      const filteredPkgs = packagesData.filter(p => (p.product || 'Gemini Pro') === activeProduct);
+
+      if(filteredPkgs.length === 0) {
+          grid.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 font-bold">Belum ada paket tersedia untuk ${activeProduct}.</div>`;
           return;
       }
-      grid.innerHTML = packagesData.map((pkg) => `
+
+      grid.innerHTML = filteredPkgs.map((pkg) => `
         <div onclick="selectPackage(${pkg.duration}, '${pkg.name}')" class="pkg-card relative bg-white/80 border-2 border-slate-100 rounded-2xl sm:rounded-3xl p-3 sm:p-5 cursor-pointer transition-all duration-300 text-center hover:-translate-y-1 flex flex-col justify-between h-full group">
           <div>
             <span class="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1 truncate">${pkg.name}</span>
@@ -243,6 +248,9 @@
       document.getElementById('activation-section').classList.add('hidden');
       document.querySelectorAll('.pkg-card').forEach(card => card.classList.remove('active', 'scale-[1.02]'));
       selectedMonths = 0;
+
+      // TAMBAHAN PENTING: Render ulang paket ketika tab diklik
+      renderPackages(); 
     }
 
     function selectPackage(months, pkgName) {
