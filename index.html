@@ -102,12 +102,11 @@
         <div class="h-[1px] w-8 sm:w-12 bg-gradient-to-l from-transparent to-slate-300"></div>
       </div>
       
-      <!-- GRID DURASI (DILOAD OTOMATIS OLEH JAVASCRIPT) -->
+      <!-- GRID DURASI (DILOAD OTOMATIS) -->
       <div id="packages-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 w-full max-w-lg md:max-w-none mx-auto">
-        <!-- Loader Skeleton sebelum data ditarik -->
         <div class="col-span-full py-10 flex flex-col items-center justify-center text-slate-400">
             <i data-lucide="loader-2" class="w-8 h-8 animate-spin mb-2"></i>
-            <span class="text-xs font-bold">Memuat daftar paket dari server...</span>
+            <span class="text-xs font-bold">Memuat daftar harga...</span>
         </div>
       </div>
     </div>
@@ -147,7 +146,6 @@
   </main>
 
   <script>
-    // API BARU Kakak
     const encodedApi = btoa("https://api-activator.achachelsea58.workers.dev");
     const API_URL = atob(encodedApi);
 
@@ -157,7 +155,7 @@
 
     window.onload = function() {
       if(typeof lucide !== 'undefined') lucide.createIcons();
-      fetchPackages(); // Langsung tarik paket saat web dibuka
+      fetchPackages(); 
     };
 
     function showToast(msg, type='info') {
@@ -170,7 +168,6 @@
       setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
     }
 
-    // FUNGSI MENGAMBIL PAKET DARI ADMIN
     async function fetchPackages() {
       try {
         const res = await fetch(`${API_URL}/api/gemini/packages`);
@@ -184,20 +181,18 @@
       }
     }
 
-    // FUNGSI MENAMPILKAN KOTAK PAKET KE LAYAR
     function renderPackages() {
       const grid = document.getElementById('packages-grid');
-      
       if(packagesData.length === 0) {
           grid.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 font-bold">Belum ada paket tersedia.</div>`;
           return;
       }
-
-      grid.innerHTML = packagesData.map((pkg, index) => `
+      grid.innerHTML = packagesData.map((pkg) => `
         <div onclick="selectPackage(${pkg.duration}, '${pkg.name}')" class="pkg-card relative bg-white/80 border-2 border-slate-100 rounded-2xl sm:rounded-3xl p-3 sm:p-5 cursor-pointer transition-all duration-300 text-center hover:-translate-y-1 flex flex-col justify-between h-full group">
           <div>
             <span class="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1 truncate">${pkg.name}</span>
-            <h4 class="text-2xl sm:text-3xl font-black text-slate-800 mt-1 mb-3">${pkg.duration} <span class="text-base sm:text-lg">Bln</span></h4>
+            <h4 class="text-2xl sm:text-3xl font-black text-slate-800 mt-1 mb-1">${pkg.duration} <span class="text-base sm:text-lg">Bln</span></h4>
+            <p class="text-xs sm:text-sm font-black text-emerald-500 mb-3 tracking-wide">Rp ${parseInt(pkg.price || 0).toLocaleString('id-ID')}</p>
           </div>
           <div class="mt-auto">
             <span class="btn-pilih block w-full py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300">Pilih Paket</span>
@@ -206,7 +201,6 @@
       `).join('');
     }
 
-    // FUNGSI GANTI PRODUK (SMART THEME)
     function setProduct(productName) {
       activeProduct = productName;
       
@@ -251,12 +245,9 @@
       selectedMonths = 0;
     }
 
-    // FUNGSI MEMILIH KOTAK
     function selectPackage(months, pkgName) {
       selectedMonths = months;
-      document.querySelectorAll('.pkg-card').forEach(card => {
-        card.classList.remove('active', 'scale-[1.02]');
-      });
+      document.querySelectorAll('.pkg-card').forEach(card => card.classList.remove('active', 'scale-[1.02]'));
       event.currentTarget.classList.add('active', 'scale-[1.02]');
       
       document.getElementById('selected-package-label').innerText = `${activeProduct} (${months} Bulan)`;
@@ -281,8 +272,7 @@
 
       try {
         const response = await fetch(`${API_URL}/api/gemini/request`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: email, wa: wa, pin: pin, durationMonths: selectedMonths, productName: activeProduct })
         });
         const result = await response.json();
@@ -293,12 +283,8 @@
         } else {
           showToast(result.message || 'Gagal memproses permintaan.', 'error');
         }
-      } catch (e) {
-        showToast('Koneksi terputus. Pastikan internet stabil.', 'error');
-      } finally {
-        btn.innerHTML = origText; btn.disabled = false;
-        if(typeof lucide !== 'undefined') lucide.createIcons();
-      }
+      } catch (e) { showToast('Koneksi terputus. Pastikan internet stabil.', 'error'); } 
+      finally { btn.innerHTML = origText; btn.disabled = false; if(typeof lucide !== 'undefined') lucide.createIcons(); }
     }
   </script>
 </body>
