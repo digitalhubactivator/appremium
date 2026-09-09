@@ -27,20 +27,20 @@
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-    /* SMART THEME */
+    /* SMART THEME (DIPERBARUI AGAR TOMBOL LANGSUNG BERWARNA) */
     .theme-gemini .pkg-card.active { border-color: #a855f7; box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.2); }
-    .theme-gemini .btn-pilih { background-color: #f3e8ff; color: #9333ea; }
-    .theme-gemini .pkg-card:hover .btn-pilih, .theme-gemini .pkg-card.active .btn-pilih { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); color: white; }
+    .theme-gemini .btn-pilih { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); color: white; }
+    .theme-gemini .pkg-card:hover .btn-pilih, .theme-gemini .pkg-card.active .btn-pilih { opacity: 0.9; box-shadow: 0 6px 15px -3px rgba(168, 85, 247, 0.4); transform: translateY(-1px); }
     .theme-gemini .btn-submit { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); }
 
     .theme-canva .pkg-card.active { border-color: #06b6d4; box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.2); }
-    .theme-canva .btn-pilih { background-color: #e0f2fe; color: #0284c7; }
-    .theme-canva .pkg-card:hover .btn-pilih, .theme-canva .pkg-card.active .btn-pilih { background: linear-gradient(135deg, #00C4CC 0%, #7D2AE8 100%); color: white; }
+    .theme-canva .btn-pilih { background: linear-gradient(135deg, #00C4CC 0%, #7D2AE8 100%); color: white; }
+    .theme-canva .pkg-card:hover .btn-pilih, .theme-canva .pkg-card.active .btn-pilih { opacity: 0.9; box-shadow: 0 6px 15px -3px rgba(6, 182, 212, 0.4); transform: translateY(-1px); }
     .theme-canva .btn-submit { background: linear-gradient(135deg, #00C4CC 0%, #7D2AE8 100%); }
 
     .theme-youtube .pkg-card.active { border-color: #ef4444; box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.2); }
-    .theme-youtube .btn-pilih { background-color: #fee2e2; color: #dc2626; }
-    .theme-youtube .pkg-card:hover .btn-pilih, .theme-youtube .pkg-card.active .btn-pilih { background: linear-gradient(135deg, #FF0000 0%, #990000 100%); color: white; }
+    .theme-youtube .btn-pilih { background: linear-gradient(135deg, #FF0000 0%, #990000 100%); color: white; }
+    .theme-youtube .pkg-card:hover .btn-pilih, .theme-youtube .pkg-card.active .btn-pilih { opacity: 0.9; box-shadow: 0 6px 15px -3px rgba(239, 68, 68, 0.4); transform: translateY(-1px); }
     .theme-youtube .btn-submit { background: linear-gradient(135deg, #FF0000 0%, #990000 100%); }
   </style>
 </head>
@@ -250,7 +250,6 @@
       }
     }
 
-    // --- PERUBAHAN: MEMBACA FITUR DINAMIS DARI DATABASE ---
     function renderPackages() {
       const grid = document.getElementById('packages-grid');
       const filteredPkgs = packagesData.filter(p => (p.product || 'Gemini Pro') === activeProduct);
@@ -263,21 +262,33 @@
       grid.innerHTML = filteredPkgs.map((pkg) => {
         let featuresHtml = '';
         
-        // Membaca input "features" dari database Admin
         if (pkg.features && pkg.features.trim() !== '') {
-            // Memecah teks baris demi baris jika ada enter (newline)
             const featureLines = pkg.features.split('\n').filter(line => line.trim() !== '');
             featuresHtml = featureLines.map(line => `
                 <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>${line.trim()}</span></li>
             `).join('');
         } else {
-            // Teks cadangan jika admin mengosongkan kolom teks fitur
             if (activeProduct === 'Gemini Pro') {
-                featuresHtml = `<li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Gemini Advanced</span></li><li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Garansi ${pkg.duration} Bulan</span></li>`;
+                featuresHtml = `
+                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Google Veo3</span></li>
+                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Model Terbaru 3.5, 3.8 & 3.1</span></li>
+                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>200 Credit Setiap Bulan</span></li>
+                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Fitur Nano Banana</span></li>
+                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Fitur Antigravity Aktif</span></li>
+                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Privasi Akun Keluarga Terjaga</span></li>
+                `;
             } else if (activeProduct === 'Canva Pro') {
-                featuresHtml = `<li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Semua Template VIP</span></li><li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Garansi ${pkg.duration} Bulan</span></li>`;
+                featuresHtml = `
+                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Semua Fitur Pro</span></li>
+                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Aktivasi via Invite Tim</span></li>
+                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Desain & Folder Privat</span></li>
+                `;
             } else if (activeProduct === 'YouTube Premium') {
-                featuresHtml = `<li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Nonton Video Tanpa Iklan</span></li><li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Garansi ${pkg.duration} Bulan</span></li>`;
+                featuresHtml = `
+                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Nonton Tanpa Iklan</span></li>
+                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses YouTube Music</span></li>
+                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Aktivasi via Invite Family</span></li>
+                `;
             }
         }
 
