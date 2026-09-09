@@ -146,16 +146,13 @@
 
         <!-- TAB DATABASE -->
         <div id="section-database" class="overflow-x-auto hidden">
-          <!-- BAR PENCARIAN & FILTER -->
           <div class="flex flex-col sm:flex-row gap-3 p-4 border-b border-slate-100 bg-slate-50/50 justify-between items-center">
-            
             <div class="flex gap-2 overflow-x-auto no-scrollbar w-full sm:w-auto">
               <button onclick="filterDatabase('Semua', this)" class="filter-btn px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold shadow-sm whitespace-nowrap transition-colors">Semua</button>
               <button onclick="filterDatabase('Gemini Pro', this)" class="filter-btn px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-100 rounded-lg text-xs font-bold whitespace-nowrap transition-colors">Gemini Pro</button>
               <button onclick="filterDatabase('Canva Pro', this)" class="filter-btn px-4 py-2 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-100 rounded-lg text-xs font-bold whitespace-nowrap transition-colors">Canva Pro</button>
               <button onclick="filterDatabase('YouTube Premium', this)" class="filter-btn px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 border border-red-100 rounded-lg text-xs font-bold whitespace-nowrap transition-colors">YouTube Premium</button>
             </div>
-            
             <div class="flex gap-2 w-full sm:w-auto">
               <div class="relative w-full sm:w-56">
                 <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
@@ -163,7 +160,6 @@
               </div>
               <button onclick="openManualModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shadow-sm transition-transform active:scale-95"><i data-lucide="user-plus" class="w-4 h-4"></i> <span class="hidden sm:inline">Manual</span></button>
             </div>
-
           </div>
 
           <table class="w-full text-left text-sm text-slate-600">
@@ -180,7 +176,7 @@
           </table>
         </div>
 
-        <!-- TAB KELOLA HEAD ACCOUNT (DENGAN MANAJEMEN KAPASITAS SLOT) -->
+        <!-- TAB KELOLA HEAD ACCOUNT -->
         <div id="section-head-accounts" class="hidden p-8 lg:p-10">
           <div class="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-8">
              <div>
@@ -192,7 +188,7 @@
           <div id="head-accounts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
         </div>
 
-        <!-- TAB MANAJEMEN PAKET -->
+        <!-- TAB MANAJEMEN PAKET (DIPERBARUI DENGAN FORM DESKRIPSI FITUR) -->
         <div id="section-paket" class="hidden p-8 lg:p-10 bg-slate-50/30">
           <div class="flex justify-between items-center mb-8">
              <div>
@@ -200,19 +196,26 @@
                 <p class="text-xs text-slate-500 mt-1">Tambahkan paket baru beserta harganya agar otomatis muncul di halaman depan.</p>
              </div>
           </div>
-          <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm mb-8 flex flex-col sm:flex-row gap-3">
+          
+          <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm mb-8 flex flex-col gap-3">
              <input type="hidden" id="edit-pkg-id" value="">
-             <select id="new-pkg-product" class="w-full sm:w-48 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
-               <option value="Gemini Pro">Gemini Pro</option>
-               <option value="Canva Pro">Canva Pro</option>
-               <option value="YouTube Premium">YouTube Premium</option>
-             </select>
-             <input type="text" id="new-pkg-name" placeholder="Nama Paket" class="flex-1 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
-             <input type="number" id="new-pkg-duration" placeholder="Durasi (Bln)" class="w-full sm:w-32 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
-             <input type="number" id="new-pkg-price" placeholder="Harga (Rp)" class="w-full sm:w-40 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
-             <div class="flex gap-2">
-               <button id="btn-cancel-edit" onclick="cancelEdit()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-3 rounded-xl text-sm font-black transition-all">Batal</button>
-               <button id="btn-save-pkg" onclick="savePackage()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl text-sm font-black shadow-lg shadow-emerald-500/20 whitespace-nowrap active:scale-95 transition-all">Simpan</button>
+             <div class="flex flex-col sm:flex-row gap-3 w-full">
+                 <select id="new-pkg-product" class="w-full sm:w-48 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
+                   <option value="Gemini Pro">Gemini Pro</option>
+                   <option value="Canva Pro">Canva Pro</option>
+                   <option value="YouTube Premium">YouTube Premium</option>
+                 </select>
+                 <input type="text" id="new-pkg-name" placeholder="Nama Paket (Contoh: VIP Invite)" class="flex-1 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
+                 <input type="number" id="new-pkg-duration" placeholder="Durasi (Bln)" class="w-full sm:w-32 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
+                 <input type="number" id="new-pkg-price" placeholder="Harga (Rp)" class="w-full sm:w-40 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
+             </div>
+             
+             <!-- KOLOM TEKS UNTUK DESKRIPSI FITUR CHECKLIST -->
+             <textarea id="new-pkg-features" placeholder="Daftar Fitur / Keterangan (Tekan tombol ENTER untuk membuat baris fitur baru)" rows="3" class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400"></textarea>
+             
+             <div class="flex gap-2 justify-end mt-1">
+               <button id="btn-cancel-edit" onclick="cancelEdit()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 px-5 py-3 rounded-xl text-sm font-black transition-all">Batal</button>
+               <button id="btn-save-pkg" onclick="savePackage()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-xl text-sm font-black shadow-lg shadow-emerald-500/20 whitespace-nowrap active:scale-95 transition-all">Simpan Paket</button>
              </div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4" id="packages-list-grid"></div>
@@ -279,19 +282,14 @@
     <div class="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 space-y-4">
       <h3 class="font-black text-xl text-slate-900">Input Manual</h3>
       <p class="text-xs text-slate-500 -mt-2 mb-2 leading-relaxed">Tambahkan pelanggan secara langsung dari catatan Anda ke dalam database.</p>
-      
       <input type="email" id="manual-email" placeholder="Email Pelanggan" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-400" />
-      
       <select id="manual-product" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-400">
         <option value="Gemini Pro">Gemini Pro</option>
         <option value="Canva Pro">Canva Pro</option>
         <option value="YouTube Premium">YouTube Premium</option>
       </select>
-      
       <input type="number" id="manual-duration" placeholder="Durasi (Contoh: 1)" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-400" />
-      
       <select id="manual-head" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-400"></select>
-      
       <div class="flex gap-2 pt-2">
         <button onclick="closeManualModal()" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-xs uppercase transition hover:bg-slate-200">Batal</button>
         <button id="btn-save-manual" onclick="submitManualEntry()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs uppercase flex justify-center items-center gap-2 transition active:scale-95 shadow-md shadow-emerald-500/20">Simpan ke DB</button>
@@ -299,7 +297,6 @@
     </div>
   </div>
 
-  <!-- SCRIPT UTAMA -->
   <script>
     const encodedApi = btoa("https://api-activator.achachelsea58.workers.dev");
     const API_URL = atob(encodedApi);
@@ -371,7 +368,7 @@
       dashboardInterval = setInterval(fetchAdminData, 5000); 
     }
 
-    // --- MANAJEMEN PAKET ---
+    // --- MANAJEMEN PAKET (DIPERBARUI) ---
     async function fetchPackages() {
       if(!isLoggedIn) return;
       try {
@@ -403,13 +400,16 @@
       grid.innerHTML = packagesList.map(p => `
         <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm relative flex flex-col group">
            <div class="absolute top-2 right-2 flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-             <button onclick="editPackage('${p.id}', '${p.name}', ${p.duration}, ${p.price || 0}, '${p.product || 'Gemini Pro'}')" class="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded transition" title="Edit"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+             <button onclick="editPackage('${p.id}')" class="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded transition" title="Edit"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
              <button onclick="deletePackage('${p.id}')" class="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded transition" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
            </div>
            <span class="text-[8px] bg-slate-100 text-slate-500 px-2 py-1 rounded mb-2 inline-block w-max uppercase font-bold">${p.product || 'Gemini Pro'}</span>
            <p class="font-black text-sm text-slate-800 pr-16 truncate">${p.name}</p>
            <p class="text-xs text-purple-600 font-bold mt-1">${p.duration} Bulan</p>
            <p class="text-sm text-emerald-600 font-black mt-1.5">Rp ${parseInt(p.price || 0).toLocaleString('id-ID')}</p>
+           <div class="mt-2 text-[10px] text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap opacity-60">
+             ${p.features ? p.features.replace(/\n/g, ', ') : 'Teks default sistem'}
+           </div>
         </div>
       `).join('');
       if(typeof lucide !== 'undefined') lucide.createIcons();
@@ -421,24 +421,29 @@
       const name = document.getElementById('new-pkg-name').value.trim();
       const duration = document.getElementById('new-pkg-duration').value.trim();
       const price = document.getElementById('new-pkg-price').value.trim();
+      const features = document.getElementById('new-pkg-features').value.trim(); // TAMBAHAN KODE
 
       if (!name || !duration || !price) { alert("Wajib mengisi Nama, Durasi, dan Harga paket!"); return; }
       
       try {
         await fetch(`${API_URL}/api/gemini/admin/packages`, {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id, name, duration, price, product })
+          body: JSON.stringify({ id, name, duration, price, product, features }) // MENGIRIM FEATURES KE API
         });
         cancelEdit(); fetchPackages(); 
       } catch(e) { alert("Error menyimpan paket."); }
     }
 
-    function editPackage(id, name, duration, price, product) {
-      document.getElementById('edit-pkg-id').value = id;
-      document.getElementById('new-pkg-product').value = product;
-      document.getElementById('new-pkg-name').value = name;
-      document.getElementById('new-pkg-duration').value = duration;
-      document.getElementById('new-pkg-price').value = price;
+    function editPackage(id) {
+      const pkg = packagesList.find(p => p.id === id);
+      if(!pkg) return;
+      
+      document.getElementById('edit-pkg-id').value = pkg.id;
+      document.getElementById('new-pkg-product').value = pkg.product || 'Gemini Pro';
+      document.getElementById('new-pkg-name').value = pkg.name;
+      document.getElementById('new-pkg-duration').value = pkg.duration;
+      document.getElementById('new-pkg-price').value = pkg.price || 0;
+      document.getElementById('new-pkg-features').value = pkg.features || ''; // MENGAMBIL FEATURES
       
       const btnSave = document.getElementById('btn-save-pkg');
       btnSave.innerText = "Update Paket";
@@ -454,9 +459,10 @@
       document.getElementById('new-pkg-name').value = "";
       document.getElementById('new-pkg-duration').value = "";
       document.getElementById('new-pkg-price').value = "";
+      document.getElementById('new-pkg-features').value = "";
       
       const btnSave = document.getElementById('btn-save-pkg');
-      btnSave.innerText = "Tambah Paket";
+      btnSave.innerText = "Simpan Paket";
       btnSave.classList.replace("bg-blue-500", "bg-emerald-500");
       btnSave.classList.replace("hover:bg-blue-600", "hover:bg-emerald-600");
       btnSave.classList.replace("shadow-blue-500/20", "shadow-emerald-500/20");
@@ -483,7 +489,6 @@
           
           renderAntrean(pending); 
           
-          // FITUR BARU: Deteksi otomatis Head Account dari database
           let extractedHeads = new Set(headAccounts);
           active.forEach(item => {
               if (item.headAccount && item.headAccount !== '-' && item.headAccount.includes('@')) {
@@ -497,8 +502,8 @@
           }
 
           activeDatabaseList = active;
-          applyDatabaseFilters(); // Terapkan pencarian & filter 
-          renderHeadAccounts();   // Perbarui kapasitas slot head account
+          applyDatabaseFilters(); 
+          renderHeadAccounts();   
           
           document.getElementById('stat-pending-count').innerText = pending.length;
           document.getElementById('badge-antrean').innerText = pending.length;
@@ -525,7 +530,6 @@
       if(typeof lucide !== 'undefined') lucide.createIcons();
     }
 
-    // --- FITUR BARU: FILTER & SEARCH ---
     function filterDatabase(kategori, btnElement) {
         if (btnElement) {
             document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -545,12 +549,9 @@
         const query = document.getElementById('search-db').value.toLowerCase().trim();
         let filtered = activeDatabaseList;
         
-        // Saring berdasarkan kategori produk
         if (currentCategoryFilter !== 'Semua') {
             filtered = filtered.filter(item => (item.productName || 'Gemini Pro') === currentCategoryFilter);
         }
-        
-        // Saring berdasarkan text pencarian universal
         if (query !== '') {
             filtered = filtered.filter(item => 
                 item.email.toLowerCase().includes(query) || 
@@ -590,7 +591,6 @@
       if(typeof lucide !== 'undefined') lucide.createIcons();
     }
 
-    // --- LOGIKA MENGHITUNG KAPASITAS SLOT HEAD ACCOUNT ---
     function getHeadAccountUsage() {
       const usage = {};
       headAccounts.forEach(h => usage[h] = 0);
@@ -615,7 +615,7 @@
       
       headAccounts.forEach(h => {
           const used = usage[h] || 0;
-          const remaining = 5 - used; // MAKSIMAL 5 SLOT
+          const remaining = 5 - used; 
           if (remaining > 0) {
               optionsHtml += `<option value="${h}">${h} (Sisa ${remaining} Slot)</option>`;
           }
@@ -726,7 +726,6 @@
         setTimeout(() => { document.getElementById('copy-status').classList.remove('opacity-100'); }, 2000);
     }
 
-    // --- TAB KELOLA HEAD ACCOUNTS ---
     function renderHeadAccounts() {
       const grid = document.getElementById('head-accounts-grid');
       
@@ -757,26 +756,21 @@
                    </div>
                    <button onclick="deleteHeadAccount('${h}')" class="text-slate-400 hover:text-rose-500 p-1.5 transition shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                </div>
-               
                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden mt-1">
                    <div class="h-2 rounded-full ${isFull ? 'bg-rose-500' : 'bg-purple-500'}" style="width: ${(used/max)*100}%"></div>
                </div>
                <p class="text-[9px] font-bold text-slate-400 text-right uppercase tracking-widest">${used} / ${max} Terpakai</p>
             </div>
           `;
-          
-          if (isFull) { fullHtml += cardHtml; } 
-          else { availableHtml += cardHtml; }
+          if (isFull) { fullHtml += cardHtml; } else { availableHtml += cardHtml; }
       });
       
       grid.innerHTML = `
           <div class="col-span-full mb-1"><h4 class="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-100 pb-2">✅ Akun Tersedia</h4></div>
           ${availableHtml || '<div class="col-span-full mb-4"><p class="text-xs text-slate-400">Tidak ada akun tersedia.</p></div>'}
-          
           <div class="col-span-full mt-6 mb-1"><h4 class="text-xs font-black text-rose-400 uppercase tracking-widest border-b border-rose-100 pb-2">⛔ Akun Penuh (Full Slot)</h4></div>
           ${fullHtml || '<div class="col-span-full"><p class="text-xs text-slate-400">Belum ada akun yang penuh.</p></div>'}
       `;
-      
       if(typeof lucide !== 'undefined') lucide.createIcons();
     }
 
@@ -800,14 +794,11 @@
       }
     }
 
-    // --- FITUR BARU: INPUT MANUAL PELANGGAN ---
     function openManualModal() {
         if(headAccounts.length === 0) { alert("Tambahkan minimal 1 Head Account terlebih dahulu!"); return; }
-        
         document.getElementById('manual-email').value = "";
         document.getElementById('manual-duration').value = "";
         
-        // Saring dropdown head account agar hanya yg ada slot
         const usage = getHeadAccountUsage();
         let optionsHtml = '';
         headAccounts.forEach(h => {
@@ -824,7 +815,6 @@
             headSelect.innerHTML = optionsHtml;
             document.getElementById('btn-save-manual').disabled = false;
         }
-
         document.getElementById('modal-add-manual').classList.remove('hidden');
     }
 
@@ -849,20 +839,17 @@
         const dummyPin = "MANUAL-" + Math.random().toString(36).substring(2,8).toUpperCase();
 
         try {
-            // 1. Masukkan ke database (pura-pura aktivasi via PIN)
             await fetch(`${API_URL}/api/gemini/request`, {
                 method: "POST", headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({email: email, wa: dummyWa, pin: dummyPin, durationMonths: duration, productName: product})
             });
-            
-            // 2. Langsung eksekusi ACC di latar belakang
             await fetch(`${API_URL}/api/gemini/admin/accept`, {
                 method: "POST", headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({email: email, headAccount: head})
             });
 
             closeManualModal();
-            fetchAdminData(); // Reload database
+            fetchAdminData();
             alert(`Selesai! Akun ${email} berhasil diinput.`);
         } catch(e) {
             alert("Terjadi kesalahan koneksi saat menyimpan manual.");
