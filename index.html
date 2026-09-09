@@ -71,7 +71,6 @@
 
   <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 space-y-8 animate-fade-up">
     
-    <!-- ADSTERRA SLOT 1 -->
     <div class="w-full flex justify-center mb-4 sm:mb-6">
         <div class="hidden md:flex flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-2 rounded-xl shadow-sm border border-slate-200/50">
             <script type="text/javascript">
@@ -113,7 +112,6 @@
       </p>
     </div>
 
-    <!-- TABS PILIHAN PRODUK -->
     <div class="flex justify-center w-full">
       <div class="bg-white border border-slate-200 p-1.5 rounded-2xl sm:rounded-full shadow-sm flex flex-wrap sm:flex-nowrap gap-1.5 w-full sm:w-auto max-w-md">
         <button onclick="setProduct('Gemini Pro')" id="tab-gemini" class="flex-1 px-4 py-3 rounded-xl sm:rounded-full text-xs font-black transition-all duration-300 bg-gemini-gradient text-white shadow-md">GEMINI PRO</button>
@@ -131,7 +129,6 @@
         <div class="h-[1px] w-8 sm:w-12 bg-gradient-to-l from-transparent to-slate-300"></div>
       </div>
       
-      <!-- GRID DURASI (DILOAD OTOMATIS) -->
       <div id="packages-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 w-full max-w-lg md:max-w-none mx-auto">
         <div class="col-span-full py-10 flex flex-col items-center justify-center text-slate-400">
             <i data-lucide="loader-2" class="w-8 h-8 animate-spin mb-2"></i>
@@ -140,7 +137,6 @@
       </div>
     </div>
 
-    <!-- ADSTERRA SLOT 2 -->
     <div class="w-full flex justify-center mt-10 mb-4">
         <div class="hidden md:flex flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-2 rounded-xl shadow-sm border border-slate-200/50">
             <script type="text/javascript">
@@ -203,7 +199,6 @@
     </div>
   </main>
 
-  <!-- HAK CIPTA -->
   <div id="digitalhub-copyright" style="text-align:center; padding:15px; font-size:11px; color:#94a3b8; border-top:1px solid #e2e8f0; margin-top:auto;">
     &copy; 2026 <b>DigitalHub Store Manager</b>. All Rights Reserved. Protected System.
   </div>
@@ -255,7 +250,7 @@
       }
     }
 
-    // --- PERUBAHAN: MENAMBAHKAN DAFTAR FITUR DI CARD ---
+    // --- PERUBAHAN: MEMBACA FITUR DINAMIS DARI DATABASE ---
     function renderPackages() {
       const grid = document.getElementById('packages-grid');
       const filteredPkgs = packagesData.filter(p => (p.product || 'Gemini Pro') === activeProduct);
@@ -268,28 +263,22 @@
       grid.innerHTML = filteredPkgs.map((pkg) => {
         let featuresHtml = '';
         
-        // Logika untuk menyesuaikan list fitur berdasarkan layanan
-        if (activeProduct === 'Gemini Pro') {
-            featuresHtml = `
-                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Gemini Advanced</span></li>
-                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Model AI 1.5 Pro Terbaru</span></li>
-                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Prioritas Akses Cepat</span></li>
-                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Garansi Penuh ${pkg.duration} Bulan</span></li>
-            `;
-        } else if (activeProduct === 'Canva Pro') {
-            featuresHtml = `
-                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Semua Template VIP</span></li>
-                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Fitur Magic Studio AI</span></li>
-                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Remove Background</span></li>
-                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Garansi Penuh ${pkg.duration} Bulan</span></li>
-            `;
-        } else if (activeProduct === 'YouTube Premium') {
-            featuresHtml = `
-                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Nonton Video Tanpa Iklan</span></li>
-                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Putar di Latar Belakang</span></li>
-                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses YouTube Music</span></li>
-                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Garansi Penuh ${pkg.duration} Bulan</span></li>
-            `;
+        // Membaca input "features" dari database Admin
+        if (pkg.features && pkg.features.trim() !== '') {
+            // Memecah teks baris demi baris jika ada enter (newline)
+            const featureLines = pkg.features.split('\n').filter(line => line.trim() !== '');
+            featuresHtml = featureLines.map(line => `
+                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>${line.trim()}</span></li>
+            `).join('');
+        } else {
+            // Teks cadangan jika admin mengosongkan kolom teks fitur
+            if (activeProduct === 'Gemini Pro') {
+                featuresHtml = `<li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Gemini Advanced</span></li><li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Garansi ${pkg.duration} Bulan</span></li>`;
+            } else if (activeProduct === 'Canva Pro') {
+                featuresHtml = `<li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Semua Template VIP</span></li><li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Garansi ${pkg.duration} Bulan</span></li>`;
+            } else if (activeProduct === 'YouTube Premium') {
+                featuresHtml = `<li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Nonton Video Tanpa Iklan</span></li><li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Garansi ${pkg.duration} Bulan</span></li>`;
+            }
         }
 
         return `
@@ -410,7 +399,6 @@
     }
   </script>
 
-  <!-- SKRIP PROTEKSI -->
   <script>
     document.addEventListener('contextmenu', e => e.preventDefault()); 
     document.addEventListener('keydown', function(e) {
