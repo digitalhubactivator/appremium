@@ -71,11 +71,8 @@
 
   <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 space-y-8 animate-fade-up">
     
-    <!-- ========================================== -->
-    <!-- ADSTERRA SLOT 1 (BANNER ATAS SMART/RESPONSIVE) -->
-    <!-- ========================================== -->
+    <!-- ADSTERRA SLOT 1 -->
     <div class="w-full flex justify-center mb-4 sm:mb-6">
-        <!-- Tampil HANYA di PC/Tablet (Ukuran 728x90) -->
         <div class="hidden md:flex flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-2 rounded-xl shadow-sm border border-slate-200/50">
             <script type="text/javascript">
                 atOptions = {
@@ -89,7 +86,6 @@
             <script type="text/javascript" src="https://www.highrevenueformat.com/9bf61f68ebce3a8e4d015c67c59f19c1/invoke.js"></script>
         </div>
 
-        <!-- Tampil HANYA di HP (Ukuran 320x50) -->
         <div class="flex md:hidden flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-1.5 rounded-lg shadow-sm border border-slate-200/50">
             <script type="text/javascript">
                 atOptions = {
@@ -103,7 +99,6 @@
             <script type="text/javascript" src="https://www.highrevenueformat.com/453e0b2e0d1c62e5be6eaed0235e474d/invoke.js"></script>
         </div>
     </div>
-    <!-- ========================================== -->
 
     <div class="text-center space-y-4 sm:space-y-6 w-full max-w-3xl mx-auto px-2 mt-0">
       <span class="inline-flex items-center gap-1.5 bg-white text-slate-800 border border-slate-200 text-[9px] sm:text-[10px] lg:text-xs font-black px-3 sm:px-4 py-1 sm:py-1.5 lg:py-2 rounded-full uppercase tracking-widest shadow-sm">
@@ -137,7 +132,7 @@
       </div>
       
       <!-- GRID DURASI (DILOAD OTOMATIS) -->
-      <div id="packages-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 w-full max-w-lg md:max-w-none mx-auto">
+      <div id="packages-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 w-full max-w-lg md:max-w-none mx-auto">
         <div class="col-span-full py-10 flex flex-col items-center justify-center text-slate-400">
             <i data-lucide="loader-2" class="w-8 h-8 animate-spin mb-2"></i>
             <span class="text-xs font-bold mt-2">Memuat daftar harga...</span>
@@ -145,11 +140,8 @@
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- ADSTERRA SLOT 2 (BANNER BAWAH SMART/RESPONSIVE) -->
-    <!-- ========================================== -->
+    <!-- ADSTERRA SLOT 2 -->
     <div class="w-full flex justify-center mt-10 mb-4">
-        <!-- Tampil HANYA di PC/Tablet (Ukuran 728x90) -->
         <div class="hidden md:flex flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-2 rounded-xl shadow-sm border border-slate-200/50">
             <script type="text/javascript">
                 atOptions = {
@@ -163,7 +155,6 @@
             <script type="text/javascript" src="https://www.highrevenueformat.com/9bf61f68ebce3a8e4d015c67c59f19c1/invoke.js"></script>
         </div>
 
-        <!-- Tampil HANYA di HP (Ukuran 320x50) -->
         <div class="flex md:hidden flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-1.5 rounded-lg shadow-sm border border-slate-200/50">
             <script type="text/javascript">
                 atOptions = {
@@ -177,7 +168,6 @@
             <script type="text/javascript" src="https://www.highrevenueformat.com/453e0b2e0d1c62e5be6eaed0235e474d/invoke.js"></script>
         </div>
     </div>
-    <!-- ========================================== -->
 
     <!-- FORM AKTIVASI -->
     <div id="activation-section" class="bg-white border border-slate-100 rounded-3xl p-5 sm:p-8 lg:p-10 w-full max-w-2xl mx-auto space-y-6 hidden shadow-2xl relative overflow-hidden transition-all duration-500 transform translate-y-4">
@@ -226,14 +216,11 @@
     let selectedMonths = 0;
     let packagesData = [];
 
-    // ====== PERUBAHAN: DETEKSI URL OTOMATIS ======
     window.onload = async function() {
       if(typeof lucide !== 'undefined') lucide.createIcons();
       
-      // 1. Ambil data paket dari API terlebih dahulu
       await fetchPackages(); 
       
-      // 2. Deteksi kata di dalam URL yang sedang dibuka
       const currentUrl = window.location.href.toLowerCase();
       
       if (currentUrl.includes('canva')) {
@@ -241,11 +228,9 @@
       } else if (currentUrl.includes('youtube')) {
         setProduct('YouTube Premium');
       } else {
-        // Default jika URL hanya domain utama atau mengandung kata gemini
         setProduct('Gemini Pro');
       }
     };
-    // ==========================================
 
     function showToast(msg, type='info') {
       const container = document.getElementById('toast-container');
@@ -270,6 +255,7 @@
       }
     }
 
+    // --- PERUBAHAN: MENAMBAHKAN DAFTAR FITUR DI CARD ---
     function renderPackages() {
       const grid = document.getElementById('packages-grid');
       const filteredPkgs = packagesData.filter(p => (p.product || 'Gemini Pro') === activeProduct);
@@ -279,18 +265,54 @@
           return;
       }
 
-      grid.innerHTML = filteredPkgs.map((pkg) => `
-        <div onclick="selectPackage(${pkg.duration}, '${pkg.name}')" class="pkg-card relative bg-white/80 border-2 border-slate-100 rounded-2xl sm:rounded-3xl p-3 sm:p-5 cursor-pointer transition-all duration-300 text-center hover:-translate-y-1 flex flex-col justify-between h-full group">
-          <div>
+      grid.innerHTML = filteredPkgs.map((pkg) => {
+        let featuresHtml = '';
+        
+        // Logika untuk menyesuaikan list fitur berdasarkan layanan
+        if (activeProduct === 'Gemini Pro') {
+            featuresHtml = `
+                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Gemini Advanced</span></li>
+                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Model AI 1.5 Pro Terbaru</span></li>
+                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Prioritas Akses Cepat</span></li>
+                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Garansi Penuh ${pkg.duration} Bulan</span></li>
+            `;
+        } else if (activeProduct === 'Canva Pro') {
+            featuresHtml = `
+                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Semua Template VIP</span></li>
+                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Fitur Magic Studio AI</span></li>
+                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Remove Background</span></li>
+                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Garansi Penuh ${pkg.duration} Bulan</span></li>
+            `;
+        } else if (activeProduct === 'YouTube Premium') {
+            featuresHtml = `
+                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Nonton Video Tanpa Iklan</span></li>
+                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Putar di Latar Belakang</span></li>
+                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses YouTube Music</span></li>
+                <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Garansi Penuh ${pkg.duration} Bulan</span></li>
+            `;
+        }
+
+        return `
+        <div onclick="selectPackage(${pkg.duration}, '${pkg.name}')" class="pkg-card relative bg-white/80 border-2 border-slate-100 rounded-2xl sm:rounded-3xl p-4 sm:p-5 cursor-pointer transition-all duration-300 text-left hover:-translate-y-1 flex flex-col h-full group">
+          <div class="text-center border-b border-slate-100 pb-3 mb-3">
             <span class="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1 truncate">${pkg.name}</span>
             <h4 class="text-2xl sm:text-3xl font-black text-slate-800 mt-1 mb-1">${pkg.duration} <span class="text-base sm:text-lg">Bln</span></h4>
-            <p class="text-xs sm:text-sm font-black text-emerald-500 mb-3 tracking-wide">Rp ${parseInt(pkg.price || 0).toLocaleString('id-ID')}</p>
+            <p class="text-xs sm:text-sm font-black text-emerald-500 tracking-wide">Rp ${parseInt(pkg.price || 0).toLocaleString('id-ID')}</p>
           </div>
+          
+          <div class="flex-grow mb-4">
+             <ul class="text-[10px] sm:text-[11px] font-medium text-slate-500 space-y-2">
+                ${featuresHtml}
+             </ul>
+          </div>
+          
           <div class="mt-auto">
-            <span class="btn-pilih block w-full py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300">Pilih Paket</span>
+            <span class="btn-pilih block w-full py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 text-center">Pilih Paket</span>
           </div>
         </div>
-      `).join('');
+      `}).join('');
+
+      if(typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     function setProduct(productName) {
@@ -342,19 +364,16 @@
     function selectPackage(months, pkgName) {
       selectedMonths = months;
       
-      // Hapus efek aktif dari paket lain, tambahkan ke yang dipilih
       document.querySelectorAll('.pkg-card').forEach(card => card.classList.remove('active', 'scale-[1.02]'));
       event.currentTarget.classList.add('active', 'scale-[1.02]');
       
-      // Tampilkan Formulir Aktivasi
       document.getElementById('selected-package-label').innerText = `${activeProduct} (${months} Bulan)`;
       const actSection = document.getElementById('activation-section');
       actSection.classList.remove('hidden');
       
-      // Memberi sedikit jeda agar transisi CSS berjalan, lalu Scroll Otomatis!
       setTimeout(() => { 
           actSection.classList.remove('translate-y-4'); 
-          actSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          actSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
       }, 50);
     }
 
