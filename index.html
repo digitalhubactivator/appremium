@@ -226,10 +226,26 @@
     let selectedMonths = 0;
     let packagesData = [];
 
-    window.onload = function() {
+    // ====== PERUBAHAN: DETEKSI URL OTOMATIS ======
+    window.onload = async function() {
       if(typeof lucide !== 'undefined') lucide.createIcons();
-      fetchPackages(); 
+      
+      // 1. Ambil data paket dari API terlebih dahulu
+      await fetchPackages(); 
+      
+      // 2. Deteksi kata di dalam URL yang sedang dibuka
+      const currentUrl = window.location.href.toLowerCase();
+      
+      if (currentUrl.includes('canva')) {
+        setProduct('Canva Pro');
+      } else if (currentUrl.includes('youtube')) {
+        setProduct('YouTube Premium');
+      } else {
+        // Default jika URL hanya domain utama atau mengandung kata gemini
+        setProduct('Gemini Pro');
+      }
     };
+    // ==========================================
 
     function showToast(msg, type='info') {
       const container = document.getElementById('toast-container');
@@ -323,7 +339,6 @@
       renderPackages(); 
     }
 
-    // ====== PERUBAHAN: FITUR AUTO SCROLL ======
     function selectPackage(months, pkgName) {
       selectedMonths = months;
       
@@ -339,10 +354,9 @@
       // Memberi sedikit jeda agar transisi CSS berjalan, lalu Scroll Otomatis!
       setTimeout(() => { 
           actSection.classList.remove('translate-y-4'); 
-          actSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); // <--- INI KUNCI AUTO SCROLL-NYA
+          actSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 50);
     }
-    // ==========================================
 
     async function submitActivation() {
       const email = document.getElementById('buyer-email').value.trim();
