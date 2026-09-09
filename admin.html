@@ -99,7 +99,6 @@
         <div class="bg-white border border-purple-100/50 p-6 lg:p-7 rounded-[2rem] shadow-sm flex flex-col justify-center relative overflow-hidden transition-transform hover:-translate-y-1">
           <p class="text-[10px] lg:text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 relative z-10 flex items-center gap-2"><i data-lucide="key" class="w-4 h-4 text-purple-500"></i> Generate PIN Lisensi</p>
           <div class="space-y-2 relative z-10">
-            <!-- TAMBAHAN: onchange="updatePinDropdown()" -->
             <select id="pin-product" onchange="updatePinDropdown()" class="text-xs font-bold border border-slate-200 rounded-xl px-4 py-2.5 bg-slate-50 focus:outline-none w-full text-slate-700">
               <option value="Gemini Pro">Gemini Pro</option>
               <option value="Canva Pro">Canva Pro</option>
@@ -147,7 +146,7 @@
 
         <!-- TAB DATABASE (DENGAN KOLOM HEAD / FAMILY & SISA HARI) -->
         <div id="section-database" class="overflow-x-auto hidden">
-          <!-- TAMBAHAN: TOMBOL FILTER DATABASE -->
+          <!-- TOMBOL FILTER DATABASE -->
           <div class="flex gap-2 p-4 border-b border-slate-100 overflow-x-auto no-scrollbar bg-slate-50/50">
             <button onclick="filterDatabase('Semua', this)" class="filter-btn px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold shadow-sm whitespace-nowrap transition-colors">Semua</button>
             <button onclick="filterDatabase('Gemini Pro', this)" class="filter-btn px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-100 rounded-lg text-xs font-bold whitespace-nowrap transition-colors">Gemini Pro</button>
@@ -169,16 +168,17 @@
           </table>
         </div>
 
-        <!-- TAB KELOLA HEAD ACCOUNT -->
+        <!-- TAB KELOLA HEAD ACCOUNT (DENGAN MANAJEMEN KAPASITAS SLOT) -->
         <div id="section-head-accounts" class="hidden p-8 lg:p-10">
-          <div class="flex justify-between items-center mb-8">
+          <div class="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-8">
              <div>
-                <h3 class="font-black text-slate-900 text-xl">Head Account</h3>
-                <p class="text-xs text-slate-500 mt-1">Daftar akun Head/Keluarga untuk mengundang pembeli.</p>
+                <h3 class="font-black text-slate-900 text-xl">Kelola Head Account</h3>
+                <p class="text-xs text-slate-500 mt-1">Daftar akun Family/Grup. Maksimal 5 pengguna per akun.</p>
              </div>
-             <button onclick="document.getElementById('modal-add-head').classList.remove('hidden')" class="bg-purple-100 text-purple-700 px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Tambah Akun</button>
+             <button onclick="document.getElementById('modal-add-head').classList.remove('hidden')" class="bg-purple-100 text-purple-700 hover:bg-purple-200 px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 transition w-full sm:w-auto justify-center"><i data-lucide="plus" class="w-4 h-4"></i> Tambah Akun</button>
           </div>
-          <div id="head-accounts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+          
+          <div id="head-accounts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
         </div>
 
         <!-- TAB MANAJEMEN PAKET -->
@@ -244,7 +244,7 @@
       </div>
       <div class="flex gap-2 pt-2">
         <button onclick="closeAccModal()" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-xs uppercase">Batal</button>
-        <button id="btn-confirm-acc" onclick="confirmAcc()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs flex justify-center items-center gap-2 uppercase shadow-lg shadow-emerald-500/20 active:scale-95 transition"><i data-lucide="check" class="w-4 h-4"></i> ACC Sekarang</button>
+        <button id="btn-confirm-acc" onclick="confirmAcc()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs flex justify-center items-center gap-2 uppercase shadow-lg shadow-emerald-500/20 active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"><i data-lucide="check" class="w-4 h-4"></i> ACC Sekarang</button>
       </div>
     </div>
   </div>
@@ -269,7 +269,7 @@
     
     let headAccounts = JSON.parse(localStorage.getItem('digitalhub_head_accounts') || '["head1@gmail.com"]');
     let packagesList = [];
-    let activeDatabaseList = []; // TAMBAHAN: Variabel global untuk filter database
+    let activeDatabaseList = []; 
     let currentEmailToApprove = null;
     let currentProdToApprove = "";
     let currentDurationToApprove = 0;
@@ -325,9 +325,10 @@
       document.getElementById('admin-login-screen').classList.remove('flex');
       document.getElementById('main-admin-content').classList.remove('hidden');
       document.getElementById('main-admin-content').classList.add('flex');
-      renderHeadAccounts(); 
+      
       fetchPackages(); 
-      fetchAdminData();
+      fetchAdminData(); // Ini otomatis memanggil renderHeadAccounts
+      
       if (dashboardInterval) clearInterval(dashboardInterval);
       dashboardInterval = setInterval(fetchAdminData, 5000); 
     }
@@ -341,12 +342,11 @@
         if (result.success) {
           packagesList = result.data || [];
           renderPackages();
-          updatePinDropdown(); // TAMBAHAN: Memanggil filter saat paket dimuat
+          updatePinDropdown(); 
         }
       } catch (e) { console.error(e); }
     }
 
-    // TAMBAHAN: Fungsi untuk filter dropdown Generate PIN
     function updatePinDropdown() {
       const selectedProduct = document.getElementById('pin-product').value;
       const filteredPackages = packagesList.filter(p => (p.product || 'Gemini Pro') === selectedProduct);
@@ -445,11 +445,13 @@
           
           renderAntrean(pending); 
           
-          // PERUBAHAN: Simpan data aktif dan pertahankan filter
           activeDatabaseList = active;
           const currentFilterBtn = document.querySelector('.filter-btn.bg-slate-900') || document.querySelector('.filter-btn');
           const currentCategory = currentFilterBtn.innerText.trim();
           filterDatabase(currentCategory, currentFilterBtn);
+          
+          // PERUBAHAN: Memanggil ulang fungsi render head accounts untuk memperbarui status bar sisa slot
+          renderHeadAccounts();
           
           document.getElementById('stat-pending-count').innerText = pending.length;
           document.getElementById('badge-antrean').innerText = pending.length;
@@ -476,25 +478,18 @@
       if(typeof lucide !== 'undefined') lucide.createIcons();
     }
 
-    // TAMBAHAN: Fungsi untuk memfilter tabel database
     function filterDatabase(kategori, btnElement) {
-        // Update styling tombol filter
         if (btnElement) {
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.className = btn.className.replace('bg-slate-900 text-white', '');
-                
-                // Kembalikan style default berdasarkan isi text-nya
                 if(btn.innerText.includes('Gemini')) btn.classList.add('bg-purple-50', 'text-purple-700', 'border-purple-100');
                 else if(btn.innerText.includes('Canva')) btn.classList.add('bg-cyan-50', 'text-cyan-700', 'border-cyan-100');
                 else if(btn.innerText.includes('YouTube')) btn.classList.add('bg-red-50', 'text-red-700', 'border-red-100');
-                else btn.classList.add('bg-slate-100', 'text-slate-700'); // Untuk tombol 'Semua' jika tidak aktif
+                else btn.classList.add('bg-slate-100', 'text-slate-700'); 
             });
-
-            // Set tombol yang diklik jadi style aktif (hitam)
             btnElement.className = "filter-btn px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold shadow-sm whitespace-nowrap transition-colors";
         }
 
-        // Filter data
         let listToRender = activeDatabaseList;
         if (kategori !== 'Semua') {
             listToRender = activeDatabaseList.filter(item => (item.productName || 'Gemini Pro') === kategori);
@@ -530,13 +525,47 @@
       if(typeof lucide !== 'undefined') lucide.createIcons();
     }
 
+    // --- LOGIKA MENGHITUNG KAPASITAS SLOT HEAD ACCOUNT ---
+    function getHeadAccountUsage() {
+      const usage = {};
+      headAccounts.forEach(h => usage[h] = 0);
+      
+      activeDatabaseList.forEach(item => {
+          if (item.headAccount && usage.hasOwnProperty(item.headAccount)) {
+              usage[item.headAccount]++;
+          }
+      });
+      return usage;
+    }
+
     function openAccModal(email, product, duration) {
       if(headAccounts.length === 0) { alert("Tambah Akun Head dulu di Tab Kelola Head Account!"); return; }
       currentEmailToApprove = email; currentProdToApprove = product; currentDurationToApprove = duration;
       
       document.getElementById('modal-target-email').innerText = email;
       document.getElementById('modal-target-paket').innerText = `${product} - ${duration} BULAN`;
-      document.getElementById('select-head-account').innerHTML = headAccounts.map(h => `<option value="${h}">${h}</option>`).join('');
+      
+      // PERUBAHAN: Menyaring akun berdasarkan sisa slot di opsi dropdown modal
+      const usage = getHeadAccountUsage();
+      let optionsHtml = '';
+      
+      headAccounts.forEach(h => {
+          const used = usage[h] || 0;
+          const remaining = 5 - used; // MAKSIMAL 5 SLOT
+          if (remaining > 0) {
+              optionsHtml += `<option value="${h}">${h} (Sisa ${remaining} Slot)</option>`;
+          }
+      });
+
+      const btnConfirm = document.getElementById('btn-confirm-acc');
+      if (optionsHtml === '') {
+          optionsHtml = '<option value="">(Semua Head Account Penuh)</option>';
+          btnConfirm.disabled = true; // Matikan tombol ACC jika tidak ada slot
+      } else {
+          btnConfirm.disabled = false;
+      }
+      
+      document.getElementById('select-head-account').innerHTML = optionsHtml;
       document.getElementById('modal-select-head').classList.remove('hidden');
     }
 
@@ -638,22 +667,57 @@
         setTimeout(() => { document.getElementById('copy-status').classList.remove('opacity-100'); }, 2000);
     }
 
-    // --- KELOLA HEAD ACCOUNTS ---
+    // --- PERUBAHAN: TAB KELOLA HEAD ACCOUNTS DIPISAH TERSEDIA & PENUH ---
     function renderHeadAccounts() {
       const grid = document.getElementById('head-accounts-grid');
+      
       if(headAccounts.length === 0) {
         grid.innerHTML = `<p class="text-sm text-slate-400">Belum ada head account.</p>`;
         return;
       }
-      grid.innerHTML = headAccounts.map((h, i) => `
-        <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex items-center justify-between">
-           <div class="flex items-center gap-3">
-             <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-black text-xs">H${i+1}</div>
-             <p class="font-black text-sm text-slate-800">${h}</p>
-           </div>
-           <button onclick="deleteHeadAccount(${i})" class="text-slate-400 hover:text-rose-500 p-1.5 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-        </div>
-      `).join('');
+      
+      const usage = getHeadAccountUsage();
+      let availableHtml = '';
+      let fullHtml = '';
+      
+      headAccounts.forEach((h, i) => {
+          const used = usage[h] || 0;
+          const max = 5;
+          const remaining = max - used;
+          const isFull = remaining <= 0;
+          
+          const cardHtml = `
+            <div class="bg-white border ${isFull ? 'border-rose-200 opacity-70' : 'border-slate-200'} p-5 rounded-2xl shadow-sm flex flex-col gap-3">
+               <div class="flex items-center justify-between">
+                   <div class="flex items-center gap-3">
+                     <div class="w-9 h-9 rounded-xl ${isFull ? 'bg-rose-50 text-rose-600' : 'bg-purple-50 text-purple-600'} flex items-center justify-center font-black text-xs shrink-0">H${i+1}</div>
+                     <div class="min-w-0 pr-2">
+                        <p class="font-black text-sm text-slate-800 break-words">${h}</p>
+                        <p class="text-[10px] font-bold ${isFull ? 'text-rose-500' : 'text-emerald-500'} mt-0.5">${isFull ? 'Kapasitas Penuh' : `Sisa ${remaining} Slot`}</p>
+                     </div>
+                   </div>
+                   <button onclick="deleteHeadAccount(${i})" class="text-slate-400 hover:text-rose-500 p-1.5 transition shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+               </div>
+               
+               <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden mt-1">
+                   <div class="h-2 rounded-full ${isFull ? 'bg-rose-500' : 'bg-purple-500'}" style="width: ${(used/max)*100}%"></div>
+               </div>
+               <p class="text-[9px] font-bold text-slate-400 text-right uppercase tracking-widest">${used} / ${max} Terpakai</p>
+            </div>
+          `;
+          
+          if (isFull) { fullHtml += cardHtml; } 
+          else { availableHtml += cardHtml; }
+      });
+      
+      grid.innerHTML = `
+          <div class="col-span-full mb-1"><h4 class="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-100 pb-2">✅ Akun Tersedia</h4></div>
+          ${availableHtml || '<div class="col-span-full mb-4"><p class="text-xs text-slate-400">Tidak ada akun tersedia.</p></div>'}
+          
+          <div class="col-span-full mt-6 mb-1"><h4 class="text-xs font-black text-rose-400 uppercase tracking-widest border-b border-rose-100 pb-2">⛔ Akun Penuh (Full Slot)</h4></div>
+          ${fullHtml || '<div class="col-span-full"><p class="text-xs text-slate-400">Belum ada akun yang penuh.</p></div>'}
+      `;
+      
       if(typeof lucide !== 'undefined') lucide.createIcons();
     }
 
@@ -668,7 +732,7 @@
     }
 
     function deleteHeadAccount(index) {
-      if(confirm("Hapus Head Account ini?")) {
+      if(confirm("Hapus Head Account ini? (Data di database tidak terhapus)")) {
         headAccounts.splice(index, 1);
         localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
         renderHeadAccounts();
