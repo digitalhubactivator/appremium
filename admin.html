@@ -144,14 +144,26 @@
           </table>
         </div>
 
-        <!-- TAB DATABASE (DENGAN KOLOM HEAD / FAMILY & SISA HARI) -->
+        <!-- TAB DATABASE -->
         <div id="section-database" class="overflow-x-auto hidden">
-          <!-- TOMBOL FILTER DATABASE -->
-          <div class="flex gap-2 p-4 border-b border-slate-100 overflow-x-auto no-scrollbar bg-slate-50/50">
-            <button onclick="filterDatabase('Semua', this)" class="filter-btn px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold shadow-sm whitespace-nowrap transition-colors">Semua</button>
-            <button onclick="filterDatabase('Gemini Pro', this)" class="filter-btn px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-100 rounded-lg text-xs font-bold whitespace-nowrap transition-colors">Gemini Pro</button>
-            <button onclick="filterDatabase('Canva Pro', this)" class="filter-btn px-4 py-2 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-100 rounded-lg text-xs font-bold whitespace-nowrap transition-colors">Canva Pro</button>
-            <button onclick="filterDatabase('YouTube Premium', this)" class="filter-btn px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 border border-red-100 rounded-lg text-xs font-bold whitespace-nowrap transition-colors">YouTube Premium</button>
+          <!-- BAR PENCARIAN & FILTER -->
+          <div class="flex flex-col sm:flex-row gap-3 p-4 border-b border-slate-100 bg-slate-50/50 justify-between items-center">
+            
+            <div class="flex gap-2 overflow-x-auto no-scrollbar w-full sm:w-auto">
+              <button onclick="filterDatabase('Semua', this)" class="filter-btn px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold shadow-sm whitespace-nowrap transition-colors">Semua</button>
+              <button onclick="filterDatabase('Gemini Pro', this)" class="filter-btn px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-100 rounded-lg text-xs font-bold whitespace-nowrap transition-colors">Gemini Pro</button>
+              <button onclick="filterDatabase('Canva Pro', this)" class="filter-btn px-4 py-2 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-100 rounded-lg text-xs font-bold whitespace-nowrap transition-colors">Canva Pro</button>
+              <button onclick="filterDatabase('YouTube Premium', this)" class="filter-btn px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 border border-red-100 rounded-lg text-xs font-bold whitespace-nowrap transition-colors">YouTube Premium</button>
+            </div>
+            
+            <div class="flex gap-2 w-full sm:w-auto">
+              <div class="relative w-full sm:w-56">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="search-db" oninput="applyDatabaseFilters()" placeholder="Cari email / head account..." class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:border-purple-400 shadow-sm transition-colors">
+              </div>
+              <button onclick="openManualModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shadow-sm transition-transform active:scale-95"><i data-lucide="user-plus" class="w-4 h-4"></i> <span class="hidden sm:inline">Manual</span></button>
+            </div>
+
           </div>
 
           <table class="w-full text-left text-sm text-slate-600">
@@ -177,7 +189,6 @@
              </div>
              <button onclick="document.getElementById('modal-add-head').classList.remove('hidden')" class="bg-purple-100 text-purple-700 hover:bg-purple-200 px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 transition w-full sm:w-auto justify-center"><i data-lucide="plus" class="w-4 h-4"></i> Tambah Akun</button>
           </div>
-          
           <div id="head-accounts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
         </div>
 
@@ -262,14 +273,41 @@
     </div>
   </div>
 
+  <!-- MODAL TAMBAH PELANGGAN MANUAL -->
+  <div id="modal-add-manual" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeManualModal()"></div>
+    <div class="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 space-y-4">
+      <h3 class="font-black text-xl text-slate-900">Input Manual</h3>
+      <p class="text-xs text-slate-500 -mt-2 mb-2 leading-relaxed">Tambahkan pelanggan secara langsung dari catatan Anda ke dalam database.</p>
+      
+      <input type="email" id="manual-email" placeholder="Email Pelanggan" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-400" />
+      
+      <select id="manual-product" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-400">
+        <option value="Gemini Pro">Gemini Pro</option>
+        <option value="Canva Pro">Canva Pro</option>
+        <option value="YouTube Premium">YouTube Premium</option>
+      </select>
+      
+      <input type="number" id="manual-duration" placeholder="Durasi (Contoh: 1)" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-400" />
+      
+      <select id="manual-head" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-400"></select>
+      
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeManualModal()" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-xs uppercase transition hover:bg-slate-200">Batal</button>
+        <button id="btn-save-manual" onclick="submitManualEntry()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs uppercase flex justify-center items-center gap-2 transition active:scale-95 shadow-md shadow-emerald-500/20">Simpan ke DB</button>
+      </div>
+    </div>
+  </div>
+
   <!-- SCRIPT UTAMA -->
   <script>
     const encodedApi = btoa("https://api-activator.achachelsea58.workers.dev");
     const API_URL = atob(encodedApi);
     
-    let headAccounts = JSON.parse(localStorage.getItem('digitalhub_head_accounts') || '["head1@gmail.com"]');
+    let headAccounts = JSON.parse(localStorage.getItem('digitalhub_head_accounts') || '[]');
     let packagesList = [];
     let activeDatabaseList = []; 
+    let currentCategoryFilter = 'Semua';
     let currentEmailToApprove = null;
     let currentProdToApprove = "";
     let currentDurationToApprove = 0;
@@ -327,7 +365,7 @@
       document.getElementById('main-admin-content').classList.add('flex');
       
       fetchPackages(); 
-      fetchAdminData(); // Ini otomatis memanggil renderHeadAccounts
+      fetchAdminData();
       
       if (dashboardInterval) clearInterval(dashboardInterval);
       dashboardInterval = setInterval(fetchAdminData, 5000); 
@@ -445,13 +483,22 @@
           
           renderAntrean(pending); 
           
+          // FITUR BARU: Deteksi otomatis Head Account dari database
+          let extractedHeads = new Set(headAccounts);
+          active.forEach(item => {
+              if (item.headAccount && item.headAccount !== '-' && item.headAccount.includes('@')) {
+                  extractedHeads.add(item.headAccount);
+              }
+          });
+          const updatedHeads = Array.from(extractedHeads);
+          if (updatedHeads.length !== headAccounts.length) {
+              headAccounts = updatedHeads;
+              localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+          }
+
           activeDatabaseList = active;
-          const currentFilterBtn = document.querySelector('.filter-btn.bg-slate-900') || document.querySelector('.filter-btn');
-          const currentCategory = currentFilterBtn.innerText.trim();
-          filterDatabase(currentCategory, currentFilterBtn);
-          
-          // PERUBAHAN: Memanggil ulang fungsi render head accounts untuk memperbarui status bar sisa slot
-          renderHeadAccounts();
+          applyDatabaseFilters(); // Terapkan pencarian & filter 
+          renderHeadAccounts();   // Perbarui kapasitas slot head account
           
           document.getElementById('stat-pending-count').innerText = pending.length;
           document.getElementById('badge-antrean').innerText = pending.length;
@@ -478,6 +525,7 @@
       if(typeof lucide !== 'undefined') lucide.createIcons();
     }
 
+    // --- FITUR BARU: FILTER & SEARCH ---
     function filterDatabase(kategori, btnElement) {
         if (btnElement) {
             document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -487,20 +535,37 @@
                 else if(btn.innerText.includes('YouTube')) btn.classList.add('bg-red-50', 'text-red-700', 'border-red-100');
                 else btn.classList.add('bg-slate-100', 'text-slate-700'); 
             });
-            btnElement.className = "filter-btn px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold shadow-sm whitespace-nowrap transition-colors";
+            btnElement.className = "filter-btn px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold shadow-sm whitespace-nowrap transition-colors active-filter";
         }
+        currentCategoryFilter = kategori;
+        applyDatabaseFilters();
+    }
 
-        let listToRender = activeDatabaseList;
-        if (kategori !== 'Semua') {
-            listToRender = activeDatabaseList.filter(item => (item.productName || 'Gemini Pro') === kategori);
+    function applyDatabaseFilters() {
+        const query = document.getElementById('search-db').value.toLowerCase().trim();
+        let filtered = activeDatabaseList;
+        
+        // Saring berdasarkan kategori produk
+        if (currentCategoryFilter !== 'Semua') {
+            filtered = filtered.filter(item => (item.productName || 'Gemini Pro') === currentCategoryFilter);
         }
-        renderDatabase(listToRender);
+        
+        // Saring berdasarkan text pencarian universal
+        if (query !== '') {
+            filtered = filtered.filter(item => 
+                item.email.toLowerCase().includes(query) || 
+                (item.headAccount && item.headAccount.toLowerCase().includes(query)) ||
+                (item.productName && item.productName.toLowerCase().includes(query))
+            );
+        }
+        
+        renderDatabase(filtered);
     }
 
     function renderDatabase(list) {
       const tbody = document.getElementById('table-database-body');
       if (list.length === 0) { 
-        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400">Belum ada pelanggan aktif di kategori ini.</td></tr>`; 
+        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400">Data tidak ditemukan.</td></tr>`; 
         return; 
       }
       tbody.innerHTML = list.map(item => {
@@ -539,13 +604,12 @@
     }
 
     function openAccModal(email, product, duration) {
-      if(headAccounts.length === 0) { alert("Tambah Akun Head dulu di Tab Kelola Head Account!"); return; }
+      if(headAccounts.length === 0) { alert("Daftar Head Account kosong!"); return; }
       currentEmailToApprove = email; currentProdToApprove = product; currentDurationToApprove = duration;
       
       document.getElementById('modal-target-email').innerText = email;
       document.getElementById('modal-target-paket').innerText = `${product} - ${duration} BULAN`;
       
-      // PERUBAHAN: Menyaring akun berdasarkan sisa slot di opsi dropdown modal
       const usage = getHeadAccountUsage();
       let optionsHtml = '';
       
@@ -560,7 +624,7 @@
       const btnConfirm = document.getElementById('btn-confirm-acc');
       if (optionsHtml === '') {
           optionsHtml = '<option value="">(Semua Head Account Penuh)</option>';
-          btnConfirm.disabled = true; // Matikan tombol ACC jika tidak ada slot
+          btnConfirm.disabled = true; 
       } else {
           btnConfirm.disabled = false;
       }
@@ -582,12 +646,8 @@
 
       try {
         const res = await fetch(`${API_URL}/api/gemini/admin/accept`, { 
-          method: "POST", 
-          headers: { "Content-Type": "application/json" }, 
-          body: JSON.stringify({ 
-            email: currentEmailToApprove,
-            headAccount: selectedHead 
-          }) 
+          method: "POST", headers: { "Content-Type": "application/json" }, 
+          body: JSON.stringify({ email: currentEmailToApprove, headAccount: selectedHead }) 
         });
         const result = await res.json();
         
@@ -597,7 +657,6 @@
           
           let inviteLink = "https://myaccount.google.com/family/details";
           if(currentProdToApprove.toLowerCase().includes("canva")) inviteLink = "https://www.canva.com/settings/members";
-          
           if(newTab) newTab.location.href = inviteLink;
         } else { 
           if(newTab) newTab.close();
@@ -667,7 +726,7 @@
         setTimeout(() => { document.getElementById('copy-status').classList.remove('opacity-100'); }, 2000);
     }
 
-    // --- PERUBAHAN: TAB KELOLA HEAD ACCOUNTS DIPISAH TERSEDIA & PENUH ---
+    // --- TAB KELOLA HEAD ACCOUNTS ---
     function renderHeadAccounts() {
       const grid = document.getElementById('head-accounts-grid');
       
@@ -696,7 +755,7 @@
                         <p class="text-[10px] font-bold ${isFull ? 'text-rose-500' : 'text-emerald-500'} mt-0.5">${isFull ? 'Kapasitas Penuh' : `Sisa ${remaining} Slot`}</p>
                      </div>
                    </div>
-                   <button onclick="deleteHeadAccount(${i})" class="text-slate-400 hover:text-rose-500 p-1.5 transition shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                   <button onclick="deleteHeadAccount('${h}')" class="text-slate-400 hover:text-rose-500 p-1.5 transition shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                </div>
                
                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden mt-1">
@@ -724,19 +783,94 @@
     function addHeadAccount() {
       const email = document.getElementById('new-head-email').value.trim();
       if(!email || !email.includes('@')) { alert("Masukkan email yang valid!"); return; }
-      headAccounts.push(email);
-      localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+      if(!headAccounts.includes(email)) {
+          headAccounts.push(email);
+          localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+      }
       document.getElementById('new-head-email').value = "";
       document.getElementById('modal-add-head').classList.add('hidden');
       renderHeadAccounts();
     }
 
-    function deleteHeadAccount(index) {
-      if(confirm("Hapus Head Account ini? (Data di database tidak terhapus)")) {
-        headAccounts.splice(index, 1);
+    function deleteHeadAccount(emailToDelete) {
+      if(confirm("Hapus Head Account ini? (Hanya menghapus daftar, data di database tetap aman)")) {
+        headAccounts = headAccounts.filter(h => h !== emailToDelete);
         localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
         renderHeadAccounts();
       }
+    }
+
+    // --- FITUR BARU: INPUT MANUAL PELANGGAN ---
+    function openManualModal() {
+        if(headAccounts.length === 0) { alert("Tambahkan minimal 1 Head Account terlebih dahulu!"); return; }
+        
+        document.getElementById('manual-email').value = "";
+        document.getElementById('manual-duration').value = "";
+        
+        // Saring dropdown head account agar hanya yg ada slot
+        const usage = getHeadAccountUsage();
+        let optionsHtml = '';
+        headAccounts.forEach(h => {
+            const used = usage[h] || 0;
+            const remaining = 5 - used; 
+            if (remaining > 0) optionsHtml += `<option value="${h}">${h} (Sisa ${remaining} Slot)</option>`;
+        });
+        
+        const headSelect = document.getElementById('manual-head');
+        if (optionsHtml === '') {
+            headSelect.innerHTML = '<option value="">(Semua Head Account Penuh)</option>';
+            document.getElementById('btn-save-manual').disabled = true;
+        } else {
+            headSelect.innerHTML = optionsHtml;
+            document.getElementById('btn-save-manual').disabled = false;
+        }
+
+        document.getElementById('modal-add-manual').classList.remove('hidden');
+    }
+
+    function closeManualModal() {
+        document.getElementById('modal-add-manual').classList.add('hidden');
+    }
+
+    async function submitManualEntry() {
+        const email = document.getElementById('manual-email').value.trim();
+        const product = document.getElementById('manual-product').value;
+        const duration = document.getElementById('manual-duration').value;
+        const head = document.getElementById('manual-head').value;
+
+        if(!email || !duration) { alert("Email dan Durasi wajib diisi!"); return; }
+
+        const btn = document.getElementById('btn-save-manual');
+        const orig = btn.innerHTML;
+        btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Menyimpan...`;
+        btn.disabled = true;
+
+        const dummyWa = "080000000000";
+        const dummyPin = "MANUAL-" + Math.random().toString(36).substring(2,8).toUpperCase();
+
+        try {
+            // 1. Masukkan ke database (pura-pura aktivasi via PIN)
+            await fetch(`${API_URL}/api/gemini/request`, {
+                method: "POST", headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({email: email, wa: dummyWa, pin: dummyPin, durationMonths: duration, productName: product})
+            });
+            
+            // 2. Langsung eksekusi ACC di latar belakang
+            await fetch(`${API_URL}/api/gemini/admin/accept`, {
+                method: "POST", headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({email: email, headAccount: head})
+            });
+
+            closeManualModal();
+            fetchAdminData(); // Reload database
+            alert(`Selesai! Akun ${email} berhasil diinput.`);
+        } catch(e) {
+            alert("Terjadi kesalahan koneksi saat menyimpan manual.");
+        } finally {
+            btn.innerHTML = orig;
+            btn.disabled = false;
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
     }
   </script>
 </body>
