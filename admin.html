@@ -99,7 +99,8 @@
         <div class="bg-white border border-purple-100/50 p-6 lg:p-7 rounded-[2rem] shadow-sm flex flex-col justify-center relative overflow-hidden transition-transform hover:-translate-y-1">
           <p class="text-[10px] lg:text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 relative z-10 flex items-center gap-2"><i data-lucide="key" class="w-4 h-4 text-purple-500"></i> Generate PIN Lisensi</p>
           <div class="space-y-2 relative z-10">
-            <select id="pin-product" class="text-xs font-bold border border-slate-200 rounded-xl px-4 py-2.5 bg-slate-50 focus:outline-none w-full text-slate-700">
+            <!-- TAMBAHAN: onchange="updatePinDropdown()" -->
+            <select id="pin-product" onchange="updatePinDropdown()" class="text-xs font-bold border border-slate-200 rounded-xl px-4 py-2.5 bg-slate-50 focus:outline-none w-full text-slate-700">
               <option value="Gemini Pro">Gemini Pro</option>
               <option value="Canva Pro">Canva Pro</option>
               <option value="YouTube Premium">YouTube Premium</option>
@@ -146,6 +147,14 @@
 
         <!-- TAB DATABASE (DENGAN KOLOM HEAD / FAMILY & SISA HARI) -->
         <div id="section-database" class="overflow-x-auto hidden">
+          <!-- TAMBAHAN: TOMBOL FILTER DATABASE -->
+          <div class="flex gap-2 p-4 border-b border-slate-100 overflow-x-auto no-scrollbar bg-slate-50/50">
+            <button onclick="filterDatabase('Semua', this)" class="filter-btn px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold shadow-sm whitespace-nowrap transition-colors">Semua</button>
+            <button onclick="filterDatabase('Gemini Pro', this)" class="filter-btn px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-100 rounded-lg text-xs font-bold whitespace-nowrap transition-colors">Gemini Pro</button>
+            <button onclick="filterDatabase('Canva Pro', this)" class="filter-btn px-4 py-2 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-100 rounded-lg text-xs font-bold whitespace-nowrap transition-colors">Canva Pro</button>
+            <button onclick="filterDatabase('YouTube Premium', this)" class="filter-btn px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 border border-red-100 rounded-lg text-xs font-bold whitespace-nowrap transition-colors">YouTube Premium</button>
+          </div>
+
           <table class="w-full text-left text-sm text-slate-600">
             <thead class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-black border-b border-slate-100 tracking-[0.2em]">
               <tr>
@@ -214,7 +223,7 @@
       </div>
   </div>
 
-  <!-- MODAL ACC PESANAN (DENGAN TOMBOL COPY KECIL MANUAL) -->
+  <!-- MODAL ACC PESANAN -->
   <div id="modal-select-head" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeAccModal()"></div>
     <div class="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 space-y-5">
@@ -223,8 +232,7 @@
         <p class="text-[10px] font-bold text-slate-400 uppercase">Pelanggan & Produk</p>
         <div class="flex items-center gap-2 mt-1">
           <p id="modal-target-email" class="font-black text-slate-800 text-sm break-all"></p>
-          <!-- Tombol Copy Kecil Manual -->
-          <button type="button" onclick="copyToClipboard(currentEmailToApprove); alert('Email berhasil disalin: ' + currentEmailToApprove);" class="p-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg transition shrink-0" title="Copy Email">
+          <button type="button" onclick="copyToClipboard(currentEmailToApprove); alert('Email disalin: ' + currentEmailToApprove);" class="p-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg transition shrink-0" title="Copy Email">
             <i data-lucide="copy" class="w-3.5 h-3.5"></i>
           </button>
         </div>
@@ -261,6 +269,7 @@
     
     let headAccounts = JSON.parse(localStorage.getItem('digitalhub_head_accounts') || '["head1@gmail.com"]');
     let packagesList = [];
+    let activeDatabaseList = []; // TAMBAHAN: Variabel global untuk filter database
     let currentEmailToApprove = null;
     let currentProdToApprove = "";
     let currentDurationToApprove = 0;
@@ -332,10 +341,22 @@
         if (result.success) {
           packagesList = result.data || [];
           renderPackages();
-          const pinSelect = document.getElementById('pin-duration');
-          pinSelect.innerHTML = packagesList.map(p => `<option value="${p.duration}">${p.name} (${p.duration} Bln)</option>`).join('');
+          updatePinDropdown(); // TAMBAHAN: Memanggil filter saat paket dimuat
         }
       } catch (e) { console.error(e); }
+    }
+
+    // TAMBAHAN: Fungsi untuk filter dropdown Generate PIN
+    function updatePinDropdown() {
+      const selectedProduct = document.getElementById('pin-product').value;
+      const filteredPackages = packagesList.filter(p => (p.product || 'Gemini Pro') === selectedProduct);
+      
+      const pinSelect = document.getElementById('pin-duration');
+      if (filteredPackages.length === 0) {
+          pinSelect.innerHTML = '<option value="">(Belum ada paket)</option>';
+      } else {
+          pinSelect.innerHTML = filteredPackages.map(p => `<option value="${p.duration}">${p.name} (${p.duration} Bln)</option>`).join('');
+      }
     }
 
     function renderPackages() {
@@ -423,7 +444,12 @@
           const active = allData.filter(d => d.status === "ACCEPTED");
           
           renderAntrean(pending); 
-          renderDatabase(active);
+          
+          // PERUBAHAN: Simpan data aktif dan pertahankan filter
+          activeDatabaseList = active;
+          const currentFilterBtn = document.querySelector('.filter-btn.bg-slate-900') || document.querySelector('.filter-btn');
+          const currentCategory = currentFilterBtn.innerText.trim();
+          filterDatabase(currentCategory, currentFilterBtn);
           
           document.getElementById('stat-pending-count').innerText = pending.length;
           document.getElementById('badge-antrean').innerText = pending.length;
@@ -450,11 +476,36 @@
       if(typeof lucide !== 'undefined') lucide.createIcons();
     }
 
-    // RENDER DATABASE: KOLOM HEAD ACCOUNT + SISA HARI
+    // TAMBAHAN: Fungsi untuk memfilter tabel database
+    function filterDatabase(kategori, btnElement) {
+        // Update styling tombol filter
+        if (btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = btn.className.replace('bg-slate-900 text-white', '');
+                
+                // Kembalikan style default berdasarkan isi text-nya
+                if(btn.innerText.includes('Gemini')) btn.classList.add('bg-purple-50', 'text-purple-700', 'border-purple-100');
+                else if(btn.innerText.includes('Canva')) btn.classList.add('bg-cyan-50', 'text-cyan-700', 'border-cyan-100');
+                else if(btn.innerText.includes('YouTube')) btn.classList.add('bg-red-50', 'text-red-700', 'border-red-100');
+                else btn.classList.add('bg-slate-100', 'text-slate-700'); // Untuk tombol 'Semua' jika tidak aktif
+            });
+
+            // Set tombol yang diklik jadi style aktif (hitam)
+            btnElement.className = "filter-btn px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold shadow-sm whitespace-nowrap transition-colors";
+        }
+
+        // Filter data
+        let listToRender = activeDatabaseList;
+        if (kategori !== 'Semua') {
+            listToRender = activeDatabaseList.filter(item => (item.productName || 'Gemini Pro') === kategori);
+        }
+        renderDatabase(listToRender);
+    }
+
     function renderDatabase(list) {
       const tbody = document.getElementById('table-database-body');
       if (list.length === 0) { 
-        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400">Belum ada pelanggan aktif.</td></tr>`; 
+        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400">Belum ada pelanggan aktif di kategori ini.</td></tr>`; 
         return; 
       }
       tbody.innerHTML = list.map(item => {
@@ -491,7 +542,6 @@
 
     function closeAccModal() { document.getElementById('modal-select-head').classList.add('hidden'); }
 
-    // FUNGSI ACC: SIMPAN HEAD + BYPASS POPUP BLOCKER
     async function confirmAcc() {
       const btn = document.getElementById('btn-confirm-acc');
       const selectedHead = document.getElementById('select-head-account').value;
@@ -499,7 +549,6 @@
       btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Memproses...`; 
       btn.disabled = true;
 
-      // Buka tab kosong lebih awal untuk mencegah popup blocker
       const newTab = window.open("about:blank", "_blank");
 
       try {
@@ -560,6 +609,9 @@
       const prodSelect = document.getElementById('pin-product');
       const durationSelect = document.getElementById('pin-duration');
       const product = prodSelect.value;
+      
+      if(!durationSelect.value) { alert("Tidak ada durasi paket yang bisa dipilih!"); return; }
+      
       const duration = durationSelect.value;
       const durationLabel = durationSelect.options[durationSelect.selectedIndex]?.text || `${duration} Bulan`;
       
@@ -577,7 +629,9 @@
           document.getElementById('pin-result-modal').classList.remove('hidden');
       } catch (e) { alert("Gagal menyimpan PIN ke database."); }
     }
+    
     function closePinModal() { document.getElementById('pin-result-modal').classList.add('hidden'); }
+    
     function copyPin() {
         copyToClipboard(document.getElementById('generated-pin').innerText);
         document.getElementById('copy-status').classList.add('opacity-100');
