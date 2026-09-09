@@ -188,16 +188,16 @@
           <div id="head-accounts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
         </div>
 
-        <!-- TAB MANAJEMEN PAKET (DIPERBARUI DENGAN FORM DESKRIPSI FITUR) -->
-        <div id="section-paket" class="hidden p-8 lg:p-10 bg-slate-50/30">
-          <div class="flex justify-between items-center mb-8">
+        <!-- TAB MANAJEMEN PAKET (DIPERBARUI: DAFTAR DIPISAH PER KATEGORI) -->
+        <div id="section-paket" class="hidden p-8 lg:p-10 bg-slate-50/30 space-y-10">
+          <div class="flex justify-between items-center">
              <div>
                 <h3 class="font-black text-slate-900 text-xl">Manajemen Paket Dinamis</h3>
                 <p class="text-xs text-slate-500 mt-1">Tambahkan paket baru beserta harganya agar otomatis muncul di halaman depan.</p>
              </div>
           </div>
           
-          <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm mb-8 flex flex-col gap-3">
+          <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex flex-col gap-3">
              <input type="hidden" id="edit-pkg-id" value="">
              <div class="flex flex-col sm:flex-row gap-3 w-full">
                  <select id="new-pkg-product" class="w-full sm:w-48 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
@@ -210,7 +210,6 @@
                  <input type="number" id="new-pkg-price" placeholder="Harga (Rp)" class="w-full sm:w-40 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400">
              </div>
              
-             <!-- KOLOM TEKS UNTUK DESKRIPSI FITUR CHECKLIST -->
              <textarea id="new-pkg-features" placeholder="Daftar Fitur / Keterangan (Tekan tombol ENTER untuk membuat baris fitur baru)" rows="3" class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-purple-400"></textarea>
              
              <div class="flex gap-2 justify-end mt-1">
@@ -218,7 +217,25 @@
                <button id="btn-save-pkg" onclick="savePackage()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-xl text-sm font-black shadow-lg shadow-emerald-500/20 whitespace-nowrap active:scale-95 transition-all">Simpan Paket</button>
              </div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4" id="packages-list-grid"></div>
+
+          <!-- SECTION KATEGORI PAKET TERPISAH -->
+          <div class="space-y-8">
+              <div>
+                  <h4 class="text-xs font-black text-purple-700 uppercase tracking-widest border-b border-purple-100 pb-2 mb-4 flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4"></i> Gemini Pro Packages</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4" id="grid-gemini"></div>
+              </div>
+
+              <div>
+                  <h4 class="text-xs font-black text-cyan-700 uppercase tracking-widest border-b border-cyan-100 pb-2 mb-4 flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4"></i> Canva Pro Packages</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4" id="grid-canva"></div>
+              </div>
+
+              <div>
+                  <h4 class="text-xs font-black text-rose-700 uppercase tracking-widest border-b border-rose-100 pb-2 mb-4 flex items-center gap-2"><i data-lucide="youtube" class="w-4 h-4"></i> YouTube Premium Packages</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4" id="grid-youtube"></div>
+              </div>
+          </div>
+
         </div>
 
       </div>
@@ -368,7 +385,6 @@
       dashboardInterval = setInterval(fetchAdminData, 5000); 
     }
 
-    // --- MANAJEMEN PAKET (DIPERBARUI) ---
     async function fetchPackages() {
       if(!isLoggedIn) return;
       try {
@@ -394,10 +410,17 @@
       }
     }
 
+    // --- PERUBAHAN: RENDER PAKET KE MASING-MASING GRID TERPISAH ---
     function renderPackages() {
-      const grid = document.getElementById('packages-list-grid');
-      if (packagesList.length === 0) { grid.innerHTML = `<p class="text-sm text-slate-400">Belum ada paket.</p>`; return; }
-      grid.innerHTML = packagesList.map(p => `
+      const gridGemini = document.getElementById('grid-gemini');
+      const gridCanva = document.getElementById('grid-canva');
+      const gridYoutube = document.getElementById('grid-youtube');
+
+      const geminiPkgs = packagesList.filter(p => (p.product || 'Gemini Pro') === 'Gemini Pro');
+      const canvaPkgs = packagesList.filter(p => p.product === 'Canva Pro');
+      const youtubePkgs = packagesList.filter(p => p.product === 'YouTube Premium');
+
+      const templateCard = (p) => `
         <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm relative flex flex-col group">
            <div class="absolute top-2 right-2 flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
              <button onclick="editPackage('${p.id}')" class="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded transition" title="Edit"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
@@ -408,10 +431,15 @@
            <p class="text-xs text-purple-600 font-bold mt-1">${p.duration} Bulan</p>
            <p class="text-sm text-emerald-600 font-black mt-1.5">Rp ${parseInt(p.price || 0).toLocaleString('id-ID')}</p>
            <div class="mt-2 text-[10px] text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap opacity-60">
-             ${p.features ? p.features.replace(/\n/g, ', ') : 'Teks default sistem'}
+             ${p.features ? p.features.replace(/\n/g, ', ') : 'Tanpa deskripsi'}
            </div>
         </div>
-      `).join('');
+      `;
+
+      gridGemini.innerHTML = geminiPkgs.length > 0 ? geminiPkgs.map(templateCard).join('') : `<p class="text-xs text-slate-400 col-span-full">Belum ada paket Gemini.</p>`;
+      gridCanva.innerHTML = canvaPkgs.length > 0 ? canvaPkgs.map(templateCard).join('') : `<p class="text-xs text-slate-400 col-span-full">Belum ada paket Canva.</p>`;
+      gridYoutube.innerHTML = youtubePkgs.length > 0 ? youtubePkgs.map(templateCard).join('') : `<p class="text-xs text-slate-400 col-span-full">Belum ada paket YouTube.</p>`;
+
       if(typeof lucide !== 'undefined') lucide.createIcons();
     }
 
@@ -421,14 +449,14 @@
       const name = document.getElementById('new-pkg-name').value.trim();
       const duration = document.getElementById('new-pkg-duration').value.trim();
       const price = document.getElementById('new-pkg-price').value.trim();
-      const features = document.getElementById('new-pkg-features').value.trim(); // TAMBAHAN KODE
+      const features = document.getElementById('new-pkg-features').value.trim(); 
 
       if (!name || !duration || !price) { alert("Wajib mengisi Nama, Durasi, dan Harga paket!"); return; }
       
       try {
         await fetch(`${API_URL}/api/gemini/admin/packages`, {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id, name, duration, price, product, features }) // MENGIRIM FEATURES KE API
+          body: JSON.stringify({ id, name, duration, price, product, features }) 
         });
         cancelEdit(); fetchPackages(); 
       } catch(e) { alert("Error menyimpan paket."); }
@@ -443,7 +471,7 @@
       document.getElementById('new-pkg-name').value = pkg.name;
       document.getElementById('new-pkg-duration').value = pkg.duration;
       document.getElementById('new-pkg-price').value = pkg.price || 0;
-      document.getElementById('new-pkg-features').value = pkg.features || ''; // MENGAMBIL FEATURES
+      document.getElementById('new-pkg-features').value = pkg.features || ''; 
       
       const btnSave = document.getElementById('btn-save-pkg');
       btnSave.innerText = "Update Paket";
