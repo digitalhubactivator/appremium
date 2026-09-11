@@ -27,7 +27,7 @@
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-    /* SMART THEME (DIPERBARUI AGAR TOMBOL LANGSUNG BERWARNA) */
+    /* SMART THEME */
     .theme-gemini .pkg-card.active { border-color: #a855f7; box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.2); }
     .theme-gemini .btn-pilih { background: linear-gradient(135deg, #1A73E8 0%, #9333EA 50%, #E91E63 100%); color: white; }
     .theme-gemini .pkg-card:hover .btn-pilih, .theme-gemini .pkg-card.active .btn-pilih { opacity: 0.9; box-shadow: 0 6px 15px -3px rgba(168, 85, 247, 0.4); transform: translateY(-1px); }
@@ -71,34 +71,6 @@
 
   <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 space-y-8 animate-fade-up">
     
-    <div class="w-full flex justify-center mb-4 sm:mb-6">
-        <div class="hidden md:flex flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-2 rounded-xl shadow-sm border border-slate-200/50">
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : '9bf61f68ebce3a8e4d015c67c59f19c1',
-                    'format' : 'iframe',
-                    'height' : 90,
-                    'width' : 728,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="https://www.highrevenueformat.com/9bf61f68ebce3a8e4d015c67c59f19c1/invoke.js"></script>
-        </div>
-
-        <div class="flex md:hidden flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-1.5 rounded-lg shadow-sm border border-slate-200/50">
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : '453e0b2e0d1c62e5be6eaed0235e474d',
-                    'format' : 'iframe',
-                    'height' : 50,
-                    'width' : 320,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="https://www.highrevenueformat.com/453e0b2e0d1c62e5be6eaed0235e474d/invoke.js"></script>
-        </div>
-    </div>
-
     <div class="text-center space-y-4 sm:space-y-6 w-full max-w-3xl mx-auto px-2 mt-0">
       <span class="inline-flex items-center gap-1.5 bg-white text-slate-800 border border-slate-200 text-[9px] sm:text-[10px] lg:text-xs font-black px-3 sm:px-4 py-1 sm:py-1.5 lg:py-2 rounded-full uppercase tracking-widest shadow-sm">
         <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-slate-800 animate-pulse"></div>
@@ -112,6 +84,7 @@
       </p>
     </div>
 
+    <!-- TABS PILIHAN PRODUK -->
     <div class="flex justify-center w-full">
       <div class="bg-white border border-slate-200 p-1.5 rounded-2xl sm:rounded-full shadow-sm flex flex-wrap sm:flex-nowrap gap-1.5 w-full sm:w-auto max-w-md">
         <button onclick="setProduct('Gemini Pro')" id="tab-gemini" class="flex-1 px-4 py-3 rounded-xl sm:rounded-full text-xs font-black transition-all duration-300 bg-gemini-gradient text-white shadow-md">GEMINI PRO</button>
@@ -129,40 +102,13 @@
         <div class="h-[1px] w-8 sm:w-12 bg-gradient-to-l from-transparent to-slate-300"></div>
       </div>
       
+      <!-- GRID DURASI (DILOAD OTOMATIS) -->
       <div id="packages-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 w-full max-w-lg md:max-w-none mx-auto">
         <div class="col-span-full py-10 flex flex-col items-center justify-center text-slate-400">
             <i data-lucide="loader-2" class="w-8 h-8 animate-spin mb-2"></i>
             <span class="text-xs font-bold mt-2">Memuat daftar harga...</span>
         </div>
       </div>
-    </div>
-
-    <div class="w-full flex justify-center mt-10 mb-4">
-        <div class="hidden md:flex flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-2 rounded-xl shadow-sm border border-slate-200/50">
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : '9bf61f68ebce3a8e4d015c67c59f19c1',
-                    'format' : 'iframe',
-                    'height' : 90,
-                    'width' : 728,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="https://www.highrevenueformat.com/9bf61f68ebce3a8e4d015c67c59f19c1/invoke.js"></script>
-        </div>
-
-        <div class="flex md:hidden flex-col items-center justify-center overflow-hidden bg-white/50 backdrop-blur-sm p-1.5 rounded-lg shadow-sm border border-slate-200/50">
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : '453e0b2e0d1c62e5be6eaed0235e474d',
-                    'format' : 'iframe',
-                    'height' : 50,
-                    'width' : 320,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="https://www.highrevenueformat.com/453e0b2e0d1c62e5be6eaed0235e474d/invoke.js"></script>
-        </div>
     </div>
 
     <!-- FORM AKTIVASI -->
@@ -199,6 +145,7 @@
     </div>
   </main>
 
+  <!-- HAK CIPTA -->
   <div id="digitalhub-copyright" style="text-align:center; padding:15px; font-size:11px; color:#94a3b8; border-top:1px solid #e2e8f0; margin-top:auto;">
     &copy; 2026 <b>DigitalHub Store Manager</b>. All Rights Reserved. Protected System.
   </div>
