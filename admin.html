@@ -188,7 +188,7 @@
           <div id="head-accounts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
         </div>
 
-        <!-- TAB MANAJEMEN PAKET (DAFTAR DIPISAH PER KATEGORI) -->
+        <!-- TAB MANAJEMEN PAKET -->
         <div id="section-paket" class="hidden p-8 lg:p-10 bg-slate-50/30 space-y-10">
           <div class="flex justify-between items-center">
              <div>
@@ -317,20 +317,29 @@
     </div>
   </div>
 
-  <!-- MODAL TAMBAH PELANGGAN MANUAL -->
+  <!-- MODAL TAMBAH PELANGGAN MANUAL (DENGAN OPSI TULIS HEAD MANUAL) -->
   <div id="modal-add-manual" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeManualModal()"></div>
     <div class="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 space-y-4">
       <h3 class="font-black text-xl text-slate-900">Input Manual</h3>
       <p class="text-xs text-slate-500 -mt-2 mb-2 leading-relaxed">Tambahkan pelanggan secara langsung dari catatan Anda ke dalam database.</p>
+      
       <input type="email" id="manual-email" placeholder="Email Pelanggan" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-400" />
+      
       <select id="manual-product" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-400">
         <option value="Gemini Pro">Gemini Pro</option>
         <option value="Canva Pro">Canva Pro</option>
         <option value="YouTube Premium">YouTube Premium</option>
       </select>
+      
       <input type="number" id="manual-duration" placeholder="Durasi (Contoh: 1)" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-400" />
-      <select id="manual-head" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-400"></select>
+      
+      <div class="space-y-2">
+        <select id="manual-head" onchange="toggleManualHeadInput()" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-400"></select>
+        <!-- Input Teks Manual -->
+        <input type="email" id="manual-head-custom" placeholder="Ketik Email Head Manual (Contoh: headbaru@gmail.com)" class="hidden w-full px-4 py-3.5 bg-purple-50/50 border border-purple-200 rounded-xl text-sm font-bold outline-none focus:border-purple-400 focus:bg-white transition-all text-slate-800" />
+      </div>
+
       <div class="flex gap-2 pt-2">
         <button onclick="closeManualModal()" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-xs uppercase transition hover:bg-slate-200">Batal</button>
         <button id="btn-save-manual" onclick="submitManualEntry()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs uppercase flex justify-center items-center gap-2 transition active:scale-95 shadow-md shadow-emerald-500/20">Simpan ke DB</button>
@@ -614,7 +623,6 @@
         renderDatabase(filtered);
     }
 
-    // --- PERUBAHAN: KOLOM KELOLA MEMILIKI TOMBOL EDIT & HAPUS ---
     function renderDatabase(list) {
       const tbody = document.getElementById('table-database-body');
       if (list.length === 0) { 
@@ -644,7 +652,6 @@
       if(typeof lucide !== 'undefined') lucide.createIcons();
     }
 
-    // --- FUNGSI MODAL EDIT EMAIL PELANGGAN ---
     function openEditEmailModal(oldEmail) {
       document.getElementById('edit-customer-old-email').value = oldEmail;
       document.getElementById('edit-customer-new-email').value = oldEmail;
@@ -733,7 +740,7 @@
           optionsHtml = '<option value="">(Semua Head Account Penuh)</option>';
           btnConfirm.disabled = true; 
       } else {
-          btnConfirm.disabled = false;
+          btnConfirm.disabled = false; 
       }
       
       document.getElementById('select-head-account').innerHTML = optionsHtml;
@@ -766,11 +773,11 @@
           if(currentProdToApprove.toLowerCase().includes("canva")) inviteLink = "https://www.canva.com/settings/members";
           if(newTab) newTab.location.href = inviteLink;
         } else { 
-          if(newTab) newTab.close();
+          if(newTab) newTab.close(); 
           alert(result.message); 
         }
       } catch (e) { 
-        if(newTab) newTab.close();
+        if(newTab) newTab.close(); 
         alert("Error koneksi jaringan."); 
       } finally { 
         btn.innerHTML = originalText; 
@@ -901,27 +908,39 @@
       }
     }
 
+    // --- MANUAL ENTRY DENGAN FITUR HEAD ACCOUNT MANUAL ---
+    function toggleManualHeadInput() {
+        const headSelect = document.getElementById('manual-head');
+        const customInput = document.getElementById('manual-head-custom');
+        if (headSelect.value === '__custom__') {
+            customInput.classList.remove('hidden');
+            customInput.focus();
+        } else {
+            customInput.classList.add('hidden');
+        }
+    }
+
     function openManualModal() {
-        if(headAccounts.length === 0) { alert("Tambahkan minimal 1 Head Account terlebih dahulu!"); return; }
         document.getElementById('manual-email').value = "";
         document.getElementById('manual-duration').value = "";
+        document.getElementById('manual-head-custom').value = "";
+        document.getElementById('manual-head-custom').classList.add('hidden');
         
         const usage = getHeadAccountUsage();
         let optionsHtml = '';
+        
         headAccounts.forEach(h => {
             const used = usage[h] || 0;
             const remaining = 5 - used; 
             if (remaining > 0) optionsHtml += `<option value="${h}">${h} (Sisa ${remaining} Slot)</option>`;
         });
         
+        optionsHtml += `<option value="__custom__">✍️ + Ketik Manual Akun Head...</option>`;
+        
         const headSelect = document.getElementById('manual-head');
-        if (optionsHtml === '') {
-            headSelect.innerHTML = '<option value="">(Semua Head Account Penuh)</option>';
-            document.getElementById('btn-save-manual').disabled = true;
-        } else {
-            headSelect.innerHTML = optionsHtml;
-            document.getElementById('btn-save-manual').disabled = false;
-        }
+        headSelect.innerHTML = optionsHtml;
+        document.getElementById('btn-save-manual').disabled = false;
+        
         document.getElementById('modal-add-manual').classList.remove('hidden');
     }
 
@@ -933,9 +952,26 @@
         const email = document.getElementById('manual-email').value.trim();
         const product = document.getElementById('manual-product').value;
         const duration = document.getElementById('manual-duration').value;
-        const head = document.getElementById('manual-head').value;
+        const headSelectVal = document.getElementById('manual-head').value;
+        const headCustomVal = document.getElementById('manual-head-custom').value.trim();
 
-        if(!email || !duration) { alert("Email dan Durasi wajib diisi!"); return; }
+        let head = headSelectVal;
+        if (headSelectVal === '__custom__') {
+            if (!headCustomVal || !headCustomVal.includes('@')) {
+                alert("Masukkan email Head Account manual yang valid!");
+                return;
+            }
+            head = headCustomVal;
+            
+            if (!headAccounts.includes(head)) {
+                headAccounts.push(head);
+                localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+                renderHeadAccounts();
+            }
+        }
+
+        if (!email || !duration) { alert("Email dan Durasi wajib diisi!"); return; }
+        if (!head) { alert("Pilih atau isi Head Account!"); return; }
 
         const btn = document.getElementById('btn-save-manual');
         const orig = btn.innerHTML;
@@ -957,7 +993,7 @@
 
             closeManualModal();
             fetchAdminData();
-            alert(`Selesai! Akun ${email} berhasil diinput.`);
+            alert(`Selesai! Akun ${email} berhasil diinput dengan Head: ${head}`);
         } catch(e) {
             alert("Terjadi kesalahan koneksi saat menyimpan manual.");
         } finally {
