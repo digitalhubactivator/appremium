@@ -67,7 +67,12 @@
             <i data-lucide="layout-dashboard" class="w-5 h-5 lg:w-6 lg:h-6 relative z-10"></i>
           </div>
           <div>
-            <h1 class="font-black text-lg lg:text-xl tracking-tight text-slate-900 leading-none">ADMIN<span class="text-gemini">WORKSPACE</span></h1>
+            <div class="flex items-center gap-2">
+              <h1 class="font-black text-lg lg:text-xl tracking-tight text-slate-900 leading-none">ADMIN<span class="text-gemini">WORKSPACE</span></h1>
+              <span id="sync-indicator" class="hidden text-[9px] bg-slate-100 text-slate-500 font-bold px-2 py-0.5 rounded-full items-center gap-1">
+                <i data-lucide="refresh-cw" class="w-2.5 h-2.5 animate-spin"></i> Syncing
+              </span>
+            </div>
             <p class="text-[9px] lg:text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">DigitalHub Store Control</p>
           </div>
         </div>
@@ -188,7 +193,7 @@
           <div id="head-accounts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
         </div>
 
-        <!-- TAB MANAJEMEN PAKET -->
+        <!-- TAB MANAJEMEN PAKET (DIPISAH PER KATEGORI) -->
         <div id="section-paket" class="hidden p-8 lg:p-10 bg-slate-50/30 space-y-10">
           <div class="flex justify-between items-center">
              <div>
@@ -317,7 +322,7 @@
     </div>
   </div>
 
-  <!-- MODAL TAMBAH PELANGGAN MANUAL (DENGAN OPSI TULIS HEAD MANUAL) -->
+  <!-- MODAL TAMBAH PELANGGAN MANUAL (OPSI PILIH / TULIS MANUAL HEAD) -->
   <div id="modal-add-manual" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeManualModal()"></div>
     <div class="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 space-y-4">
@@ -351,9 +356,12 @@
     const encodedApi = btoa("https://api-activator.achachelsea58.workers.dev");
     const API_URL = atob(encodedApi);
     
+    // CACHE-FIRST STATE: Langsung render dari penyimpanan lokal saat web dibuka
     let headAccounts = JSON.parse(localStorage.getItem('digitalhub_head_accounts') || '[]');
-    let packagesList = [];
-    let activeDatabaseList = []; 
+    let packagesList = JSON.parse(localStorage.getItem('cache_packages') || '[]');
+    let activeDatabaseList = JSON.parse(localStorage.getItem('cache_active_db') || '[]'); 
+    let cachedPendingList = JSON.parse(localStorage.getItem('cache_pending_db') || '[]');
+
     let currentCategoryFilter = 'Semua';
     let currentEmailToApprove = null;
     let currentProdToApprove = "";
@@ -362,9 +370,27 @@
     let isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
 
     window.onload = function() {
-      if(typeof lucide !== 'undefined') lucide.createIcons();
+      refreshIcons();
       if (isLoggedIn) showDashboard();
     };
+
+    function refreshIcons() {
+      if(typeof lucide !== 'undefined') {
+        requestAnimationFrame(() => lucide.createIcons());
+      }
+    }
+
+    function setSyncStatus(isSyncing) {
+      const el = document.getElementById('sync-indicator');
+      if (!el) return;
+      if (isSyncing) {
+        el.classList.remove('hidden');
+        el.classList.add('inline-flex');
+      } else {
+        el.classList.add('hidden');
+        el.classList.remove('inline-flex');
+      }
+    }
 
     function copyToClipboard(text) {
       if (navigator.clipboard && window.isSecureContext) {
@@ -405,17 +431,39 @@
       document.getElementById('admin-login-screen').classList.add('flex');
     }
 
+    // --- INSTANT DISPLAY DARI CACHE + SYNC PARALEL ---
     function showDashboard() {
       document.getElementById('admin-login-screen').classList.add('hidden');
       document.getElementById('admin-login-screen').classList.remove('flex');
       document.getElementById('main-admin-content').classList.remove('hidden');
       document.getElementById('main-admin-content').classList.add('flex');
       
-      fetchPackages(); 
-      fetchAdminData();
+      // 1. RENDER INSTAN DARI CACHE (Data langsung tampil tanpa jeda 10 detik)
+      renderPackages();
+      updatePinDropdown();
+      renderAntrean(cachedPendingList);
+      applyDatabaseFilters();
+      renderHeadAccounts();
+      
+      document.getElementById('stat-pending-count').innerText = cachedPendingList.length;
+      document.getElementById('badge-antrean').innerText = cachedPendingList.length;
+      document.getElementById('stat-active-count').innerText = activeDatabaseList.length;
+
+      // 2. AMBIL DATA TERBARU SECARA PARALEL DI BACKGROUND
+      refreshAllDataParallel();
       
       if (dashboardInterval) clearInterval(dashboardInterval);
-      dashboardInterval = setInterval(fetchAdminData, 5000); 
+      dashboardInterval = setInterval(refreshAllDataParallel, 6000); 
+    }
+
+    async function refreshAllDataParallel() {
+      if(!isLoggedIn) return;
+      setSyncStatus(true);
+      try {
+        await Promise.allSettled([fetchPackages(), fetchAdminData()]);
+      } finally {
+        setSyncStatus(false);
+      }
     }
 
     async function fetchPackages() {
@@ -423,8 +471,9 @@
       try {
         const res = await fetch(`${API_URL}/api/gemini/packages`);
         const result = await res.json();
-        if (result.success) {
-          packagesList = result.data || [];
+        if (result.success && Array.isArray(result.data)) {
+          packagesList = result.data;
+          localStorage.setItem('cache_packages', JSON.stringify(packagesList));
           renderPackages();
           updatePinDropdown(); 
         }
@@ -472,7 +521,7 @@
       gridCanva.innerHTML = canvaPkgs.length > 0 ? canvaPkgs.map(templateCard).join('') : `<p class="text-xs text-slate-400 col-span-full">Belum ada paket Canva.</p>`;
       gridYoutube.innerHTML = youtubePkgs.length > 0 ? youtubePkgs.map(templateCard).join('') : `<p class="text-xs text-slate-400 col-span-full">Belum ada paket YouTube.</p>`;
 
-      if(typeof lucide !== 'undefined') lucide.createIcons();
+      refreshIcons();
     }
 
     async function savePackage() {
@@ -542,10 +591,17 @@
       try {
         const response = await fetch(`${API_URL}/api/gemini/admin/requests`);
         const result = await response.json();
-        if (result.success) {
-          const allData = result.data || [];
+        if (result.success && Array.isArray(result.data)) {
+          const allData = result.data;
           const pending = allData.filter(d => d.status === "PENDING");
           const active = allData.filter(d => d.status === "ACCEPTED");
+          
+          cachedPendingList = pending;
+          activeDatabaseList = active;
+          
+          // Simpan cache agar kunjungan berikutnya otomatis 0 detik
+          localStorage.setItem('cache_pending_db', JSON.stringify(pending));
+          localStorage.setItem('cache_active_db', JSON.stringify(active));
           
           renderAntrean(pending); 
           
@@ -561,7 +617,6 @@
               localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
           }
 
-          activeDatabaseList = active;
           applyDatabaseFilters(); 
           renderHeadAccounts();   
           
@@ -569,7 +624,9 @@
           document.getElementById('badge-antrean').innerText = pending.length;
           document.getElementById('stat-active-count').innerText = active.length;
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error("Gagal sinkron data:", e);
+      }
     }
 
     function renderAntrean(list) {
@@ -587,7 +644,7 @@
           </td>
         </tr>
       `).join('');
-      if(typeof lucide !== 'undefined') lucide.createIcons();
+      refreshIcons();
     }
 
     function filterDatabase(kategori, btnElement) {
@@ -649,7 +706,7 @@
           </td>
         </tr>
       `}).join('');
-      if(typeof lucide !== 'undefined') lucide.createIcons();
+      refreshIcons();
     }
 
     function openEditEmailModal(oldEmail) {
@@ -701,7 +758,7 @@
       } finally {
         btn.innerHTML = origText;
         btn.disabled = false;
-        if(typeof lucide !== 'undefined') lucide.createIcons();
+        refreshIcons();
       }
     }
 
@@ -782,7 +839,7 @@
       } finally { 
         btn.innerHTML = originalText; 
         btn.disabled = false; 
-        if(typeof lucide !== 'undefined') lucide.createIcons(); 
+        refreshIcons(); 
       }
     }
 
@@ -885,7 +942,7 @@
           <div class="col-span-full mt-6 mb-1"><h4 class="text-xs font-black text-rose-400 uppercase tracking-widest border-b border-rose-100 pb-2">⛔ Akun Penuh (Full Slot)</h4></div>
           ${fullHtml || '<div class="col-span-full"><p class="text-xs text-slate-400">Belum ada akun yang penuh.</p></div>'}
       `;
-      if(typeof lucide !== 'undefined') lucide.createIcons();
+      refreshIcons();
     }
 
     function addHeadAccount() {
@@ -908,7 +965,7 @@
       }
     }
 
-    // --- MANUAL ENTRY DENGAN FITUR HEAD ACCOUNT MANUAL ---
+    // --- LOGIKA INPUT MANUAL PELANGGAN & HEAD MANUAL ---
     function toggleManualHeadInput() {
         const headSelect = document.getElementById('manual-head');
         const customInput = document.getElementById('manual-head-custom');
@@ -935,6 +992,7 @@
             if (remaining > 0) optionsHtml += `<option value="${h}">${h} (Sisa ${remaining} Slot)</option>`;
         });
         
+        // Pilihan input manual di bagian paling bawah
         optionsHtml += `<option value="__custom__">✍️ + Ketik Manual Akun Head...</option>`;
         
         const headSelect = document.getElementById('manual-head');
@@ -963,6 +1021,7 @@
             }
             head = headCustomVal;
             
+            // Simpan ke daftar Head Account jika belum terdaftar
             if (!headAccounts.includes(head)) {
                 headAccounts.push(head);
                 localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
@@ -999,7 +1058,7 @@
         } finally {
             btn.innerHTML = orig;
             btn.disabled = false;
-            if(typeof lucide !== 'undefined') lucide.createIcons();
+            refreshIcons();
         }
     }
   </script>
