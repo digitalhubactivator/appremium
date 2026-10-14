@@ -77,7 +77,6 @@
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <!-- Fitur Cadangkan & Pulihkan Akun Gmail -->
           <button onclick="exportDataBackup()" class="flex items-center gap-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm" title="Download Cadangan Data Akun Gmail">
             <i data-lucide="download" class="w-3.5 h-3.5"></i> <span class="hidden md:inline">Backup DB</span>
           </button>
@@ -159,7 +158,7 @@
           </table>
         </div>
 
-        <!-- TAB DATABASE -->
+        <!-- TAB DATABASE (DENGAN KOLOM TGL JOIN LENGKAP) -->
         <div id="section-database" class="overflow-x-auto hidden">
           <div class="flex flex-col sm:flex-row gap-3 p-4 border-b border-slate-100 bg-slate-50/50 justify-between items-center">
             <div class="flex gap-2 overflow-x-auto no-scrollbar w-full sm:w-auto">
@@ -181,6 +180,7 @@
             <thead class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-black border-b border-slate-100 tracking-[0.2em]">
               <tr>
                 <th class="px-6 py-5">Pelanggan Aktif</th>
+                <th class="px-6 py-5">Tgl Join</th>
                 <th class="px-6 py-5">Head / Family</th>
                 <th class="px-6 py-5">Durasi & Layanan</th>
                 <th class="px-6 py-5 text-center">Sisa Waktu</th>
@@ -191,12 +191,12 @@
           </table>
         </div>
 
-        <!-- TAB KELOLA HEAD ACCOUNT -->
+        <!-- TAB KELOLA HEAD ACCOUNT (DENGAN TOGGLE KUNCI / FULL MANUAL) -->
         <div id="section-head-accounts" class="hidden p-8 lg:p-10">
           <div class="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-8">
              <div>
                 <h3 class="font-black text-slate-900 text-xl">Kelola Head Account</h3>
-                <p class="text-xs text-slate-500 mt-1">Daftar akun Family/Grup. Maksimal 5 pengguna per akun.</p>
+                <p class="text-xs text-slate-500 mt-1">Daftar akun Family/Grup. Klik gembok jika ingin menandai akun sudah full manual.</p>
              </div>
              <button onclick="document.getElementById('modal-add-head').classList.remove('hidden')" class="bg-purple-100 text-purple-700 hover:bg-purple-200 px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 transition w-full sm:w-auto justify-center"><i data-lucide="plus" class="w-4 h-4"></i> Tambah Akun</button>
           </div>
@@ -233,7 +233,6 @@
              </div>
           </div>
 
-          <!-- SECTION KATEGORI PAKET TERPISAH -->
           <div class="space-y-8">
               <div>
                   <h4 class="text-xs font-black text-purple-700 uppercase tracking-widest border-b border-purple-100 pb-2 mb-4 flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4"></i> Gemini Pro Packages</h4>
@@ -269,7 +268,7 @@
       </div>
   </div>
 
-  <!-- MODAL ACC PESANAN -->
+  <!-- MODAL ACC PESANAN (OPSI PILIH / TULIS MANUAL HEAD) -->
   <div id="modal-select-head" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeAccModal()"></div>
     <div class="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-8 space-y-5">
@@ -284,9 +283,10 @@
         </div>
         <p id="modal-target-paket" class="text-xs text-purple-600 font-black mt-1 uppercase"></p>
       </div>
-      <div>
+      <div class="space-y-2">
         <label class="text-[10px] font-bold text-slate-700 block uppercase mb-1">Pilih Head Account Pengirim</label>
-        <select id="select-head-account" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none"></select>
+        <select id="select-head-account" onchange="toggleAccHeadInput()" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-purple-400"></select>
+        <input type="email" id="acc-head-custom" placeholder="Ketik Email Head Manual (Contoh: headbaru@gmail.com)" class="hidden w-full px-4 py-3.5 bg-purple-50/50 border border-purple-200 rounded-xl text-sm font-bold outline-none focus:border-purple-400 focus:bg-white text-slate-800 transition" />
       </div>
       <div class="flex gap-2 pt-2">
         <button onclick="closeAccModal()" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-xs uppercase">Batal</button>
@@ -365,8 +365,10 @@
     const encodedApi = btoa("https://api-activator.achachelsea58.workers.dev");
     const API_URL = atob(encodedApi);
     
-    // CACHE-FIRST STATE: Menjaga semua akun Gmail dan Head yang tersimpan
+    // CACHE-FIRST STATE: Menjaga respon cepat instan di browser
     let headAccounts = JSON.parse(localStorage.getItem('digitalhub_head_accounts') || '[]');
+    let manualFullHeads = JSON.parse(localStorage.getItem('digitalhub_manual_full_heads') || '[]');
+    let deletedHeads = JSON.parse(localStorage.getItem('digitalhub_deleted_heads') || '[]');
     let packagesList = JSON.parse(localStorage.getItem('cache_packages') || '[]');
     let activeDatabaseList = JSON.parse(localStorage.getItem('cache_active_db') || '[]'); 
     let cachedPendingList = JSON.parse(localStorage.getItem('cache_pending_db') || '[]');
@@ -421,6 +423,24 @@
         return diffDays > 0 ? diffDays : 0;
     }
 
+    // Format tanggal join lengkap: Tanggal Bulan Tahun & Jam
+    function formatTglJoin(dateStr) {
+        if (!dateStr) return { tgl: '-', jam: '-' };
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return { tgl: '-', jam: '-' };
+        
+        const tgl = d.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+        const jam = d.toLocaleTimeString('id-ID', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        return { tgl, jam };
+    }
+
     function handleAdminLogin(e) {
       e.preventDefault();
       const user = document.getElementById('login-user').value.trim();
@@ -444,11 +464,12 @@
       document.getElementById('admin-login-screen').classList.add('flex');
     }
 
-    // --- FITUR CADANGKAN & PULIHKAN SEMUA DATA AKUN GMAIL (BACKUP / RESTORE) ---
+    // --- FITUR CADANGKAN & PULIHKAN DATA AKUN (BACKUP / RESTORE) ---
     function exportDataBackup() {
       const backupData = {
         timestamp: new Date().toISOString(),
         headAccounts: headAccounts,
+        manualFullHeads: manualFullHeads,
         packages: packagesList,
         activeDatabase: activeDatabaseList,
         pendingRequests: cachedPendingList
@@ -458,7 +479,7 @@
       const downloadAnchor = document.createElement('a');
       const dateStr = new Date().toISOString().slice(0, 10);
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `DigitalHub_Accounts_Backup_${dateStr}.json`);
+      downloadAnchor.setAttribute("download", `DigitalHub_Backup_${dateStr}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -476,8 +497,11 @@
             headAccounts = Array.from(new Set([...headAccounts, ...imported.headAccounts]));
             localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
           }
+          if (Array.isArray(imported.manualFullHeads)) {
+            manualFullHeads = Array.from(new Set([...manualFullHeads, ...imported.manualFullHeads]));
+            localStorage.setItem('digitalhub_manual_full_heads', JSON.stringify(manualFullHeads));
+          }
           if (Array.isArray(imported.activeDatabase)) {
-            // Gabungkan akun unik berdasarkan email
             const existingEmails = new Set(activeDatabaseList.map(a => a.email));
             imported.activeDatabase.forEach(item => {
               if (!existingEmails.has(item.email)) {
@@ -492,7 +516,7 @@
             localStorage.setItem('cache_packages', JSON.stringify(packagesList));
           }
 
-          alert("Cadangan database akun berhasil digabungkan/dipulihkan!");
+          alert("Data cadangan berhasil dipulihkan!");
           showDashboard();
         } catch (err) {
           alert("File JSON cadangan tidak valid!");
@@ -502,14 +526,14 @@
       event.target.value = '';
     }
 
-    // --- INSTANT DISPLAY DARI CACHE + SYNC PARALEL ---
+    // --- RENDER CEPAT INSTAN DARI CACHE + SYNC PARALEL ---
     function showDashboard() {
       document.getElementById('admin-login-screen').classList.add('hidden');
       document.getElementById('admin-login-screen').classList.remove('flex');
       document.getElementById('main-admin-content').classList.remove('hidden');
       document.getElementById('main-admin-content').classList.add('flex');
       
-      // 1. Render instan dari memori lokal (semua akun Gmail langsung terlihat)
+      // Render data instan dari memori lokal (0 detik tanpa menunggu API)
       renderPackages();
       updatePinDropdown();
       renderAntrean(cachedPendingList);
@@ -520,7 +544,7 @@
       document.getElementById('badge-antrean').innerText = cachedPendingList.length;
       document.getElementById('stat-active-count').innerText = activeDatabaseList.length;
 
-      // 2. Ambil data terbaru secara paralel di latar belakang
+      // Update data di latar belakang
       refreshAllDataParallel();
       
       if (dashboardInterval) clearInterval(dashboardInterval);
@@ -657,7 +681,7 @@
       }
     }
 
-    // --- ANTREAN & DATABASE (AKUN GMAIL) ---
+    // --- ANTREAN & DATABASE ---
     async function fetchAdminData() {
       if(!isLoggedIn) return;
       try {
@@ -671,7 +695,6 @@
           cachedPendingList = pending;
           activeDatabaseList = active;
           
-          // Simpan pembaruan cache tanpa merusak data lama
           localStorage.setItem('cache_pending_db', JSON.stringify(pending));
           localStorage.setItem('cache_active_db', JSON.stringify(active));
           
@@ -679,7 +702,7 @@
           
           let extractedHeads = new Set(headAccounts);
           active.forEach(item => {
-              if (item.headAccount && item.headAccount !== '-' && item.headAccount.includes('@')) {
+              if (item.headAccount && item.headAccount !== '-' && item.headAccount.includes('@') && !deletedHeads.includes(item.headAccount)) {
                   extractedHeads.add(item.headAccount);
               }
           });
@@ -697,7 +720,7 @@
           document.getElementById('stat-active-count').innerText = active.length;
         }
       } catch (e) {
-        console.error("Gagal sinkron data cloud, tetap menggunakan data tersimpan:", e);
+        console.error("Gagal sinkron data cloud:", e);
       }
     }
 
@@ -709,7 +732,7 @@
       }
       tbody.innerHTML = list.map(item => `
         <tr class="hover:bg-slate-50 transition">
-          <td class="px-6 py-4 text-xs font-bold text-slate-400">${item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '-'}</td>
+          <td class="px-6 py-4 text-xs font-bold text-slate-400">${item.createdAt ? new Date(item.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}</td>
           <td class="px-6 py-4">
             <div class="font-black text-slate-800">${item.email}</div>
             <a href="https://wa.me/${(item.wa || '').replace(/[^0-9]/g, '')}" target="_blank" class="text-[10px] text-emerald-600 font-bold inline-flex items-center gap-1 mt-0.5">
@@ -760,14 +783,17 @@
         renderDatabase(filtered);
     }
 
+    // --- RENDER DATABASE DENGAN KOLOM TANGGAL JOIN LENGKAP ---
     function renderDatabase(list) {
       const tbody = document.getElementById('table-database-body');
       if (!list || list.length === 0) { 
-        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400">Data akun tidak ditemukan.</td></tr>`; 
+        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-slate-400">Data akun tidak ditemukan.</td></tr>`; 
         return; 
       }
       tbody.innerHTML = list.map(item => {
         const sisaHari = hitungSisaHari(item.acceptedAt, item.durationMonths);
+        const joinInfo = formatTglJoin(item.acceptedAt || item.createdAt);
+
         return `
         <tr class="hover:bg-slate-50 transition">
           <td class="px-6 py-4 font-black text-slate-800">
@@ -777,6 +803,13 @@
                 <i data-lucide="copy" class="w-3.5 h-3.5"></i>
               </button>
             </div>
+          </td>
+          <!-- TAMPILAN TANGGAL, BULAN, TAHUN JOIN -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="font-bold text-xs text-slate-700 flex items-center gap-1.5">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-purple-500"></i> ${joinInfo.tgl}
+            </div>
+            <div class="text-[10px] text-slate-400 font-semibold pl-5">${joinInfo.jam} WIB</div>
           </td>
           <td class="px-6 py-4">
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 text-purple-700 border border-purple-100">
@@ -834,7 +867,6 @@
         const result = await res.json();
 
         if (result.success) {
-          // Update juga di cache lokal secara instan
           activeDatabaseList = activeDatabaseList.map(item => {
             if (item.email === oldEmail) return { ...item, email: newEmail };
             return item;
@@ -868,8 +900,19 @@
       return usage;
     }
 
+    // --- ACC PESANAN DENGAN OPSI PILIH / KETIK MANUAL ---
+    function toggleAccHeadInput() {
+      const select = document.getElementById('select-head-account');
+      const customInput = document.getElementById('acc-head-custom');
+      if (select.value === '__custom__') {
+        customInput.classList.remove('hidden');
+        customInput.focus();
+      } else {
+        customInput.classList.add('hidden');
+      }
+    }
+
     function openAccModal(email, product, duration) {
-      if(headAccounts.length === 0) { alert("Daftar Head Account kosong! Tambah Head Account terlebih dahulu."); return; }
       currentEmailToApprove = email; 
       currentProdToApprove = product; 
       currentDurationToApprove = duration;
@@ -877,26 +920,30 @@
       document.getElementById('modal-target-email').innerText = email;
       document.getElementById('modal-target-paket').innerText = `${product} - ${duration} BULAN`;
       
+      const customInput = document.getElementById('acc-head-custom');
+      if (customInput) {
+        customInput.value = "";
+        customInput.classList.add('hidden');
+      }
+
       const usage = getHeadAccountUsage();
       let optionsHtml = '';
       
-      headAccounts.forEach(h => {
+      // Tampilkan akun head dari yang terbaru ditambahkan
+      const reversedHeads = [...headAccounts].reverse();
+      reversedHeads.forEach(h => {
           const used = usage[h] || 0;
           const remaining = 5 - used; 
-          if (remaining > 0) {
+          // Sembunyikan akun jika slot habis ATAU ditandai penuh manual
+          if (remaining > 0 && !manualFullHeads.includes(h)) {
               optionsHtml += `<option value="${h}">${h} (Sisa ${remaining} Slot)</option>`;
           }
       });
 
-      const btnConfirm = document.getElementById('btn-confirm-acc');
-      if (optionsHtml === '') {
-          optionsHtml = '<option value="">(Semua Head Account Penuh)</option>';
-          btnConfirm.disabled = true; 
-      } else {
-          btnConfirm.disabled = false; 
-      }
+      optionsHtml += `<option value="__custom__">✍️ + Ketik Manual Akun Head...</option>`;
       
       document.getElementById('select-head-account').innerHTML = optionsHtml;
+      document.getElementById('btn-confirm-acc').disabled = false;
       document.getElementById('modal-select-head').classList.remove('hidden');
     }
 
@@ -904,7 +951,23 @@
 
     async function confirmAcc() {
       const btn = document.getElementById('btn-confirm-acc');
-      const selectedHead = document.getElementById('select-head-account').value;
+      const selectVal = document.getElementById('select-head-account').value;
+      const customVal = document.getElementById('acc-head-custom').value.trim();
+
+      let selectedHead = selectVal;
+      if (selectVal === '__custom__') {
+        if (!customVal || !customVal.includes('@')) {
+          alert("Masukkan email Head Account manual yang valid!");
+          return;
+        }
+        selectedHead = customVal;
+        if (!headAccounts.includes(selectedHead)) {
+          headAccounts.push(selectedHead);
+          localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+          renderHeadAccounts();
+        }
+      }
+
       const originalText = btn.innerHTML;
       btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Memproses...`; 
       btn.disabled = true;
@@ -941,7 +1004,6 @@
 
     async function rejectAction(email) {
       if(confirm(`Yakin ingin menghapus / menolak email: ${email}?`)) {
-        // Hapus langsung dari memori lokal untuk respon instan
         activeDatabaseList = activeDatabaseList.filter(item => item.email !== email);
         cachedPendingList = cachedPendingList.filter(item => item.email !== email);
         localStorage.setItem('cache_active_db', JSON.stringify(activeDatabaseList));
@@ -1007,6 +1069,17 @@
         setTimeout(() => { document.getElementById('copy-status').classList.remove('opacity-100'); }, 2000);
     }
 
+    // --- MANAJEMEN HEAD ACCOUNT & FITUR GEMBOK MANUAL ---
+    function toggleManualFull(email) {
+      if (manualFullHeads.includes(email)) {
+        manualFullHeads = manualFullHeads.filter(h => h !== email);
+      } else {
+        manualFullHeads.push(email);
+      }
+      localStorage.setItem('digitalhub_manual_full_heads', JSON.stringify(manualFullHeads));
+      renderHeadAccounts();
+    }
+
     function renderHeadAccounts() {
       const grid = document.getElementById('head-accounts-grid');
       
@@ -1023,24 +1096,35 @@
           const used = usage[h] || 0;
           const max = 5;
           const remaining = max - used;
-          const isFull = remaining <= 0;
+          const isManualFull = manualFullHeads.includes(h);
+          const isFull = remaining <= 0 || isManualFull;
           
           const cardHtml = `
-            <div class="bg-white border ${isFull ? 'border-rose-200 opacity-70' : 'border-slate-200'} p-5 rounded-2xl shadow-sm flex flex-col gap-3">
+            <div class="bg-white border ${isFull ? 'border-rose-200 opacity-80' : 'border-slate-200'} p-5 rounded-2xl shadow-sm flex flex-col gap-3">
                <div class="flex items-center justify-between">
                    <div class="flex items-center gap-3">
                      <div class="w-9 h-9 rounded-xl ${isFull ? 'bg-rose-50 text-rose-600' : 'bg-purple-50 text-purple-600'} flex items-center justify-center font-black text-xs shrink-0">H${i+1}</div>
                      <div class="min-w-0 pr-2">
                         <p class="font-black text-sm text-slate-800 break-words">${h}</p>
-                        <p class="text-[10px] font-bold ${isFull ? 'text-rose-500' : 'text-emerald-500'} mt-0.5">${isFull ? 'Kapasitas Penuh' : `Sisa ${remaining} Slot`}</p>
+                        <p class="text-[10px] font-bold ${isFull ? 'text-rose-500' : 'text-emerald-500'} mt-0.5">
+                          ${isManualFull ? 'Ditandai Penuh (Manual)' : (isFull ? 'Kapasitas Penuh' : `Sisa ${remaining} Slot`)}
+                        </p>
                      </div>
                    </div>
-                   <button onclick="deleteHeadAccount('${h}')" class="text-slate-400 hover:text-rose-500 p-1.5 transition shrink-0" title="Hapus dari daftar"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                   <div class="flex items-center gap-1">
+                     <button onclick="toggleManualFull('${h}')" title="${isManualFull ? 'Buka Kunci Slot' : 'Tandai Sudah Penuh'}" class="p-1.5 rounded-lg text-xs font-bold transition ${isManualFull ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' : 'bg-slate-100 text-slate-500 hover:bg-rose-50 hover:text-rose-600'}">
+                       <i data-lucide="${isManualFull ? 'unlock' : 'lock'}" class="w-4 h-4"></i>
+                     </button>
+                     <button onclick="deleteHeadAccount('${h}')" class="text-slate-400 hover:text-rose-500 p-1.5 transition shrink-0" title="Hapus Akun"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                   </div>
                </div>
                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden mt-1">
-                   <div class="h-2 rounded-full ${isFull ? 'bg-rose-500' : 'bg-purple-500'}" style="width: ${(used/max)*100}%"></div>
+                   <div class="h-2 rounded-full ${isFull ? 'bg-rose-500' : 'bg-purple-500'}" style="width: ${isManualFull ? 100 : (used/max)*100}%"></div>
                </div>
-               <p class="text-[9px] font-bold text-slate-400 text-right uppercase tracking-widest">${used} / ${max} Terpakai</p>
+               <div class="flex justify-between items-center text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                 <span>${isManualFull ? 'Manual Lock' : 'Auto Count'}</span>
+                 <span>${isManualFull ? '5 / 5' : `${used} /${max}`} Terpakai</span>
+               </div>
             </div>
           `;
           if (isFull) { fullHtml += cardHtml; } else { availableHtml += cardHtml; }
@@ -1062,20 +1146,29 @@
           headAccounts.push(email);
           localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
       }
+      deletedHeads = deletedHeads.filter(h => h !== email);
+      localStorage.setItem('digitalhub_deleted_heads', JSON.stringify(deletedHeads));
+      
       document.getElementById('new-head-email').value = "";
       document.getElementById('modal-add-head').classList.add('hidden');
       renderHeadAccounts();
     }
 
     function deleteHeadAccount(emailToDelete) {
-      if(confirm("Hapus Head Account ini? (Hanya menghapus dari list pilihan, akun pelanggan di database tetap aman)")) {
+      if(confirm(`Hapus Head Account "${emailToDelete}" dari daftar?`)) {
         headAccounts = headAccounts.filter(h => h !== emailToDelete);
         localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+
+        if (!deletedHeads.includes(emailToDelete)) {
+          deletedHeads.push(emailToDelete);
+          localStorage.setItem('digitalhub_deleted_heads', JSON.stringify(deletedHeads));
+        }
+
         renderHeadAccounts();
       }
     }
 
-    // --- LOGIKA INPUT MANUAL PELANGGAN & HEAD MANUAL ---
+    // --- MANUAL ENTRY DENGAN OPSI PILIH / TULIS MANUAL HEAD ---
     function toggleManualHeadInput() {
         const headSelect = document.getElementById('manual-head');
         const customInput = document.getElementById('manual-head-custom');
@@ -1096,10 +1189,13 @@
         const usage = getHeadAccountUsage();
         let optionsHtml = '';
         
-        headAccounts.forEach(h => {
+        const reversedHeads = [...headAccounts].reverse();
+        reversedHeads.forEach(h => {
             const used = usage[h] || 0;
             const remaining = 5 - used; 
-            if (remaining > 0) optionsHtml += `<option value="${h}">${h} (Sisa ${remaining} Slot)</option>`;
+            if (remaining > 0 && !manualFullHeads.includes(h)) {
+                optionsHtml += `<option value="${h}">${h} (Sisa ${remaining} Slot)</option>`;
+            }
         });
         
         optionsHtml += `<option value="__custom__">✍️ + Ketik Manual Akun Head...</option>`;
@@ -1147,6 +1243,7 @@
 
         const dummyWa = "080000000000";
         const dummyPin = "MANUAL-" + Math.random().toString(36).substring(2,8).toUpperCase();
+        const nowIso = new Date().toISOString();
 
         try {
             await fetch(`${API_URL}/api/gemini/request`, {
@@ -1158,13 +1255,14 @@
                 body: JSON.stringify({email: email, headAccount: head})
             });
 
-            // Tambahkan langsung ke database aktif lokal
+            // Tambahkan langsung ke database lokal lengkap dengan timestamp sekarang
             activeDatabaseList.unshift({
               email: email,
               headAccount: head,
               productName: product,
               durationMonths: duration,
-              acceptedAt: new Date().toISOString()
+              acceptedAt: nowIso,
+              createdAt: nowIso
             });
             localStorage.setItem('cache_active_db', JSON.stringify(activeDatabaseList));
 
