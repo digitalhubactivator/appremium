@@ -796,13 +796,18 @@
 
         return `
         <tr class="hover:bg-slate-50 transition">
-          <td class="px-6 py-4 font-black text-slate-800">
-            <div class="flex items-center gap-1.5">
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-1.5 font-black text-slate-800">
               <span>${item.email}</span>
-              <button onclick="copyToClipboard('${item.email}'); alert('Email disalin: ${item.email}');" class="text-slate-400 hover:text-purple-600 transition" title="Salin Email">
+              <button onclick="copyToClipboard('${item.email}'); alert('Email disalin:${item.email}');" class="text-slate-400 hover:text-purple-600 transition" title="Salin Email">
                 <i data-lucide="copy" class="w-3.5 h-3.5"></i>
               </button>
             </div>
+            ${item.wa ? `
+              <a href="https://wa.me/${item.wa.replace(/[^0-9]/g, '')}" target="_blank" class="text-[10px] text-emerald-600 font-bold inline-flex items-center gap-1 mt-0.5 hover:underline">
+                <i data-lucide="phone" class="w-3 h-3"></i> ${item.wa}
+              </a>
+            ` : ''}
           </td>
           <!-- TAMPILAN TANGGAL, BULAN, TAHUN JOIN -->
           <td class="px-6 py-4 whitespace-nowrap">
