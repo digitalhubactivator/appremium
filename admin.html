@@ -178,7 +178,7 @@
             <div class="flex flex-wrap sm:flex-nowrap gap-2 items-center">
               <div class="relative flex-grow sm:w-64">
                 <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-                <input type="text" id="search-db" oninput="applyDatabaseFilters()" placeholder="Cari email, nomor WA, atau head..." class="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:border-purple-500 shadow-sm transition">
+                <input type="text" id="search-db" oninput="applyDatabaseFilters()" placeholder="Cari email, WA, head, atau '0 hari'..." class="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:border-purple-500 shadow-sm transition">
               </div>
               <button onclick="exportWhatsAppContacts()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3.5 py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 whitespace-nowrap transition active:scale-95" title="Download Semua Nomor WA">
                 <i data-lucide="phone-outgoing" class="w-3.5 h-3.5"></i> <span>Tarik WA</span>
@@ -890,6 +890,7 @@
         applyDatabaseFilters();
     }
 
+    // --- FILTER & SEARCH MENDUKUNG PENCARIAN SISA DURASI (CONTOH: "0 hari", "sisa durasi 0 hari", "habis") ---
     function applyDatabaseFilters() {
         const query = document.getElementById('search-db').value.toLowerCase().trim();
         let filtered = activeDatabaseList;
@@ -898,12 +899,38 @@
             filtered = filtered.filter(item => (item.productName || 'Gemini Pro') === currentCategoryFilter);
         }
         if (query !== '') {
-            filtered = filtered.filter(item => 
-                (item.email && item.email.toLowerCase().includes(query)) || 
-                (item.wa && item.wa.toLowerCase().includes(query)) ||
-                (item.headAccount && item.headAccount.toLowerCase().includes(query)) ||
-                (item.productName && item.productName.toLowerCase().includes(query))
-            );
+            // Deteksi jika user mengetik pencarian sisa hari secara spesifik (misal: "0 hari", "sisa 0 hari", "sisa durasi 0 hari")
+            const dayMatch = query.match(/^(?:sisa\s*)?(?:durasi\s*)?(?:waktu\s*)?(\d+)\s*(?:hari|hr)?$/);
+            const isExpiredKeyword = (query === 'habis' || query === 'expired' || query === 'kadaluarsa');
+
+            filtered = filtered.filter(item => {
+                const sisaHari = hitungSisaHari(item);
+
+                // Jika kata kunci adalah "habis" / "expired"
+                if (isExpiredKeyword) {
+                    return sisaHari === 0;
+                }
+
+                // Jika mengetik format durasi hari (seperti "0 hari" atau "sisa durasi 0 hari") -> harus cocok persis angkanya
+                if (dayMatch && (query.includes('hari') || query.includes('hr') || query.includes('sisa') || query.includes('durasi'))) {
+                    return sisaHari === parseInt(dayMatch[1], 10);
+                }
+
+                // Teks gabungan untuk pencarian umum (email, WA, head, layanan, atau sisa hari)
+                const sisaStr = `${sisaHari} hari`;
+                const sisaFullStr = `sisa ${sisaHari} hari`;
+                const sisaDurasiStr = `sisa durasi ${sisaHari} hari`;
+
+                return (
+                    (item.email && item.email.toLowerCase().includes(query)) || 
+                    (item.wa && item.wa.toLowerCase().includes(query)) ||
+                    (item.headAccount && item.headAccount.toLowerCase().includes(query)) ||
+                    (item.productName && item.productName.toLowerCase().includes(query)) ||
+                    sisaStr === query ||
+                    sisaFullStr.includes(query) ||
+                    sisaDurasiStr.includes(query)
+                );
+            });
         }
         
         renderDatabase(filtered);
