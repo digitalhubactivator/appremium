@@ -72,9 +72,9 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base sm:text-lg lg:text-xl tracking-tight text-slate-900 leading-none">ADMIN<span class="text-gemini">WORKSPACE</span></h1>
-              <span id="sync-indicator" class="hidden text-[10px] bg-purple-50 text-purple-600 border border-purple-200 font-bold px-2 py-0.5 rounded-full items-center gap-1">
-                <i data-lucide="refresh-cw" class="w-2.5 h-2.5 animate-spin"></i> <span class="hidden sm:inline">Sync</span>
-              </span>
+              <button onclick="refreshAllDataParallel()" title="Perbarui Data Manual" class="text-[9px] bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 font-black px-2 py-0.5 rounded-full inline-flex items-center gap-1 transition active:scale-95">
+                <i id="sync-icon" data-lucide="refresh-cw" class="w-2.5 h-2.5"></i> <span class="hidden sm:inline">Refresh</span>
+              </button>
             </div>
             <p class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-widest">DigitalHub Store Control</p>
           </div>
@@ -162,7 +162,7 @@
           <div id="antrean-list-container" class="space-y-3"></div>
         </div>
 
-        <!-- ================= 2. TAB DATABASE AKTIF (BENTO SMART LIST - 100% ANTI TERPOTONG) ================= -->
+        <!-- ================= 2. TAB DATABASE AKTIF ================= -->
         <div id="section-database" class="hidden">
           <!-- Filter & Search Bar -->
           <div class="p-4 sm:p-5 border-b border-slate-200/60 bg-slate-50/40 flex flex-col lg:flex-row gap-3 justify-between items-stretch lg:items-center">
@@ -189,7 +189,7 @@
             </div>
           </div>
 
-          <!-- Header Label Desktop (Hanya muncul di layar besar sebagai panduan visual) -->
+          <!-- Header Label Desktop -->
           <div class="hidden xl:grid xl:grid-cols-12 gap-4 px-6 py-3 bg-slate-100/70 border-b border-slate-200/60 text-[10px] font-black uppercase text-slate-400 tracking-wider">
             <div class="col-span-3">Pelanggan & Nomor WhatsApp</div>
             <div class="col-span-2">Waktu Join</div>
@@ -198,7 +198,7 @@
             <div class="col-span-2 text-right">Kelola / Perpanjang</div>
           </div>
 
-          <!-- Container Daftar Pelanggan (Smart Responsive Bento Rows) -->
+          <!-- Container Daftar Pelanggan -->
           <div id="database-list-container" class="p-3.5 sm:p-5 space-y-2.5 bg-slate-50/30"></div>
         </div>
 
@@ -276,6 +276,31 @@
       </div>
   </div>
 
+  <!-- ================= MODAL PILIH WHATSAPP ================= -->
+  <div id="modal-select-wa" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeWaModal()"></div>
+    <div class="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-xs p-6 space-y-4 text-center">
+      <div class="w-12 h-12 mx-auto bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center border border-emerald-100">
+        <i data-lucide="message-circle" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h3 class="font-black text-lg text-slate-900">Buka WhatsApp</h3>
+        <p class="text-xs text-slate-500 mt-1">Pilih aplikasi yang ingin digunakan</p>
+      </div>
+      <div class="space-y-2 pt-2">
+        <button onclick="openWaBiasa()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs uppercase flex justify-center items-center gap-2 transition active:scale-95 shadow-md shadow-emerald-500/20">
+          <i data-lucide="message-square" class="w-4 h-4"></i> WA Biasa
+        </button>
+        <button onclick="openWaBusiness()" class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-black rounded-xl text-xs uppercase flex justify-center items-center gap-2 transition active:scale-95 shadow-md shadow-teal-500/20">
+          <i data-lucide="briefcase" class="w-4 h-4"></i> WA Business
+        </button>
+        <button onclick="closeWaModal()" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-xs uppercase hover:bg-slate-200 transition">
+          Batal
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= MODAL ACC PESANAN ================= -->
   <div id="modal-select-head" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeAccModal()"></div>
@@ -298,12 +323,12 @@
       </div>
       <div class="flex gap-2 pt-2">
         <button onclick="closeAccModal()" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-xs uppercase">Batal</button>
-        <button id="btn-confirm-acc" onclick="confirmAcc()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs flex justify-center items-center gap-2 uppercase shadow-lg shadow-emerald-500/20 active:scale-95 transition"><i data-lucide="check" class="w-4 h-4"></i> ACC Sekarang</button>
+        <button id="btn-confirm-acc" onclick="confirmAcc()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs flex justify-center items-center gap-2 uppercase shadow-lg shadow-emerald-500/20 active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"><i data-lucide="check" class="w-4 h-4"></i> ACC Sekarang</button>
       </div>
     </div>
   </div>
 
-  <!-- ================= MODAL EDIT PELANGGAN & PERPANJANG DURASI (HARIAN / BULANAN) ================= -->
+  <!-- ================= MODAL EDIT PELANGGAN & PERPANJANG DURASI ================= -->
   <div id="modal-edit-customer-email" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeEditEmailModal()"></div>
     <div class="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-6 sm:p-7 space-y-4 max-h-[92vh] overflow-y-auto">
@@ -350,7 +375,7 @@
           <input type="number" id="edit-extend-amount" min="0" placeholder="Jumlah (Cth: 7 atau 1)" class="w-full px-3 py-2.5 bg-white border border-purple-200 rounded-xl text-xs font-black text-slate-800 outline-none focus:border-purple-500" />
         </div>
 
-        <!-- Tombol Cepat (Quick Presets) -->
+        <!-- Tombol Cepat -->
         <div class="pt-1">
           <p class="text-[9px] font-bold text-purple-600 uppercase mb-1.5">Pilihan Cepat:</p>
           <div class="flex flex-wrap gap-1.5">
@@ -411,7 +436,7 @@
 
       <div class="flex gap-2 pt-2">
         <button onclick="closeManualModal()" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-xs uppercase">Batal</button>
-        <button id="btn-save-manual" onclick="submitManualEntry()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs uppercase flex justify-center items-center gap-2 shadow-md shadow-emerald-500/20">Simpan ke DB</button>
+        <button id="btn-save-manual" onclick="submitManualEntry()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs uppercase flex justify-center items-center gap-2 shadow-md shadow-emerald-500/20 active:scale-95 transition">Simpan ke DB</button>
       </div>
     </div>
   </div>
@@ -434,7 +459,10 @@
     let currentProdToApprove = "";
     let currentDurationToApprove = 0;
     let dashboardInterval = null;
-    let isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
+    let isLoggedIn = localStorage.getItem('admin_logged_in') === 'true';
+
+    // Variabel Global untuk URL WhatsApp yang akan dibuka
+    let globalWaNumber = "";
 
     window.onload = function() {
       refreshIcons();
@@ -448,14 +476,12 @@
     }
 
     function setSyncStatus(isSyncing) {
-      const el = document.getElementById('sync-indicator');
-      if (!el) return;
+      const icon = document.getElementById('sync-icon');
+      if (!icon) return;
       if (isSyncing) {
-        el.classList.remove('hidden');
-        el.classList.add('inline-flex');
+        icon.classList.add('animate-spin');
       } else {
-        el.classList.add('hidden');
-        el.classList.remove('inline-flex');
+        icon.classList.remove('animate-spin');
       }
     }
 
@@ -469,7 +495,6 @@
       }
     }
 
-    // Kalkulasi sisa hari mendukung durasi Bulan + ekstra Hari
     function hitungSisaHari(item) {
         if (!item) return 0;
         const acceptedAt = item.acceptedAt || item.createdAt;
@@ -510,7 +535,7 @@
       const user = document.getElementById('login-user').value.trim();
       const pass = document.getElementById('login-pass').value.trim();
       if (user === 'admin' && pass === 'superadmin') {
-        sessionStorage.setItem('admin_logged_in', 'true');
+        localStorage.setItem('admin_logged_in', 'true');
         isLoggedIn = true; 
         showDashboard();
       } else { 
@@ -519,7 +544,7 @@
     }
 
     function logoutAdmin() {
-      sessionStorage.removeItem('admin_logged_in'); 
+      localStorage.removeItem('admin_logged_in'); 
       isLoggedIn = false;
       if (dashboardInterval) clearInterval(dashboardInterval);
       document.getElementById('main-admin-content').classList.add('hidden');
@@ -528,6 +553,42 @@
       document.getElementById('admin-login-screen').classList.add('flex');
     }
 
+    // --- POPUP PILIH WHATSAPP ---
+    function openWaModal(phone) {
+        globalWaNumber = phone;
+        document.getElementById('modal-select-wa').classList.remove('hidden');
+    }
+
+    function closeWaModal() {
+        document.getElementById('modal-select-wa').classList.add('hidden');
+    }
+
+    function openWaBiasa() {
+        if(!globalWaNumber) return;
+        window.open(`https://api.whatsapp.com/send?phone=${globalWaNumber}`, '_blank');
+        closeWaModal();
+    }
+
+    function openWaBusiness() {
+        if(!globalWaNumber) return;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isAndroid = /Android/.test(navigator.userAgent);
+
+        if (isIOS) {
+            window.open(`whatsapp-smb://send?phone=${globalWaNumber}`, '_blank');
+        } else if (isAndroid) {
+            // Android WA Business Scheme
+            window.location.href = `intent://send?phone=${globalWaNumber}#Intent;package=com.whatsapp.w4b;scheme=whatsapp;end;`;
+            // Fallback
+            setTimeout(() => { window.open(`https://api.whatsapp.com/send?phone=${globalWaNumber}`, '_blank'); }, 800);
+        } else {
+            // PC / Desktop (Biasanya akan redirect otomatis tergantung default browser)
+            window.open(`https://web.whatsapp.com/send?phone=${globalWaNumber}`, '_blank');
+        }
+        closeWaModal();
+    }
+
+    // --- FITUR EKSPOR ---
     function exportWhatsAppContacts() {
       const allContacts = [...activeDatabaseList, ...cachedPendingList];
       if (allContacts.length === 0) {
@@ -641,7 +702,9 @@
       refreshAllDataParallel();
       
       if (dashboardInterval) clearInterval(dashboardInterval);
-      dashboardInterval = setInterval(refreshAllDataParallel, 15000); 
+      dashboardInterval = setInterval(() => {
+          if (!document.hidden) refreshAllDataParallel();
+      }, 60000); 
     }
 
     async function refreshAllDataParallel() {
@@ -665,7 +728,7 @@
           renderPackages();
           updatePinDropdown(); 
         }
-      } catch (e) { console.error(e); }
+      } catch (e) {}
     }
 
     function updatePinDropdown() {
@@ -708,7 +771,6 @@
       gridGemini.innerHTML = geminiPkgs.length > 0 ? geminiPkgs.map(templateCard).join('') : `<p class="text-xs text-slate-400 col-span-full">Belum ada paket Gemini.</p>`;
       gridCanva.innerHTML = canvaPkgs.length > 0 ? canvaPkgs.map(templateCard).join('') : `<p class="text-xs text-slate-400 col-span-full">Belum ada paket Canva.</p>`;
       gridYoutube.innerHTML = youtubePkgs.length > 0 ? youtubePkgs.map(templateCard).join('') : `<p class="text-xs text-slate-400 col-span-full">Belum ada paket YouTube.</p>`;
-
       refreshIcons();
     }
 
@@ -721,7 +783,6 @@
       const features = document.getElementById('new-pkg-features').value.trim(); 
 
       if (!name || !duration || !price) { alert("Wajib mengisi Nama, Durasi, dan Harga paket!"); return; }
-      
       try {
         await fetch(`${API_URL}/api/gemini/admin/packages`, {
           method: "POST", headers: { "Content-Type": "application/json" },
@@ -735,7 +796,6 @@
     function editPackage(id) {
       const pkg = packagesList.find(p => p.id === id);
       if(!pkg) return;
-      
       document.getElementById('edit-pkg-id').value = pkg.id;
       document.getElementById('new-pkg-product').value = pkg.product || 'Gemini Pro';
       document.getElementById('new-pkg-name').value = pkg.name;
@@ -822,19 +882,16 @@
           document.getElementById('badge-antrean').innerText = pending.length;
           document.getElementById('stat-active-count').innerText = active.length;
         }
-      } catch (e) {
-        console.error("Gagal sinkron data cloud:", e);
-      }
+      } catch (e) {}
     }
 
-    // --- RENDER ANTREAN MODERN ---
     function renderAntrean(list) {
       const container = document.getElementById('antrean-list-container');
       if (!list || list.length === 0) { 
         container.innerHTML = `
-          <div class="py-12 text-center bg-slate-50/60 rounded-2xl border border-dashed border-slate-200">
+          <div class="py-12 text-center bg-white rounded-2xl border border-dashed border-slate-200">
             <i data-lucide="check-circle" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
-            <p class="text-xs font-bold text-slate-400">Tidak ada antrean validasi saat ini.</p>
+            <p class="text-xs font-bold text-slate-400 mt-1">Tidak ada antrean validasi saat ini.</p>
           </div>`;
         refreshIcons();
         return; 
@@ -846,23 +903,22 @@
         const waLink = cleanWa.startsWith('0') ? '62' + cleanWa.slice(1) : cleanWa;
 
         return `
-        <div class="bg-white border border-slate-200/90 hover:border-purple-300 rounded-2xl p-4 shadow-sm transition flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div class="space-y-1">
+        <div class="bg-white border border-slate-200/90 hover:border-purple-300 rounded-2xl p-4 sm:p-5 shadow-sm transition flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="space-y-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <span class="font-black text-slate-900 text-sm sm:text-base break-all">${item.email}</span>
-              <span class="font-mono text-[11px] font-black bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-lg border border-slate-200">${item.pin}</span>
+              <span class="font-mono text-[11px] font-black bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-lg border border-slate-200 shrink-0">${item.pin}</span>
             </div>
             <div class="flex items-center gap-3 flex-wrap text-xs">
-              <a href="https://wa.me/${waLink}" target="_blank" class="text-emerald-600 font-bold inline-flex items-center gap-1 hover:underline">
+              <button onclick="openWaModal('${waLink}')" class="text-emerald-600 font-bold inline-flex items-center gap-1 hover:text-emerald-700 transition">
                 <i data-lucide="phone" class="w-3.5 h-3.5"></i> ${item.wa || '-'}
-              </a>
+              </button>
               <span class="text-slate-300">•</span>
               <span class="text-slate-400 font-semibold">${joinInfo.tgl} (${joinInfo.jam})</span>
             </div>
           </div>
-
-          <div class="flex items-center justify-between lg:justify-end gap-3 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-100">
-            <span class="bg-purple-50 text-purple-700 border border-purple-200/60 font-black px-3 py-1.5 rounded-xl text-xs uppercase">
+          <div class="flex items-center justify-between lg:justify-end gap-3 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-100 shrink-0">
+            <span class="bg-purple-50 text-purple-700 border border-purple-200/60 font-black px-3 py-1.5 rounded-xl text-[10px] sm:text-xs uppercase">
               ${item.productName || 'Gemini Pro'} • ${item.durationMonths} Bln
             </span>
             <div class="flex items-center gap-2">
@@ -890,7 +946,6 @@
         applyDatabaseFilters();
     }
 
-    // --- FILTER & SEARCH MENDUKUNG PENCARIAN SISA DURASI (CONTOH: "0 hari", "sisa durasi 0 hari", "habis") ---
     function applyDatabaseFilters() {
         const query = document.getElementById('search-db').value.toLowerCase().trim();
         let filtered = activeDatabaseList;
@@ -899,52 +954,39 @@
             filtered = filtered.filter(item => (item.productName || 'Gemini Pro') === currentCategoryFilter);
         }
         if (query !== '') {
-            // Deteksi jika user mengetik pencarian sisa hari secara spesifik (misal: "0 hari", "sisa 0 hari", "sisa durasi 0 hari")
             const dayMatch = query.match(/^(?:sisa\s*)?(?:durasi\s*)?(?:waktu\s*)?(\d+)\s*(?:hari|hr)?$/);
             const isExpiredKeyword = (query === 'habis' || query === 'expired' || query === 'kadaluarsa');
 
             filtered = filtered.filter(item => {
                 const sisaHari = hitungSisaHari(item);
 
-                // Jika kata kunci adalah "habis" / "expired"
-                if (isExpiredKeyword) {
-                    return sisaHari === 0;
-                }
-
-                // Jika mengetik format durasi hari (seperti "0 hari" atau "sisa durasi 0 hari") -> harus cocok persis angkanya
-                if (dayMatch && (query.includes('hari') || query.includes('hr') || query.includes('sisa') || query.includes('durasi'))) {
+                if (isExpiredKeyword) return sisaHari === 0;
+                if (dayMatch && (query.includes('hari') || query.includes('hr') || query.includes('sisa') || query.includes('durasi') || query.trim() === dayMatch[1])) {
                     return sisaHari === parseInt(dayMatch[1], 10);
                 }
 
-                // Teks gabungan untuk pencarian umum (email, WA, head, layanan, atau sisa hari)
                 const sisaStr = `${sisaHari} hari`;
                 const sisaFullStr = `sisa ${sisaHari} hari`;
-                const sisaDurasiStr = `sisa durasi ${sisaHari} hari`;
 
                 return (
                     (item.email && item.email.toLowerCase().includes(query)) || 
                     (item.wa && item.wa.toLowerCase().includes(query)) ||
                     (item.headAccount && item.headAccount.toLowerCase().includes(query)) ||
                     (item.productName && item.productName.toLowerCase().includes(query)) ||
-                    sisaStr === query ||
-                    sisaFullStr.includes(query) ||
-                    sisaDurasiStr.includes(query)
+                    sisaStr === query || sisaFullStr.includes(query)
                 );
             });
         }
-        
         renderDatabase(filtered);
     }
 
-    // --- RENDER DATABASE: SMART BENTO ROW (TIDAK PAKAI TABLE KAKU, 100% UTUH DI SEMUA LAYAR) ---
     function renderDatabase(list) {
       const container = document.getElementById('database-list-container');
-
       if (!list || list.length === 0) { 
         container.innerHTML = `
           <div class="py-12 text-center bg-white rounded-2xl border border-dashed border-slate-200">
             <i data-lucide="search-x" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
-            <p class="text-xs font-bold text-slate-400">Data pelanggan tidak ditemukan.</p>
+            <p class="text-xs font-bold text-slate-400 mt-1">Data pelanggan tidak ditemukan.</p>
           </div>`; 
         refreshIcons();
         return; 
@@ -959,12 +1001,10 @@
         const extraDaysInfo = item.extraDays ? ` + ${item.extraDays} Hr` : '';
         const prodName = item.productName || 'Gemini Pro';
 
-        // Warna Lencana Produk
         let prodColor = 'bg-purple-50 text-purple-700 border-purple-200/80';
         if (prodName === 'Canva Pro') prodColor = 'bg-cyan-50 text-cyan-700 border-cyan-200/80';
         if (prodName === 'YouTube Premium') prodColor = 'bg-rose-50 text-rose-700 border-rose-200/80';
 
-        // Warna Lencana Sisa Hari
         let sisaColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
         if (sisaHari <= 5 && sisaHari > 0) sisaColor = 'bg-amber-50 text-amber-700 border-amber-200';
         if (sisaHari <= 0) sisaColor = 'bg-rose-50 text-rose-600 border-rose-200';
@@ -972,7 +1012,6 @@
         return `
         <div class="bg-white border border-slate-200/90 hover:border-purple-300 hover:shadow-md rounded-2xl p-4 sm:px-5 sm:py-3.5 transition-all grid grid-cols-1 xl:grid-cols-12 gap-3.5 xl:gap-4 items-center">
           
-          <!-- 1. PELANGGAN & WHATSAPP (3 Kolom di XL) -->
           <div class="xl:col-span-3 min-w-0">
             <div class="flex items-center justify-between xl:justify-start gap-1.5">
               <div class="flex items-center gap-1.5 min-w-0">
@@ -981,8 +1020,7 @@
                   <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                 </button>
               </div>
-              <!-- Sisa Hari Tampil di Pojok Kanan Atas khusus layar HP/Tablet -->
-              <span class="xl:hidden px-2.5 py-1 rounded-full text-[11px] font-black border ${sisaColor} shrink-0">
+              <span class="xl:hidden px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black border ${sisaColor} shrink-0">
                 ${sisaHari} Hari
               </span>
             </div>
@@ -990,11 +1028,11 @@
             <div class="mt-1 flex items-center gap-2">
               ${hasValidWa ? `
                 <div class="inline-flex items-center gap-1">
-                  <a href="https://wa.me/${waLink}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-100 transition">
+                  <button onclick="openWaModal('${waLink}')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-100 transition" title="Buka di WhatsApp">
                     <i data-lucide="phone" class="w-3 h-3 text-emerald-600"></i> ${item.wa}
-                  </a>
+                  </button>
                   <button onclick="copyToClipboard('${item.wa}'); alert('Nomor WA disalin: ${item.wa}');" class="p-1 text-slate-400 hover:text-emerald-600 transition" title="Salin WA">
-                    <i data-lucide="copy" class="w-3 h-3"></i>
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                   </button>
                 </div>
               ` : `
@@ -1005,7 +1043,6 @@
             </div>
           </div>
 
-          <!-- 2. WAKTU JOIN (2 Kolom di XL) -->
           <div class="xl:col-span-2 flex xl:block items-center justify-between text-xs border-t xl:border-t-0 pt-2.5 xl:pt-0 border-slate-100">
             <span class="xl:hidden text-[10px] font-extrabold text-slate-400 uppercase">Waktu Join:</span>
             <div>
@@ -1017,19 +1054,17 @@
             </div>
           </div>
 
-          <!-- 3. HEAD ACCOUNT / FAMILY (3 Kolom di XL) -->
           <div class="xl:col-span-3 flex xl:block items-center justify-between min-w-0">
             <span class="xl:hidden text-[10px] font-extrabold text-slate-400 uppercase">Head Family:</span>
-            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-50/70 text-purple-800 border border-purple-200/60 max-w-full">
+            <div class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-50/70 text-purple-800 border border-purple-200/60 max-w-full">
               <i data-lucide="crown" class="w-3.5 h-3.5 text-purple-600 shrink-0"></i>
               <span class="break-all">${item.headAccount || '-'}</span>
             </div>
           </div>
 
-          <!-- 4. LAYANAN, DURASI & SISA WAKTU (2 Kolom di XL - Dijamin Terlihat Utuh!) -->
           <div class="xl:col-span-2 flex xl:flex-col items-center xl:items-start justify-between gap-1.5">
             <span class="xl:hidden text-[10px] font-extrabold text-slate-400 uppercase">Paket & Durasi:</span>
-            <span class="px-2.5 py-1 rounded-lg text-[11px] font-black border ${prodColor} inline-block">
+            <span class="px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-black border ${prodColor} inline-block">
               ${prodName} (${item.durationMonths || 1} Bln${extraDaysInfo})
             </span>
             <span class="hidden xl:inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black border ${sisaColor}">
@@ -1037,10 +1072,9 @@
             </span>
           </div>
 
-          <!-- 5. TOMBOL KELOLA / EDIT & PERPANJANG (2 Kolom di XL) -->
           <div class="xl:col-span-2 flex items-center justify-end gap-2 border-t xl:border-t-0 pt-3 xl:pt-0 border-slate-100">
             <button onclick="openEditEmailModal('${item.email}')" class="flex-1 xl:flex-initial inline-flex items-center justify-center gap-1.5 text-blue-600 hover:text-white text-xs font-black px-3.5 py-2 bg-blue-50 hover:bg-blue-600 border border-blue-200/80 rounded-xl transition shadow-sm">
-              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> <span>Edit / Perpanjang</span>
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> <span>Edit & Tambah</span>
             </button>
             <button onclick="rejectAction('${item.email}')" class="inline-flex items-center justify-center text-rose-500 hover:text-white text-xs font-black p-2 bg-rose-50 hover:bg-rose-500 border border-rose-200/80 rounded-xl transition shadow-sm shrink-0" title="Hapus Pelanggan">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -1053,7 +1087,6 @@
       refreshIcons();
     }
 
-    // --- MODAL EDIT & PERPANJANG DURASI (HARIAN / BULANAN) ---
     function setQuickExtend(unit, amount) {
       document.getElementById('edit-extend-unit').value = unit;
       document.getElementById('edit-extend-amount').value = amount;
@@ -1092,7 +1125,6 @@
         alert("Masukkan alamat Gmail yang valid!");
         return;
       }
-
       if (extendUnit !== 'none' && (!extendAmount || extendAmount <= 0)) {
         alert("Masukkan jumlah hari/bulan perpanjangan yang valid (lebih dari 0)!");
         return;
@@ -1448,7 +1480,6 @@
           deletedHeads.push(emailToDelete);
           localStorage.setItem('digitalhub_deleted_heads', JSON.stringify(deletedHeads));
         }
-
         renderHeadAccounts();
       }
     }
