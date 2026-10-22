@@ -288,13 +288,13 @@
         <p class="text-xs text-slate-500 mt-1">Pilih aplikasi yang ingin digunakan</p>
       </div>
       <div class="space-y-2 pt-2">
-        <button onclick="openWaBiasa()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs uppercase flex justify-center items-center gap-2 transition active:scale-95 shadow-md shadow-emerald-500/20">
+        <button onclick="openWaBiasa()" class="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs uppercase flex justify-center items-center gap-2 transition active:scale-95 shadow-md shadow-emerald-500/20">
           <i data-lucide="message-square" class="w-4 h-4"></i> WA Biasa
         </button>
-        <button onclick="openWaBusiness()" class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-black rounded-xl text-xs uppercase flex justify-center items-center gap-2 transition active:scale-95 shadow-md shadow-teal-500/20">
+        <button onclick="openWaBusiness()" class="w-full py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-black rounded-xl text-xs uppercase flex justify-center items-center gap-2 transition active:scale-95 shadow-md shadow-teal-500/20">
           <i data-lucide="briefcase" class="w-4 h-4"></i> WA Business
         </button>
-        <button onclick="closeWaModal()" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-xs uppercase hover:bg-slate-200 transition">
+        <button onclick="closeWaModal()" class="w-full py-3.5 bg-slate-100 text-slate-600 font-black rounded-xl text-xs uppercase hover:bg-slate-200 transition">
           Batal
         </button>
       </div>
@@ -431,7 +431,7 @@
       
       <div class="space-y-2">
         <select id="manual-head" onchange="toggleManualHeadInput()" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-emerald-500"></select>
-        <input type="email" id="manual-head-custom" placeholder="Ketik Email Head Manual (Contoh: headbaru@gmail.com)" class="hidden w-full px-4 py-3 bg-purple-50/50 border border-purple-200 rounded-xl text-sm font-bold outline-none focus:border-purple-500 focus:bg-white text-slate-800" />
+        <input type="email" id="manual-head-custom" placeholder="Ketik Email Head Manual (Contoh: headbaru@gmail.com)" class="hidden w-full px-4 py-3 bg-purple-50/50 border border-purple-200 rounded-xl text-sm font-bold outline-none focus:border-purple-500 focus:bg-white text-slate-800 transition" />
       </div>
 
       <div class="flex gap-2 pt-2">
@@ -461,8 +461,9 @@
     let dashboardInterval = null;
     let isLoggedIn = localStorage.getItem('admin_logged_in') === 'true';
 
-    // Variabel Global untuk URL WhatsApp yang akan dibuka
+    // Variabel Global untuk URL WhatsApp & Teks Template
     let globalWaNumber = "";
+    let globalWaText = "";
 
     window.onload = function() {
       refreshIcons();
@@ -553,9 +554,20 @@
       document.getElementById('admin-login-screen').classList.add('flex');
     }
 
-    // --- POPUP PILIH WHATSAPP ---
-    function openWaModal(phone) {
+    // --- POPUP PILIH WHATSAPP DENGAN SMART TEMPLATE TEKS ---
+    function openWaModal(phone, email, sisaHari) {
         globalWaNumber = phone;
+        
+        let pesanText = "";
+        if (sisaHari === -1) {
+            pesanText = `Halo kak, pesanan untuk akun ${email} sedang kami proses ya.`;
+        } else if (sisaHari <= 0) {
+            pesanText = `halo kak boleh minta bantuannya screenshoot pengelola family akun dari : ${email}\nterimakasih sebelumnya`;
+        } else {
+            pesanText = `Halo kak, mengingatkan bahwa untuk akun ${email} sisa masa aktifnya adalah ${sisaHari} Hari.`;
+        }
+        
+        globalWaText = encodeURIComponent(pesanText);
         document.getElementById('modal-select-wa').classList.remove('hidden');
     }
 
@@ -565,7 +577,7 @@
 
     function openWaBiasa() {
         if(!globalWaNumber) return;
-        window.open(`https://api.whatsapp.com/send?phone=${globalWaNumber}`, '_blank');
+        window.open(`https://api.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
         closeWaModal();
     }
 
@@ -575,20 +587,16 @@
         const isAndroid = /Android/.test(navigator.userAgent);
 
         if (isIOS) {
-            window.open(`whatsapp-smb://send?phone=${globalWaNumber}`, '_blank');
+            window.open(`whatsapp-smb://send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
         } else if (isAndroid) {
-            // Android WA Business Scheme
-            window.location.href = `intent://send?phone=${globalWaNumber}#Intent;package=com.whatsapp.w4b;scheme=whatsapp;end;`;
-            // Fallback
-            setTimeout(() => { window.open(`https://api.whatsapp.com/send?phone=${globalWaNumber}`, '_blank'); }, 800);
+            window.location.href = `intent://send?phone=${globalWaNumber}&text=${globalWaText}#Intent;package=com.whatsapp.w4b;scheme=whatsapp;end;`;
+            setTimeout(() => { window.open(`https://api.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank'); }, 800);
         } else {
-            // PC / Desktop (Biasanya akan redirect otomatis tergantung default browser)
-            window.open(`https://web.whatsapp.com/send?phone=${globalWaNumber}`, '_blank');
+            window.open(`https://web.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
         }
         closeWaModal();
     }
 
-    // --- FITUR EKSPOR ---
     function exportWhatsAppContacts() {
       const allContacts = [...activeDatabaseList, ...cachedPendingList];
       if (allContacts.length === 0) {
@@ -771,6 +779,7 @@
       gridGemini.innerHTML = geminiPkgs.length > 0 ? geminiPkgs.map(templateCard).join('') : `<p class="text-xs text-slate-400 col-span-full">Belum ada paket Gemini.</p>`;
       gridCanva.innerHTML = canvaPkgs.length > 0 ? canvaPkgs.map(templateCard).join('') : `<p class="text-xs text-slate-400 col-span-full">Belum ada paket Canva.</p>`;
       gridYoutube.innerHTML = youtubePkgs.length > 0 ? youtubePkgs.map(templateCard).join('') : `<p class="text-xs text-slate-400 col-span-full">Belum ada paket YouTube.</p>`;
+
       refreshIcons();
     }
 
@@ -832,7 +841,6 @@
       }
     }
 
-    // --- FETCH ANTREAN & DATABASE ---
     async function fetchAdminData() {
       if(!isLoggedIn) return;
       try {
@@ -910,7 +918,7 @@
               <span class="font-mono text-[11px] font-black bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-lg border border-slate-200 shrink-0">${item.pin}</span>
             </div>
             <div class="flex items-center gap-3 flex-wrap text-xs">
-              <button onclick="openWaModal('${waLink}')" class="text-emerald-600 font-bold inline-flex items-center gap-1 hover:text-emerald-700 transition">
+              <button onclick="openWaModal('${waLink}', '${item.email}', -1)" class="text-[11px] text-emerald-600 font-bold inline-flex items-center gap-1 mt-0.5 hover:underline text-left">
                 <i data-lucide="phone" class="w-3.5 h-3.5"></i> ${item.wa || '-'}
               </button>
               <span class="text-slate-300">•</span>
@@ -1028,7 +1036,7 @@
             <div class="mt-1 flex items-center gap-2">
               ${hasValidWa ? `
                 <div class="inline-flex items-center gap-1">
-                  <button onclick="openWaModal('${waLink}')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-100 transition" title="Buka di WhatsApp">
+                  <button onclick="openWaModal('${waLink}', '${item.email}', ${sisaHari})" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-100 transition" title="Buka di WhatsApp">
                     <i data-lucide="phone" class="w-3 h-3 text-emerald-600"></i> ${item.wa}
                   </button>
                   <button onclick="copyToClipboard('${item.wa}'); alert('Nomor WA disalin: ${item.wa}');" class="p-1 text-slate-400 hover:text-emerald-600 transition" title="Salin WA">
@@ -1125,6 +1133,7 @@
         alert("Masukkan alamat Gmail yang valid!");
         return;
       }
+
       if (extendUnit !== 'none' && (!extendAmount || extendAmount <= 0)) {
         alert("Masukkan jumlah hari/bulan perpanjangan yang valid (lebih dari 0)!");
         return;
@@ -1480,6 +1489,7 @@
           deletedHeads.push(emailToDelete);
           localStorage.setItem('digitalhub_deleted_heads', JSON.stringify(deletedHeads));
         }
+
         renderHeadAccounts();
       }
     }
