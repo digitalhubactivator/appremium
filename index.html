@@ -207,51 +207,33 @@
       }
 
       grid.innerHTML = filteredPkgs.map((pkg) => {
-        let featuresHtml = '';
+        const hasFeatures = pkg.features && pkg.features.trim() !== '';
+        let featuresSectionHtml = '';
         
-        if (pkg.features && pkg.features.trim() !== '') {
+        if (hasFeatures) {
             const featureLines = pkg.features.split('\n').filter(line => line.trim() !== '');
-            featuresHtml = featureLines.map(line => `
+            const listItems = featureLines.map(line => `
                 <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>${line.trim()}</span></li>
             `).join('');
-        } else {
-            if (activeProduct === 'Gemini Pro') {
-                featuresHtml = `
-                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Google Veo3</span></li>
-                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Model Terbaru 3.5, 3.8 & 3.1</span></li>
-                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>200 Credit Setiap Bulan</span></li>
-                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Fitur Nano Banana</span></li>
-                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Fitur Antigravity Aktif</span></li>
-                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Privasi Akun Keluarga Terjaga</span></li>
-                `;
-            } else if (activeProduct === 'Canva Pro') {
-                featuresHtml = `
-                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses Semua Fitur Pro</span></li>
-                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Aktivasi via Invite Tim</span></li>
-                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Desain & Folder Privat</span></li>
-                `;
-            } else if (activeProduct === 'YouTube Premium') {
-                featuresHtml = `
-                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Nonton Tanpa Iklan</span></li>
-                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Akses YouTube Music</span></li>
-                    <li class="flex items-start gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"></i><span>Aktivasi via Invite Family</span></li>
-                `;
-            }
+            
+            featuresSectionHtml = `
+              <div class="flex-grow border-t border-slate-100 pt-3 mb-4">
+                <ul class="text-[10px] sm:text-[11px] font-medium text-slate-500 space-y-2">
+                  ${listItems}
+                </ul>
+              </div>
+            `;
         }
 
         return `
         <div onclick="selectPackage(${pkg.duration}, '${pkg.name}')" class="pkg-card relative bg-white/80 border-2 border-slate-100 rounded-2xl sm:rounded-3xl p-4 sm:p-5 cursor-pointer transition-all duration-300 text-left hover:-translate-y-1 flex flex-col h-full group">
-          <div class="text-center border-b border-slate-100 pb-3 mb-3">
+          <div class="text-center ${hasFeatures ? 'pb-3' : 'pb-4 flex-grow flex flex-col justify-center'}">
             <span class="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1 truncate">${pkg.name}</span>
             <h4 class="text-2xl sm:text-3xl font-black text-slate-800 mt-1 mb-1">${pkg.duration} <span class="text-base sm:text-lg">Bln</span></h4>
             <p class="text-xs sm:text-sm font-black text-emerald-500 tracking-wide">Rp ${parseInt(pkg.price || 0).toLocaleString('id-ID')}</p>
           </div>
           
-          <div class="flex-grow mb-4">
-             <ul class="text-[10px] sm:text-[11px] font-medium text-slate-500 space-y-2">
-                ${featuresHtml}
-             </ul>
-          </div>
+          ${featuresSectionHtml}
           
           <div class="mt-auto">
             <span class="btn-pilih block w-full py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 text-center">Pilih Paket</span>
