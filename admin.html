@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Admin Panel - DigitalHub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -454,10 +454,11 @@
     const encodedApi = btoa("https://api-activator.achachelsea58.workers.dev");
     const API_URL = atob(encodedApi);
     
-    // CACHE-FIRST STATE
+    // CACHE-FIRST STATE & DAFTAR HAPUS PERMANEN
     let headAccounts = JSON.parse(localStorage.getItem('digitalhub_head_accounts') || '[]');
     let manualFullHeads = JSON.parse(localStorage.getItem('digitalhub_manual_full_heads') || '[]');
     let deletedHeads = JSON.parse(localStorage.getItem('digitalhub_deleted_heads') || '[]');
+    let deletedAccounts = JSON.parse(localStorage.getItem('digitalhub_deleted_accounts') || '[]');
     let packagesList = JSON.parse(localStorage.getItem('cache_packages') || '[]');
     let activeDatabaseList = JSON.parse(localStorage.getItem('cache_active_db') || '[]'); 
     let cachedPendingList = JSON.parse(localStorage.getItem('cache_pending_db') || '[]');
@@ -577,7 +578,7 @@
       document.getElementById('admin-login-screen').classList.add('flex');
     }
 
-    // --- POPUP PILIH WHATSAPP DENGAN SMART TEMPLATE TEKS ---
+    // --- POPUP PILIH WHATSAPP DENGAN PEMISAHAN WA BIASA & WA BUSINESS AKURAT ---
     function openWaModal(phone, email, sisaHari) {
         globalWaNumber = phone;
         
@@ -600,7 +601,17 @@
 
     function openWaBiasa() {
         if(!globalWaNumber) return;
-        window.open(`https://api.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isAndroid = /Android/.test(navigator.userAgent);
+
+        if (isIOS) {
+            window.location.href = `whatsapp://send?phone=${globalWaNumber}&text=${globalWaText}`;
+        } else if (isAndroid) {
+            // Paksa membuka package com.whatsapp (WhatsApp Biasa/Personal)
+            window.location.href = `intent://send?phone=${globalWaNumber}&text=${globalWaText}#Intent;package=com.whatsapp;scheme=whatsapp;end;`;
+        } else {
+            window.open(`https://web.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
+        }
         closeWaModal();
     }
 
@@ -610,12 +621,12 @@
         const isAndroid = /Android/.test(navigator.userAgent);
 
         if (isIOS) {
-            window.open(`whatsapp-smb://send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
+            window.location.href = `whatsapp-smb://send?phone=${globalWaNumber}&text=${globalWaText}`;
         } else if (isAndroid) {
+            // Paksa membuka package com.whatsapp.w4b (WhatsApp Business)
             window.location.href = `intent://send?phone=${globalWaNumber}&text=${globalWaText}#Intent;package=com.whatsapp.w4b;scheme=whatsapp;end;`;
-            setTimeout(() => { window.open(`https://api.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank'); }, 800);
         } else {
-            window.open(`https://web.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
+            window.open(`https://api.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
         }
         closeWaModal();
     }
@@ -653,6 +664,8 @@
         timestamp: new Date().toISOString(),
         headAccounts: headAccounts,
         manualFullHeads: manualFullHeads,
+        deletedHeads: deletedHeads,
+        deletedAccounts: deletedAccounts,
         localOverrides: localOverrides,
         packages: packagesList,
         activeDatabase: activeDatabaseList,
@@ -685,6 +698,10 @@
             manualFullHeads = Array.from(new Set([...manualFullHeads, ...imported.manualFullHeads]));
             localStorage.setItem('digitalhub_manual_full_heads', JSON.stringify(manualFullHeads));
           }
+          if (Array.isArray(imported.deletedAccounts)) {
+            deletedAccounts = Array.from(new Set([...deletedAccounts, ...imported.deletedAccounts]));
+            localStorage.setItem('digitalhub_deleted_accounts', JSON.stringify(deletedAccounts));
+          }
           if (imported.localOverrides && typeof imported.localOverrides === 'object') {
             localOverrides = { ...localOverrides, ...imported.localOverrides };
             localStorage.setItem('digitalhub_local_overrides', JSON.stringify(localOverrides));
@@ -692,7 +709,7 @@
           if (Array.isArray(imported.activeDatabase)) {
             const existingEmails = new Set(activeDatabaseList.map(a => a.email));
             imported.activeDatabase.forEach(item => {
-              if (!existingEmails.has(item.email)) {
+              if (!existingEmails.has(item.email) && !deletedAccounts.includes(item.email)) {
                 activeDatabaseList.push(item);
                 existingEmails.add(item.email);
               }
@@ -720,6 +737,10 @@
       document.getElementById('main-admin-content').classList.remove('hidden');
       document.getElementById('main-admin-content').classList.add('flex');
       
+      // Bersihkan daftar awal dari akun yang ada di deletedAccounts
+      activeDatabaseList = activeDatabaseList.filter(d => !deletedAccounts.includes(d.email));
+      cachedPendingList = cachedPendingList.filter(d => !deletedAccounts.includes(d.email));
+
       renderPackages();
       updatePinDropdown();
       renderAntrean(cachedPendingList);
@@ -864,16 +885,20 @@
       }
     }
 
+    // --- FETCH ADMIN DATA DENGAN FILTER DELETED ACCOUNTS ---
     async function fetchAdminData() {
-      if(!isLoggedIn) return;
+      if (!isLoggedIn) return;
       try {
         const response = await fetch(`${API_URL}/api/gemini/admin/requests`);
         const result = await response.json();
         if (result.success && Array.isArray(result.data)) {
           const allData = result.data;
-          const pending = allData.filter(d => d.status === "PENDING");
-          
-          const active = allData.filter(d => d.status === "ACCEPTED").map(item => {
+
+          // Filter data agar email yang ada di deletedAccounts tidak masuk kembali
+          const filteredData = allData.filter(d => !deletedAccounts.includes(d.email));
+
+          const pending = filteredData.filter(d => d.status === "PENDING");
+          const active = filteredData.filter(d => d.status === "ACCEPTED").map(item => {
             const ov = localOverrides[item.email];
             if (ov) {
               return {
@@ -886,35 +911,37 @@
             }
             return item;
           });
-          
+
           cachedPendingList = pending;
           activeDatabaseList = active;
-          
+
           localStorage.setItem('cache_pending_db', JSON.stringify(pending));
           localStorage.setItem('cache_active_db', JSON.stringify(active));
-          
-          renderAntrean(pending); 
-          
+
+          renderAntrean(pending);
+
           let extractedHeads = new Set(headAccounts);
           active.forEach(item => {
-              if (item.headAccount && item.headAccount !== '-' && item.headAccount.includes('@') && !deletedHeads.includes(item.headAccount)) {
-                  extractedHeads.add(item.headAccount);
-              }
+            if (item.headAccount && item.headAccount !== '-' && item.headAccount.includes('@') && !deletedHeads.includes(item.headAccount)) {
+              extractedHeads.add(item.headAccount);
+            }
           });
           const updatedHeads = Array.from(extractedHeads);
           if (updatedHeads.length !== headAccounts.length) {
-              headAccounts = updatedHeads;
-              localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+            headAccounts = updatedHeads;
+            localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
           }
 
-          applyDatabaseFilters(); 
-          renderHeadAccounts();   
-          
+          applyDatabaseFilters();
+          renderHeadAccounts();
+
           document.getElementById('stat-pending-count').innerText = pending.length;
           document.getElementById('badge-antrean').innerText = pending.length;
           document.getElementById('stat-active-count').innerText = active.length;
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error("Gagal sinkron data cloud:", e);
+      }
     }
 
     function renderAntrean(list) {
@@ -1144,7 +1171,6 @@
       const currentWa = (item && item.wa && item.wa !== '080000000000') ? item.wa : '';
       document.getElementById('edit-customer-new-wa').value = currentWa;
 
-      // Siapkan pilihan Head Account di dalam Modal Edit
       const currentHead = (item && item.headAccount && item.headAccount !== '-') ? item.headAccount : '';
       const usage = getHeadAccountUsage();
       let headOptionsHtml = '';
@@ -1243,7 +1269,6 @@
         const updatedWa = newWaInput !== '' ? newWaInput : (targetItem.wa || '080000000000');
         const oldHead = targetItem.headAccount || '-';
 
-        // Jika menggunakan Head baru, langsung daftarkan ke list Head Account
         if (updatedHead && updatedHead !== '-' && updatedHead.includes('@')) {
           registerHeadAccountLocally(updatedHead);
         }
@@ -1274,7 +1299,6 @@
         });
         localStorage.setItem('cache_active_db', JSON.stringify(activeDatabaseList));
 
-        // Sinkronisasi ke Cloudflare Worker
         await fetch(`${API_URL}/api/gemini/admin/edit-email`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1288,7 +1312,6 @@
           })
         }).catch(() => {});
 
-        // Jika Head Account berubah, panggil juga endpoint accept agar di server KV ikut terupdate
         if (updatedHead !== oldHead && updatedHead !== '-') {
           await fetch(`${API_URL}/api/gemini/admin/accept`, {
             method: "POST",
@@ -1390,8 +1413,13 @@
         selectedHead = customVal;
       }
 
-      // Simpan Head baru secara instan ke daftar lokal
       registerHeadAccountLocally(selectedHead);
+
+      // Pastikan jika email pernah dihapus sebelumnya, dikeluarkan dari daftar deletedAccounts
+      if (deletedAccounts.includes(currentEmailToApprove)) {
+        deletedAccounts = deletedAccounts.filter(e => e !== currentEmailToApprove);
+        localStorage.setItem('digitalhub_deleted_accounts', JSON.stringify(deletedAccounts));
+      }
 
       const originalText = btn.innerHTML;
       btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Memproses...`; 
@@ -1407,7 +1435,6 @@
         const result = await res.json();
         
         if (result.success) {
-          // Optimistic UI update agar langsung pindah ke Database Aktif & Head Account langsung muncul
           const approvedItem = cachedPendingList.find(p => p.email === currentEmailToApprove);
           cachedPendingList = cachedPendingList.filter(p => p.email !== currentEmailToApprove);
           localStorage.setItem('cache_pending_db', JSON.stringify(cachedPendingList));
@@ -1461,8 +1488,9 @@
       }
     }
 
+    // --- FUNGSI HAPUS / REJECT DENGAN PENYIMPANAN DELETED ACCOUNTS ---
     async function rejectAction(email) {
-      if(confirm(`Yakin ingin menghapus / menolak email: ${email}?`)) {
+      if (confirm(`Yakin ingin menghapus / menolak email: ${email}?`)) {
         activeDatabaseList = activeDatabaseList.filter(item => item.email !== email);
         cachedPendingList = cachedPendingList.filter(item => item.email !== email);
         delete localOverrides[email];
@@ -1470,6 +1498,12 @@
         localStorage.setItem('cache_active_db', JSON.stringify(activeDatabaseList));
         localStorage.setItem('cache_pending_db', JSON.stringify(cachedPendingList));
         
+        // Tambahkan email ke daftar yang dihapus agar tidak muncul kembali saat sinkron
+        if (!deletedAccounts.includes(email)) {
+          deletedAccounts.push(email);
+          localStorage.setItem('digitalhub_deleted_accounts', JSON.stringify(deletedAccounts));
+        }
+
         document.getElementById('stat-pending-count').innerText = cachedPendingList.length;
         document.getElementById('badge-antrean').innerText = cachedPendingList.length;
         document.getElementById('stat-active-count').innerText = activeDatabaseList.length;
@@ -1484,7 +1518,9 @@
             headers: { "Content-Type": "application/json" }, 
             body: JSON.stringify({ email }) 
           });
-        } catch(e) {}
+        } catch (e) {
+          console.error("Gagal menghapus di server", e);
+        }
       }
     }
 
@@ -1694,8 +1730,13 @@
         if (!email || !duration) { alert("Email dan Durasi wajib diisi!"); return; }
         if (!head) { alert("Pilih atau isi Head Account!"); return; }
 
-        // Simpan Head baru secara instan ke daftar lokal
         registerHeadAccountLocally(head);
+
+        // Jika email pernah dihapus sebelumnya, keluarkan dari deletedAccounts agar bisa masuk lagi
+        if (deletedAccounts.includes(email)) {
+          deletedAccounts = deletedAccounts.filter(e => e !== email);
+          localStorage.setItem('digitalhub_deleted_accounts', JSON.stringify(deletedAccounts));
+        }
 
         const btn = document.getElementById('btn-save-manual');
         const orig = btn.innerHTML;
