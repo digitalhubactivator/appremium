@@ -20,6 +20,8 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade-up { animation: fadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    optgroup { font-weight: 900; color: #64748b; background-color: #f8fafc; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+    option { font-weight: 700; color: #1e293b; background-color: #ffffff; font-size: 13px; text-transform: none; letter-spacing: normal; }
   </style>
 </head>
 <body class="bg-[#F4F7FB] text-slate-800 min-h-screen antialiased selection:bg-purple-200 selection:text-purple-900 relative overflow-x-hidden">
@@ -72,8 +74,8 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base sm:text-lg lg:text-xl tracking-tight text-slate-900 leading-none">ADMIN<span class="text-gemini">WORKSPACE</span></h1>
-              <button onclick="refreshAllDataParallel()" title="Perbarui Data Manual" class="text-[9px] bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 font-black px-2 py-0.5 rounded-full inline-flex items-center gap-1 transition active:scale-95">
-                <i id="sync-icon" data-lucide="refresh-cw" class="w-2.5 h-2.5"></i> <span class="hidden sm:inline">Refresh</span>
+              <button onclick="refreshAllDataParallel()" title="Perbarui Data Auto-Sync" class="text-[9px] bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 font-black px-2 py-0.5 rounded-full inline-flex items-center gap-1 transition active:scale-95">
+                <i id="sync-icon" data-lucide="refresh-cw" class="w-2.5 h-2.5"></i> <span class="hidden sm:inline">Sync Cloud</span>
               </button>
             </div>
             <p class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-widest">DigitalHub Store Control</p>
@@ -81,7 +83,7 @@
         </div>
 
         <div class="flex items-center gap-1.5 sm:gap-2">
-          <button onclick="exportDataBackup()" class="flex items-center gap-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200/60 px-3 py-2 rounded-xl text-xs font-bold transition" title="Download Cadangan Data">
+          <button onclick="exportDataBackup()" class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200/60 px-3 py-2 rounded-xl text-xs font-bold transition" title="Download Cadangan Data">
             <i data-lucide="download" class="w-3.5 h-3.5"></i> <span class="hidden md:inline">Backup DB</span>
           </button>
           <label class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer" title="Restore Data JSON">
@@ -496,6 +498,38 @@
       }
     }
 
+    // --- AUTO SYNC (PENYIMPANAN PENGATURAN LOKAL KE CLOUD DIAM-DIAM) ---
+    async function syncSettingsToCloud() {
+      const currentTimestamp = Date.now();
+      localStorage.setItem('digitalhub_settings_timestamp', currentTimestamp.toString());
+
+      const payload = {
+        timestamp: currentTimestamp,
+        headAccounts: headAccounts,
+        manualFullHeads: manualFullHeads,
+        deletedHeads: deletedHeads,
+        deletedAccounts: deletedAccounts,
+        localOverrides: localOverrides
+      };
+
+      const pkgData = {
+        id: 'system_settings_v1',
+        name: 'SYSTEM_SETTINGS',
+        duration: 0,
+        price: 0,
+        product: 'SYSTEM',
+        features: JSON.stringify(payload)
+      };
+
+      try {
+        await fetch(`${API_URL}/api/gemini/admin/packages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(pkgData)
+        });
+      } catch(e) {}
+    }
+
     function copyToClipboard(text) {
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(text).catch(()=>{});
@@ -510,14 +544,18 @@
     function registerHeadAccountLocally(headEmail) {
       if (!headEmail || !headEmail.includes('@')) return;
       const cleanHead = headEmail.trim();
+      let changed = false;
       if (!headAccounts.includes(cleanHead)) {
         headAccounts.push(cleanHead);
         localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+        changed = true;
       }
       if (deletedHeads.includes(cleanHead)) {
         deletedHeads = deletedHeads.filter(h => h !== cleanHead);
         localStorage.setItem('digitalhub_deleted_heads', JSON.stringify(deletedHeads));
+        changed = true;
       }
+      if (changed) syncSettingsToCloud();
     }
 
     function hitungSisaHari(item) {
@@ -578,7 +616,7 @@
       document.getElementById('admin-login-screen').classList.add('flex');
     }
 
-    // --- POPUP PILIH WHATSAPP DENGAN PEMISAHAN WA BIASA & WA BUSINESS AKURAT ---
+    // --- POPUP PILIH WHATSAPP DENGAN SMART TEMPLATE TEKS ---
     function openWaModal(phone, email, sisaHari) {
         globalWaNumber = phone;
         
@@ -607,7 +645,6 @@
         if (isIOS) {
             window.location.href = `whatsapp://send?phone=${globalWaNumber}&text=${globalWaText}`;
         } else if (isAndroid) {
-            // Paksa membuka package com.whatsapp (WhatsApp Biasa/Personal)
             window.location.href = `intent://send?phone=${globalWaNumber}&text=${globalWaText}#Intent;package=com.whatsapp;scheme=whatsapp;end;`;
         } else {
             window.open(`https://web.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
@@ -623,7 +660,6 @@
         if (isIOS) {
             window.location.href = `whatsapp-smb://send?phone=${globalWaNumber}&text=${globalWaText}`;
         } else if (isAndroid) {
-            // Paksa membuka package com.whatsapp.w4b (WhatsApp Business)
             window.location.href = `intent://send?phone=${globalWaNumber}&text=${globalWaText}#Intent;package=com.whatsapp.w4b;scheme=whatsapp;end;`;
         } else {
             window.open(`https://api.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
@@ -721,6 +757,7 @@
             localStorage.setItem('cache_packages', JSON.stringify(packagesList));
           }
 
+          syncSettingsToCloud(); // Sync after restore
           alert("Data cadangan berhasil dipulihkan!");
           showDashboard();
         } catch (err) {
@@ -737,7 +774,6 @@
       document.getElementById('main-admin-content').classList.remove('hidden');
       document.getElementById('main-admin-content').classList.add('flex');
       
-      // Bersihkan daftar awal dari akun yang ada di deletedAccounts
       activeDatabaseList = activeDatabaseList.filter(d => !deletedAccounts.includes(d.email));
       cachedPendingList = cachedPendingList.filter(d => !deletedAccounts.includes(d.email));
 
@@ -775,10 +811,50 @@
         const res = await fetch(`${API_URL}/api/gemini/packages`);
         const result = await res.json();
         if (result.success && Array.isArray(result.data)) {
-          packagesList = result.data;
+          const normalPackages = [];
+          let systemSettings = null;
+
+          result.data.forEach(p => {
+            if (p.id === 'system_settings_v1') {
+              systemSettings = p;
+            } else {
+              normalPackages.push(p);
+            }
+          });
+
+          packagesList = normalPackages;
           localStorage.setItem('cache_packages', JSON.stringify(packagesList));
           renderPackages();
           updatePinDropdown(); 
+
+          // --- EKSTRAK SETTINGS DARI CLOUD (AUTO-SYNC) ---
+          if (systemSettings && systemSettings.features) {
+            try {
+              const s = JSON.parse(systemSettings.features);
+              const localTimestamp = parseInt(localStorage.getItem('digitalhub_settings_timestamp') || '0');
+              const cloudTimestamp = s.timestamp || 0;
+
+              if (cloudTimestamp > localTimestamp) {
+                headAccounts = s.headAccounts || [];
+                manualFullHeads = s.manualFullHeads || [];
+                deletedHeads = s.deletedHeads || [];
+                deletedAccounts = s.deletedAccounts || [];
+                localOverrides = s.localOverrides || {};
+
+                localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+                localStorage.setItem('digitalhub_manual_full_heads', JSON.stringify(manualFullHeads));
+                localStorage.setItem('digitalhub_deleted_heads', JSON.stringify(deletedHeads));
+                localStorage.setItem('digitalhub_deleted_accounts', JSON.stringify(deletedAccounts));
+                localStorage.setItem('digitalhub_local_overrides', JSON.stringify(localOverrides));
+                localStorage.setItem('digitalhub_settings_timestamp', cloudTimestamp.toString());
+
+                // Karena deletedAccounts atau localOverrides mungkin diupdate dari cloud,
+                // jalankan fetchAdminData lagi di latar agar database cocok.
+                setTimeout(fetchAdminData, 100);
+                renderHeadAccounts();
+              }
+            } catch(e) {}
+          }
         }
       } catch (e) {}
     }
@@ -885,7 +961,7 @@
       }
     }
 
-    // --- FETCH ADMIN DATA DENGAN FILTER DELETED ACCOUNTS ---
+    // --- FETCH ADMIN DATA DENGAN PENCEGAHAN EMAIL YANG DIHAPUS (DELETED ACCOUNTS) ---
     async function fetchAdminData() {
       if (!isLoggedIn) return;
       try {
@@ -893,8 +969,6 @@
         const result = await response.json();
         if (result.success && Array.isArray(result.data)) {
           const allData = result.data;
-
-          // Filter data agar email yang ada di deletedAccounts tidak masuk kembali
           const filteredData = allData.filter(d => !deletedAccounts.includes(d.email));
 
           const pending = filteredData.filter(d => d.status === "PENDING");
@@ -926,11 +1000,15 @@
               extractedHeads.add(item.headAccount);
             }
           });
+          
+          let changed = false;
           const updatedHeads = Array.from(extractedHeads);
           if (updatedHeads.length !== headAccounts.length) {
             headAccounts = updatedHeads;
             localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+            changed = true;
           }
+          if (changed) syncSettingsToCloud();
 
           applyDatabaseFilters();
           renderHeadAccounts();
@@ -1171,15 +1249,20 @@
       const currentWa = (item && item.wa && item.wa !== '080000000000') ? item.wa : '';
       document.getElementById('edit-customer-new-wa').value = currentWa;
 
+      // Siapkan pilihan Head Account di dalam Modal Edit
       const currentHead = (item && item.headAccount && item.headAccount !== '-') ? item.headAccount : '';
       const usage = getHeadAccountUsage();
-      let headOptionsHtml = '';
+      
+      let currentHtml = '';
+      let newHeads = '';
+      let partialHeads = '';
+      let fullHeads = '';
 
       if (currentHead) {
         const usedCurrent = usage[currentHead] || 1;
-        headOptionsHtml += `<option value="${currentHead}">📌 Tetap: ${currentHead} (${usedCurrent}/5 Terpakai)</option>`;
+        currentHtml = `<optgroup label="📌 AKUN SAAT INI"><option value="${currentHead}">Tetap: ${currentHead} (${usedCurrent}/5 Terpakai)</option></optgroup>`;
       } else {
-        headOptionsHtml += `<option value="-">-- Belum Ada Head Account --</option>`;
+        currentHtml = `<option value="-">-- Belum Ada Head Account --</option>`;
       }
 
       const reversedHeads = [...headAccounts].reverse();
@@ -1188,11 +1271,22 @@
           const used = usage[h] || 0;
           const remaining = 5 - used;
           const isLocked = manualFullHeads.includes(h);
-          const statusLabel = isLocked ? 'Dikunci Penuh' : (remaining > 0 ? `Sisa ${remaining} Slot` : 'Penuh 5/5');
-          headOptionsHtml += `<option value="${h}">${h} (${statusLabel})</option>`;
+
+          if (isLocked || remaining <= 0) {
+            const statusLabel = isLocked ? 'Dikunci Penuh' : 'Penuh 5/5';
+            fullHeads += `<option value="${h}">[Penuh] ${h} (${statusLabel})</option>`;
+          } else if (remaining === 5) {
+            newHeads += `<option value="${h}">[Baru] ${h} (Sisa 5 Slot)</option>`;
+          } else {
+            partialHeads += `<option value="${h}">[Sisa ${remaining}] ${h}</option>`;
+          }
         }
       });
 
+      let headOptionsHtml = currentHtml;
+      if (newHeads !== '') headOptionsHtml += `<optgroup label="🌟 AKUN BARU (Sisa 5 Slot)">${newHeads}</optgroup>`;
+      if (partialHeads !== '') headOptionsHtml += `<optgroup label="⚡ ADA SISA SLOT">${partialHeads}</optgroup>`;
+      if (fullHeads !== '') headOptionsHtml += `<optgroup label="⛔ PENUH / DIKUNCI">${fullHeads}</optgroup>`;
       headOptionsHtml += `<option value="__custom__">✍️ + Ketik Manual Akun Head Baru...</option>`;
 
       const headSelectEl = document.getElementById('edit-customer-head-select');
@@ -1269,6 +1363,7 @@
         const updatedWa = newWaInput !== '' ? newWaInput : (targetItem.wa || '080000000000');
         const oldHead = targetItem.headAccount || '-';
 
+        // Jika menggunakan Head baru, langsung daftarkan ke list Head Account & Trigger Cloud Sync
         if (updatedHead && updatedHead !== '-' && updatedHead.includes('@')) {
           registerHeadAccountLocally(updatedHead);
         }
@@ -1299,6 +1394,10 @@
         });
         localStorage.setItem('cache_active_db', JSON.stringify(activeDatabaseList));
 
+        // Sync ke Cloud Storage Settings
+        syncSettingsToCloud();
+
+        // Sinkronisasi ke Cloudflare Worker DB
         await fetch(`${API_URL}/api/gemini/admin/edit-email`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1312,6 +1411,7 @@
           })
         }).catch(() => {});
 
+        // Jika Head Account berubah, panggil juga endpoint accept agar di server KV ikut terupdate
         if (updatedHead !== oldHead && updatedHead !== '-') {
           await fetch(`${API_URL}/api/gemini/admin/accept`, {
             method: "POST",
@@ -1350,6 +1450,7 @@
       return usage;
     }
 
+    // --- ACC & INPUT MANUAL (DENGAN OPTGROUP PINTAR) ---
     function toggleAccHeadInput() {
       const select = document.getElementById('select-head-account');
       const customInput = document.getElementById('acc-head-custom');
@@ -1376,17 +1477,25 @@
       }
 
       const usage = getHeadAccountUsage();
-      let optionsHtml = '';
+      let newHeads = '';
+      let partialHeads = '';
       
       const reversedHeads = [...headAccounts].reverse();
       reversedHeads.forEach(h => {
           const used = usage[h] || 0;
           const remaining = 5 - used; 
           if (remaining > 0 && !manualFullHeads.includes(h)) {
-              optionsHtml += `<option value="${h}">${h} (Sisa ${remaining} Slot)</option>`;
+              if (remaining === 5) {
+                  newHeads += `<option value="${h}">[Baru] ${h} (Sisa 5 Slot)</option>`;
+              } else {
+                  partialHeads += `<option value="${h}">[Sisa ${remaining}] ${h}</option>`;
+              }
           }
       });
 
+      let optionsHtml = '';
+      if (newHeads !== '') optionsHtml += `<optgroup label="🌟 AKUN BARU (Sisa 5 Slot)">${newHeads}</optgroup>`;
+      if (partialHeads !== '') optionsHtml += `<optgroup label="⚡ ADA SISA SLOT">${partialHeads}</optgroup>`;
       optionsHtml += `<option value="__custom__">✍️ + Ketik Manual Akun Head...</option>`;
       
       document.getElementById('select-head-account').innerHTML = optionsHtml;
@@ -1415,7 +1524,6 @@
 
       registerHeadAccountLocally(selectedHead);
 
-      // Pastikan jika email pernah dihapus sebelumnya, dikeluarkan dari daftar deletedAccounts
       if (deletedAccounts.includes(currentEmailToApprove)) {
         deletedAccounts = deletedAccounts.filter(e => e !== currentEmailToApprove);
         localStorage.setItem('digitalhub_deleted_accounts', JSON.stringify(deletedAccounts));
@@ -1457,6 +1565,7 @@
             durationMonths: currentDurationToApprove || 1
           };
           localStorage.setItem('digitalhub_local_overrides', JSON.stringify(localOverrides));
+          syncSettingsToCloud();
 
           activeDatabaseList = activeDatabaseList.filter(a => a.email !== currentEmailToApprove);
           activeDatabaseList.unshift(newActiveItem);
@@ -1504,6 +1613,8 @@
           localStorage.setItem('digitalhub_deleted_accounts', JSON.stringify(deletedAccounts));
         }
 
+        syncSettingsToCloud(); // Push deletion to cloud
+
         document.getElementById('stat-pending-count').innerText = cachedPendingList.length;
         document.getElementById('badge-antrean').innerText = cachedPendingList.length;
         document.getElementById('stat-active-count').innerText = activeDatabaseList.length;
@@ -1521,146 +1632,6 @@
         } catch (e) {
           console.error("Gagal menghapus di server", e);
         }
-      }
-    }
-
-    function switchTab(tabName) {
-      ['antrean', 'database', 'head-accounts', 'paket'].forEach(tab => {
-          const btn = document.getElementById('tab-' + tab);
-          const sec = document.getElementById('section-' + tab);
-          if (tab === tabName) {
-              btn.className = "px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-black text-purple-700 bg-white rounded-2xl shadow-sm border border-purple-100 flex items-center gap-2 transition-all whitespace-nowrap" + (tab === 'paket' ? " sm:ml-auto" : "");
-              sec.classList.remove('hidden');
-          } else {
-              btn.className = "px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-white/80 rounded-2xl transition-all flex items-center gap-2 whitespace-nowrap" + (tab === 'paket' ? " sm:ml-auto" : "");
-              sec.classList.add('hidden');
-          }
-      });
-    }
-
-    async function generatePin() {
-      const prodSelect = document.getElementById('pin-product');
-      const durationSelect = document.getElementById('pin-duration');
-      const product = prodSelect.value;
-      
-      if(!durationSelect.value) { alert("Tidak ada durasi paket yang bisa dipilih!"); return; }
-      
-      const duration = durationSelect.value;
-      const durationLabel = durationSelect.options[durationSelect.selectedIndex]?.text || `${duration} Bulan`;
-      
-      const randomString = Math.random().toString(36).substring(2, 6).toUpperCase();
-      const prefix = product === 'Canva Pro' ? 'CNV' : (product === 'YouTube Premium' ? 'YTB' : 'GEM');
-      const newPin = `${prefix}${duration}-${randomString}`;
-      
-      try {
-          await fetch(`${API_URL}/api/gemini/admin/generate-pin`, { 
-              method: "POST", headers: { "Content-Type": "application/json" }, 
-              body: JSON.stringify({ pin: newPin, durationMonths: duration, productName: product }) 
-          });
-          document.getElementById('pin-duration-label').innerText = `Paket: ${product} (${durationLabel})`;
-          document.getElementById('generated-pin').innerText = newPin;
-          document.getElementById('pin-result-modal').classList.remove('hidden');
-      } catch (e) { alert("Gagal menyimpan PIN ke database."); }
-    }
-    
-    function closePinModal() { document.getElementById('pin-result-modal').classList.add('hidden'); }
-    
-    function copyPin() {
-        copyToClipboard(document.getElementById('generated-pin').innerText);
-        document.getElementById('copy-status').classList.add('opacity-100');
-        setTimeout(() => { document.getElementById('copy-status').classList.remove('opacity-100'); }, 2000);
-    }
-
-    function toggleManualFull(email) {
-      if (manualFullHeads.includes(email)) {
-        manualFullHeads = manualFullHeads.filter(h => h !== email);
-      } else {
-        manualFullHeads.push(email);
-      }
-      localStorage.setItem('digitalhub_manual_full_heads', JSON.stringify(manualFullHeads));
-      renderHeadAccounts();
-    }
-
-    function renderHeadAccounts() {
-      const grid = document.getElementById('head-accounts-grid');
-      
-      if(headAccounts.length === 0) {
-        grid.innerHTML = `<p class="text-sm text-slate-400">Belum ada head account.</p>`;
-        return;
-      }
-      
-      const usage = getHeadAccountUsage();
-      let availableHtml = '';
-      let fullHtml = '';
-      
-      headAccounts.forEach((h, i) => {
-          const used = usage[h] || 0;
-          const max = 5;
-          const remaining = max - used;
-          const isManualFull = manualFullHeads.includes(h);
-          const isFull = remaining <= 0 || isManualFull;
-          
-          const cardHtml = `
-            <div class="bg-white border ${isFull ? 'border-rose-200 opacity-80' : 'border-slate-200'} p-5 rounded-2xl shadow-sm flex flex-col gap-3">
-               <div class="flex items-center justify-between">
-                   <div class="flex items-center gap-3 min-w-0">
-                     <div class="w-9 h-9 rounded-xl ${isFull ? 'bg-rose-50 text-rose-600' : 'bg-purple-50 text-purple-600'} flex items-center justify-center font-black text-xs shrink-0">H${i+1}</div>
-                     <div class="min-w-0 pr-2">
-                        <p class="font-black text-sm text-slate-800 break-all">${h}</p>
-                        <p class="text-[10px] font-bold ${isFull ? 'text-rose-500' : 'text-emerald-500'} mt-0.5">
-                          ${isManualFull ? 'Ditandai Penuh (Manual)' : (isFull ? 'Kapasitas Penuh' : `Sisa ${remaining} Slot`)}
-                        </p>
-                     </div>
-                   </div>
-                   <div class="flex items-center gap-1 shrink-0">
-                     <button onclick="toggleManualFull('${h}')" title="${isManualFull ? 'Buka Kunci Slot' : 'Tandai Sudah Penuh'}" class="p-1.5 rounded-lg text-xs font-bold transition ${isManualFull ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' : 'bg-slate-100 text-slate-500 hover:bg-rose-50 hover:text-rose-600'}">
-                       <i data-lucide="${isManualFull ? 'unlock' : 'lock'}" class="w-4 h-4"></i>
-                     </button>
-                     <button onclick="deleteHeadAccount('${h}')" class="text-slate-400 hover:text-rose-500 p-1.5 transition shrink-0" title="Hapus Akun"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                   </div>
-               </div>
-               <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden mt-1">
-                   <div class="h-2 rounded-full ${isFull ? 'bg-rose-500' : 'bg-purple-500'}" style="width: ${isManualFull ? 100 : (used/max)*100}%"></div>
-               </div>
-               <div class="flex justify-between items-center text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                 <span>${isManualFull ? 'Manual Lock' : 'Auto Count'}</span>
-                 <span>${isManualFull ? '5 / 5' : `${used} / ${max}`} Terpakai</span>
-               </div>
-            </div>
-          `;
-          if (isFull) { fullHtml += cardHtml; } else { availableHtml += cardHtml; }
-      });
-      
-      grid.innerHTML = `
-          <div class="col-span-full mb-1"><h4 class="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-100 pb-2">✅ Akun Tersedia</h4></div>
-          ${availableHtml || '<div class="col-span-full mb-4"><p class="text-xs text-slate-400">Tidak ada akun tersedia.</p></div>'}
-          <div class="col-span-full mt-6 mb-1"><h4 class="text-xs font-black text-rose-400 uppercase tracking-widest border-b border-rose-100 pb-2">⛔ Akun Penuh (Full Slot)</h4></div>
-          ${fullHtml || '<div class="col-span-full"><p class="text-xs text-slate-400">Belum ada akun yang penuh.</p></div>'}
-      `;
-      refreshIcons();
-    }
-
-    function addHeadAccount() {
-      const email = document.getElementById('new-head-email').value.trim();
-      if(!email || !email.includes('@')) { alert("Masukkan email yang valid!"); return; }
-      registerHeadAccountLocally(email);
-      
-      document.getElementById('new-head-email').value = "";
-      document.getElementById('modal-add-head').classList.add('hidden');
-      renderHeadAccounts();
-    }
-
-    function deleteHeadAccount(emailToDelete) {
-      if(confirm(`Hapus Head Account "${emailToDelete}" dari daftar?`)) {
-        headAccounts = headAccounts.filter(h => h !== emailToDelete);
-        localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
-
-        if (!deletedHeads.includes(emailToDelete)) {
-          deletedHeads.push(emailToDelete);
-          localStorage.setItem('digitalhub_deleted_heads', JSON.stringify(deletedHeads));
-        }
-
-        renderHeadAccounts();
       }
     }
 
@@ -1683,17 +1654,25 @@
         document.getElementById('manual-head-custom').classList.add('hidden');
         
         const usage = getHeadAccountUsage();
-        let optionsHtml = '';
+        let newHeads = '';
+        let partialHeads = '';
         
         const reversedHeads = [...headAccounts].reverse();
         reversedHeads.forEach(h => {
             const used = usage[h] || 0;
             const remaining = 5 - used; 
             if (remaining > 0 && !manualFullHeads.includes(h)) {
-                optionsHtml += `<option value="${h}">${h} (Sisa ${remaining} Slot)</option>`;
+                if (remaining === 5) {
+                    newHeads += `<option value="${h}">[Baru] ${h} (Sisa 5 Slot)</option>`;
+                } else {
+                    partialHeads += `<option value="${h}">[Sisa ${remaining}] ${h}</option>`;
+                }
             }
         });
         
+        let optionsHtml = '';
+        if (newHeads !== '') optionsHtml += `<optgroup label="🌟 AKUN BARU (Sisa 5 Slot)">${newHeads}</optgroup>`;
+        if (partialHeads !== '') optionsHtml += `<optgroup label="⚡ ADA SISA SLOT">${partialHeads}</optgroup>`;
         optionsHtml += `<option value="__custom__">✍️ + Ketik Manual Akun Head...</option>`;
         
         const headSelect = document.getElementById('manual-head');
@@ -1732,7 +1711,6 @@
 
         registerHeadAccountLocally(head);
 
-        // Jika email pernah dihapus sebelumnya, keluarkan dari deletedAccounts agar bisa masuk lagi
         if (deletedAccounts.includes(email)) {
           deletedAccounts = deletedAccounts.filter(e => e !== email);
           localStorage.setItem('digitalhub_deleted_accounts', JSON.stringify(deletedAccounts));
@@ -1764,6 +1742,7 @@
               extraDays: 0
             };
             localStorage.setItem('digitalhub_local_overrides', JSON.stringify(localOverrides));
+            syncSettingsToCloud();
 
             activeDatabaseList = activeDatabaseList.filter(a => a.email !== email);
             activeDatabaseList.unshift({
