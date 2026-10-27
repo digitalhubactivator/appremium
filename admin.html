@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel - DigitalHub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -20,8 +20,6 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade-up { animation: fadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    optgroup { font-weight: 900; color: #64748b; background-color: #f8fafc; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
-    option { font-weight: 700; color: #1e293b; background-color: #ffffff; font-size: 13px; text-transform: none; letter-spacing: normal; }
   </style>
 </head>
 <body class="bg-[#F4F7FB] text-slate-800 min-h-screen antialiased selection:bg-purple-200 selection:text-purple-900 relative overflow-x-hidden">
@@ -74,8 +72,8 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base sm:text-lg lg:text-xl tracking-tight text-slate-900 leading-none">ADMIN<span class="text-gemini">WORKSPACE</span></h1>
-              <button id="btn-sync-status" onclick="refreshAllDataParallel()" title="Perbarui Data Auto-Sync" class="text-[9px] bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 font-black px-2 py-0.5 rounded-full inline-flex items-center gap-1 transition active:scale-95">
-                <i id="sync-icon" data-lucide="refresh-cw" class="w-2.5 h-2.5"></i> <span id="sync-text" class="hidden sm:inline">Sync Cloud</span>
+              <button onclick="refreshAllDataParallel()" title="Perbarui Data Manual" class="text-[9px] bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 font-black px-2 py-0.5 rounded-full inline-flex items-center gap-1 transition active:scale-95">
+                <i id="sync-icon" data-lucide="refresh-cw" class="w-2.5 h-2.5"></i> <span class="hidden sm:inline">Refresh</span>
               </button>
             </div>
             <p class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-widest">DigitalHub Store Control</p>
@@ -83,7 +81,7 @@
         </div>
 
         <div class="flex items-center gap-1.5 sm:gap-2">
-          <button onclick="exportDataBackup()" class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200/60 px-3 py-2 rounded-xl text-xs font-bold transition" title="Download Cadangan Data">
+          <button onclick="exportDataBackup()" class="flex items-center gap-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200/60 px-3 py-2 rounded-xl text-xs font-bold transition" title="Download Cadangan Data">
             <i data-lucide="download" class="w-3.5 h-3.5"></i> <span class="hidden md:inline">Backup DB</span>
           </button>
           <label class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer" title="Restore Data JSON">
@@ -330,14 +328,14 @@
     </div>
   </div>
 
-  <!-- ================= MODAL EDIT PELANGGAN (EMAIL, WA, HEAD ACCOUNT, & PERPANJANG DURASI) ================= -->
+  <!-- ================= MODAL EDIT PELANGGAN & PERPANJANG DURASI ================= -->
   <div id="modal-edit-customer-email" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeEditEmailModal()"></div>
     <div class="relative bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-6 sm:p-7 space-y-4 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div>
           <h3 class="font-black text-lg sm:text-xl text-slate-900">Edit Data & Perpanjang</h3>
-          <p class="text-xs text-slate-500 mt-0.5">Ubah email, WA, head account, atau masa aktif pelanggan.</p>
+          <p class="text-xs text-slate-500 mt-0.5">Ubah email, nomor WA, atau tambah masa aktif pelanggan.</p>
         </div>
         <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
           <i data-lucide="calendar-clock" class="w-5 h-5"></i>
@@ -357,15 +355,6 @@
           <i data-lucide="phone" class="w-4 h-4 text-emerald-500 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
           <input type="text" id="edit-customer-new-wa" placeholder="Contoh: 081234567890" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 outline-none focus:border-emerald-500 focus:bg-white transition" />
         </div>
-      </div>
-
-      <!-- FITUR EDIT / GANTI HEAD ACCOUNT PENGIRIM -->
-      <div class="space-y-1.5">
-        <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider px-1 flex items-center gap-1">
-          <i data-lucide="crown" class="w-3.5 h-3.5 text-purple-600"></i> Head Account / Family Pengirim
-        </label>
-        <select id="edit-customer-head-select" onchange="toggleEditHeadInput()" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 outline-none focus:border-purple-500 focus:bg-white transition"></select>
-        <input type="email" id="edit-customer-head-custom" placeholder="Ketik Email Head Baru (Contoh: headbaru@gmail.com)" class="hidden w-full px-4 py-3 bg-purple-50/60 border border-purple-200 rounded-xl text-sm font-bold text-slate-800 outline-none focus:border-purple-500 focus:bg-white transition mt-2" />
       </div>
 
       <!-- KOTAK PERPANJANG DURASI HARIAN / BULANAN -->
@@ -456,25 +445,14 @@
     const encodedApi = btoa("https://api-activator.achachelsea58.workers.dev");
     const API_URL = atob(encodedApi);
     
-    // SAFETY WRAPPER: Mencegah Array menjadi Corrupt karena format penyimpanan lama
-    function safeArray(key) {
-      try { const v = JSON.parse(localStorage.getItem(key)); return Array.isArray(v) ? v : []; }
-      catch(e) { return []; }
-    }
-    function safeObject(key) {
-      try { const v = JSON.parse(localStorage.getItem(key)); return (v && typeof v === 'object' && !Array.isArray(v)) ? v : {}; }
-      catch(e) { return {}; }
-    }
-
     // CACHE-FIRST STATE
-    let headAccounts = safeArray('digitalhub_head_accounts');
-    let manualFullHeads = safeArray('digitalhub_manual_full_heads');
-    let deletedHeads = safeArray('digitalhub_deleted_heads');
-    let deletedAccounts = safeArray('digitalhub_deleted_accounts');
-    let packagesList = safeArray('cache_packages');
-    let activeDatabaseList = safeArray('cache_active_db'); 
-    let cachedPendingList = safeArray('cache_pending_db');
-    let localOverrides = safeObject('digitalhub_local_overrides');
+    let headAccounts = JSON.parse(localStorage.getItem('digitalhub_head_accounts') || '[]');
+    let manualFullHeads = JSON.parse(localStorage.getItem('digitalhub_manual_full_heads') || '[]');
+    let deletedHeads = JSON.parse(localStorage.getItem('digitalhub_deleted_heads') || '[]');
+    let packagesList = JSON.parse(localStorage.getItem('cache_packages') || '[]');
+    let activeDatabaseList = JSON.parse(localStorage.getItem('cache_active_db') || '[]'); 
+    let cachedPendingList = JSON.parse(localStorage.getItem('cache_pending_db') || '[]');
+    let localOverrides = JSON.parse(localStorage.getItem('digitalhub_local_overrides') || '{}');
 
     let currentCategoryFilter = 'Semua';
     let currentEmailToApprove = null;
@@ -498,65 +476,14 @@
       }
     }
 
-    function setSyncStatus(isSyncing, isError = false) {
-      const btn = document.getElementById('btn-sync-status');
+    function setSyncStatus(isSyncing) {
       const icon = document.getElementById('sync-icon');
-      const text = document.getElementById('sync-text');
-      
-      if (!icon || !btn || !text) return;
-      
-      if (isError) {
-        icon.classList.remove('animate-spin');
-        btn.classList.replace('bg-purple-50', 'bg-rose-50');
-        btn.classList.replace('text-purple-700', 'text-rose-600');
-        btn.classList.replace('border-purple-200', 'border-rose-200');
-        text.innerText = 'Server Error';
-        icon.setAttribute('data-lucide', 'alert-triangle');
+      if (!icon) return;
+      if (isSyncing) {
+        icon.classList.add('animate-spin');
       } else {
-        btn.classList.replace('bg-rose-50', 'bg-purple-50');
-        btn.classList.replace('text-rose-600', 'text-purple-700');
-        btn.classList.replace('border-rose-200', 'border-purple-200');
-        text.innerText = 'Sync Cloud';
-        icon.setAttribute('data-lucide', 'refresh-cw');
-        if (isSyncing) {
-          icon.classList.add('animate-spin');
-        } else {
-          icon.classList.remove('animate-spin');
-        }
+        icon.classList.remove('animate-spin');
       }
-      refreshIcons();
-    }
-
-    // --- AUTO SYNC (PENYIMPANAN PENGATURAN LOKAL KE CLOUD DIAM-DIAM) ---
-    async function syncSettingsToCloud() {
-      const currentTimestamp = Date.now();
-      localStorage.setItem('digitalhub_settings_timestamp', currentTimestamp.toString());
-
-      const payload = {
-        timestamp: currentTimestamp,
-        headAccounts: headAccounts,
-        manualFullHeads: manualFullHeads,
-        deletedHeads: deletedHeads,
-        deletedAccounts: deletedAccounts,
-        localOverrides: localOverrides
-      };
-
-      const pkgData = {
-        id: 'system_settings_v1',
-        name: 'SYSTEM_SETTINGS',
-        duration: 0,
-        price: 0,
-        product: 'SYSTEM',
-        features: JSON.stringify(payload)
-      };
-
-      try {
-        await fetch(`${API_URL}/api/gemini/admin/packages`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(pkgData)
-        });
-      } catch(e) {}
     }
 
     function copyToClipboard(text) {
@@ -567,23 +494,6 @@
         textArea.value = text; document.body.appendChild(textArea); textArea.select();
         try { document.execCommand('copy'); } catch (err) {} textArea.remove();
       }
-    }
-
-    function registerHeadAccountLocally(headEmail) {
-      if (!headEmail || !headEmail.includes('@')) return;
-      const cleanHead = headEmail.trim();
-      let changed = false;
-      if (!headAccounts.includes(cleanHead)) {
-        headAccounts.push(cleanHead);
-        localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
-        changed = true;
-      }
-      if (deletedHeads.includes(cleanHead)) {
-        deletedHeads = deletedHeads.filter(h => h !== cleanHead);
-        localStorage.setItem('digitalhub_deleted_heads', JSON.stringify(deletedHeads));
-        changed = true;
-      }
-      if (changed) syncSettingsToCloud();
     }
 
     function hitungSisaHari(item) {
@@ -644,6 +554,7 @@
       document.getElementById('admin-login-screen').classList.add('flex');
     }
 
+    // --- POPUP PILIH WHATSAPP DENGAN SMART TEMPLATE TEKS ---
     function openWaModal(phone, email, sisaHari) {
         globalWaNumber = phone;
         
@@ -666,16 +577,7 @@
 
     function openWaBiasa() {
         if(!globalWaNumber) return;
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        const isAndroid = /Android/.test(navigator.userAgent);
-
-        if (isIOS) {
-            window.location.href = `whatsapp://send?phone=${globalWaNumber}&text=${globalWaText}`;
-        } else if (isAndroid) {
-            window.location.href = `intent://send?phone=${globalWaNumber}&text=${globalWaText}#Intent;package=com.whatsapp;scheme=whatsapp;end;`;
-        } else {
-            window.open(`https://web.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
-        }
+        window.open(`https://api.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
         closeWaModal();
     }
 
@@ -685,11 +587,12 @@
         const isAndroid = /Android/.test(navigator.userAgent);
 
         if (isIOS) {
-            window.location.href = `whatsapp-smb://send?phone=${globalWaNumber}&text=${globalWaText}`;
+            window.open(`whatsapp-smb://send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
         } else if (isAndroid) {
             window.location.href = `intent://send?phone=${globalWaNumber}&text=${globalWaText}#Intent;package=com.whatsapp.w4b;scheme=whatsapp;end;`;
+            setTimeout(() => { window.open(`https://api.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank'); }, 800);
         } else {
-            window.open(`https://api.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
+            window.open(`https://web.whatsapp.com/send?phone=${globalWaNumber}&text=${globalWaText}`, '_blank');
         }
         closeWaModal();
     }
@@ -727,8 +630,6 @@
         timestamp: new Date().toISOString(),
         headAccounts: headAccounts,
         manualFullHeads: manualFullHeads,
-        deletedHeads: deletedHeads,
-        deletedAccounts: deletedAccounts,
         localOverrides: localOverrides,
         packages: packagesList,
         activeDatabase: activeDatabaseList,
@@ -761,10 +662,6 @@
             manualFullHeads = Array.from(new Set([...manualFullHeads, ...imported.manualFullHeads]));
             localStorage.setItem('digitalhub_manual_full_heads', JSON.stringify(manualFullHeads));
           }
-          if (Array.isArray(imported.deletedAccounts)) {
-            deletedAccounts = Array.from(new Set([...deletedAccounts, ...imported.deletedAccounts]));
-            localStorage.setItem('digitalhub_deleted_accounts', JSON.stringify(deletedAccounts));
-          }
           if (imported.localOverrides && typeof imported.localOverrides === 'object') {
             localOverrides = { ...localOverrides, ...imported.localOverrides };
             localStorage.setItem('digitalhub_local_overrides', JSON.stringify(localOverrides));
@@ -772,7 +669,7 @@
           if (Array.isArray(imported.activeDatabase)) {
             const existingEmails = new Set(activeDatabaseList.map(a => a.email));
             imported.activeDatabase.forEach(item => {
-              if (item && item.email && !existingEmails.has(item.email) && !deletedAccounts.includes(item.email)) {
+              if (!existingEmails.has(item.email)) {
                 activeDatabaseList.push(item);
                 existingEmails.add(item.email);
               }
@@ -784,7 +681,6 @@
             localStorage.setItem('cache_packages', JSON.stringify(packagesList));
           }
 
-          syncSettingsToCloud(); // Sync after restore
           alert("Data cadangan berhasil dipulihkan!");
           showDashboard();
         } catch (err) {
@@ -801,10 +697,6 @@
       document.getElementById('main-admin-content').classList.remove('hidden');
       document.getElementById('main-admin-content').classList.add('flex');
       
-      // Keamanan JS (Filter Corrupt Cache)
-      activeDatabaseList = activeDatabaseList.filter(d => d && d.email && !deletedAccounts.includes(d.email));
-      cachedPendingList = cachedPendingList.filter(d => d && d.email && !deletedAccounts.includes(d.email));
-
       renderPackages();
       updatePinDropdown();
       renderAntrean(cachedPendingList);
@@ -828,14 +720,8 @@
       setSyncStatus(true);
       try {
         await Promise.allSettled([fetchPackages(), fetchAdminData()]);
-      } catch(e) {
-        setSyncStatus(false, true); // Trigger limit error status
       } finally {
-        // Jika tidak error, matikan spinner
-        const icon = document.getElementById('sync-icon');
-        if(icon && icon.getAttribute('data-lucide') === 'refresh-cw') {
-            setSyncStatus(false);
-        }
+        setSyncStatus(false);
       }
     }
 
@@ -843,56 +729,14 @@
       if(!isLoggedIn) return;
       try {
         const res = await fetch(`${API_URL}/api/gemini/packages`);
-        if(!res.ok) throw new Error("Limit");
-        
         const result = await res.json();
         if (result.success && Array.isArray(result.data)) {
-          const normalPackages = [];
-          let systemSettings = null;
-
-          result.data.forEach(p => {
-            if (p.id === 'system_settings_v1') {
-              systemSettings = p;
-            } else {
-              normalPackages.push(p);
-            }
-          });
-
-          packagesList = normalPackages;
+          packagesList = result.data;
           localStorage.setItem('cache_packages', JSON.stringify(packagesList));
           renderPackages();
           updatePinDropdown(); 
-
-          // --- EKSTRAK SETTINGS DARI CLOUD (AUTO-SYNC) ---
-          if (systemSettings && systemSettings.features) {
-            try {
-              const s = JSON.parse(systemSettings.features);
-              const localTimestamp = parseInt(localStorage.getItem('digitalhub_settings_timestamp') || '0');
-              const cloudTimestamp = s.timestamp || 0;
-
-              if (cloudTimestamp > localTimestamp) {
-                headAccounts = s.headAccounts || [];
-                manualFullHeads = s.manualFullHeads || [];
-                deletedHeads = s.deletedHeads || [];
-                deletedAccounts = s.deletedAccounts || [];
-                localOverrides = s.localOverrides || {};
-
-                localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
-                localStorage.setItem('digitalhub_manual_full_heads', JSON.stringify(manualFullHeads));
-                localStorage.setItem('digitalhub_deleted_heads', JSON.stringify(deletedHeads));
-                localStorage.setItem('digitalhub_deleted_accounts', JSON.stringify(deletedAccounts));
-                localStorage.setItem('digitalhub_local_overrides', JSON.stringify(localOverrides));
-                localStorage.setItem('digitalhub_settings_timestamp', cloudTimestamp.toString());
-
-                setTimeout(fetchAdminData, 100);
-                renderHeadAccounts();
-              }
-            } catch(e) {}
-          }
         }
-      } catch (e) {
-          throw e; // Lemparkan ke Promise.allSettled
-      }
+      } catch (e) {}
     }
 
     function updatePinDropdown() {
@@ -997,70 +841,56 @@
       }
     }
 
-    // --- FETCH ADMIN DATA DENGAN ERROR CATCHING LENGKAP ---
     async function fetchAdminData() {
-      if (!isLoggedIn) return;
+      if(!isLoggedIn) return;
       try {
         const response = await fetch(`${API_URL}/api/gemini/admin/requests`);
-        if(!response.ok) throw new Error("Cloudflare Limit Error");
-        
         const result = await response.json();
-        
         if (result.success && Array.isArray(result.data)) {
           const allData = result.data;
-          const filteredData = allData.filter(d => d && d.email && !deletedAccounts.includes(d.email));
-
-          const pending = filteredData.filter(d => d.status === "PENDING");
-          const active = filteredData.filter(d => d.status === "ACCEPTED").map(item => {
+          const pending = allData.filter(d => d.status === "PENDING");
+          
+          const active = allData.filter(d => d.status === "ACCEPTED").map(item => {
             const ov = localOverrides[item.email];
             if (ov) {
               return {
                 ...item,
                 wa: ov.wa !== undefined ? ov.wa : item.wa,
-                headAccount: ov.headAccount !== undefined ? ov.headAccount : item.headAccount,
                 durationMonths: ov.durationMonths !== undefined ? ov.durationMonths : item.durationMonths,
                 extraDays: ov.extraDays !== undefined ? ov.extraDays : (item.extraDays || 0)
               };
             }
             return item;
           });
-
+          
           cachedPendingList = pending;
           activeDatabaseList = active;
-
+          
           localStorage.setItem('cache_pending_db', JSON.stringify(pending));
           localStorage.setItem('cache_active_db', JSON.stringify(active));
-
-          renderAntrean(pending);
-
+          
+          renderAntrean(pending); 
+          
           let extractedHeads = new Set(headAccounts);
           active.forEach(item => {
-            if (item.headAccount && item.headAccount !== '-' && item.headAccount.includes('@') && !deletedHeads.includes(item.headAccount)) {
-              extractedHeads.add(item.headAccount);
-            }
+              if (item.headAccount && item.headAccount !== '-' && item.headAccount.includes('@') && !deletedHeads.includes(item.headAccount)) {
+                  extractedHeads.add(item.headAccount);
+              }
           });
-          
-          let changed = false;
           const updatedHeads = Array.from(extractedHeads);
           if (updatedHeads.length !== headAccounts.length) {
-            headAccounts = updatedHeads;
-            localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
-            changed = true;
+              headAccounts = updatedHeads;
+              localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
           }
-          if (changed) syncSettingsToCloud();
 
-          applyDatabaseFilters();
-          renderHeadAccounts();
-
+          applyDatabaseFilters(); 
+          renderHeadAccounts();   
+          
           document.getElementById('stat-pending-count').innerText = pending.length;
           document.getElementById('badge-antrean').innerText = pending.length;
           document.getElementById('stat-active-count').innerText = active.length;
         }
-      } catch (e) {
-        console.error("Gagal sinkron data cloud:", e);
-        setSyncStatus(false, true); // Alert UI that worker is limited
-        throw e;
-      }
+      } catch (e) {}
     }
 
     function renderAntrean(list) {
@@ -1270,17 +1100,6 @@
       document.getElementById('edit-extend-amount').value = amount;
     }
 
-    function toggleEditHeadInput() {
-      const select = document.getElementById('edit-customer-head-select');
-      const customInput = document.getElementById('edit-customer-head-custom');
-      if (select.value === '__custom__') {
-        customInput.classList.remove('hidden');
-        customInput.focus();
-      } else {
-        customInput.classList.add('hidden');
-      }
-    }
-
     function openEditEmailModal(oldEmail) {
       const item = activeDatabaseList.find(a => a.email === oldEmail);
       document.getElementById('edit-customer-old-email').value = oldEmail;
@@ -1288,53 +1107,6 @@
       
       const currentWa = (item && item.wa && item.wa !== '080000000000') ? item.wa : '';
       document.getElementById('edit-customer-new-wa').value = currentWa;
-
-      const currentHead = (item && item.headAccount && item.headAccount !== '-') ? item.headAccount : '';
-      const usage = getHeadAccountUsage();
-      
-      let currentHtml = '';
-      let newHeads = '';
-      let partialHeads = '';
-      let fullHeads = '';
-
-      if (currentHead) {
-        const usedCurrent = usage[currentHead] || 1;
-        currentHtml = `<optgroup label="📌 AKUN SAAT INI"><option value="${currentHead}">Tetap: ${currentHead} (${usedCurrent}/5 Terpakai)</option></optgroup>`;
-      } else {
-        currentHtml = `<option value="-">-- Belum Ada Head Account --</option>`;
-      }
-
-      const reversedHeads = [...headAccounts].reverse();
-      reversedHeads.forEach(h => {
-        if (h !== currentHead) {
-          const used = usage[h] || 0;
-          const remaining = 5 - used;
-          const isLocked = manualFullHeads.includes(h);
-
-          if (isLocked || remaining <= 0) {
-            const statusLabel = isLocked ? 'Dikunci Penuh' : 'Penuh 5/5';
-            fullHeads += `<option value="${h}">[Penuh] ${h} (${statusLabel})</option>`;
-          } else if (remaining === 5) {
-            newHeads += `<option value="${h}">[Baru] ${h} (Sisa 5 Slot)</option>`;
-          } else {
-            partialHeads += `<option value="${h}">[Sisa ${remaining}] ${h}</option>`;
-          }
-        }
-      });
-
-      let headOptionsHtml = currentHtml;
-      if (newHeads !== '') headOptionsHtml += `<optgroup label="🌟 AKUN BARU (Sisa 5 Slot)">${newHeads}</optgroup>`;
-      if (partialHeads !== '') headOptionsHtml += `<optgroup label="⚡ ADA SISA SLOT">${partialHeads}</optgroup>`;
-      if (fullHeads !== '') headOptionsHtml += `<optgroup label="⛔ PENUH / DIKUNCI">${fullHeads}</optgroup>`;
-      headOptionsHtml += `<option value="__custom__">✍️ + Ketik Manual Akun Head Baru...</option>`;
-
-      const headSelectEl = document.getElementById('edit-customer-head-select');
-      headSelectEl.innerHTML = headOptionsHtml;
-      headSelectEl.value = currentHead || '-';
-
-      const customHeadInput = document.getElementById('edit-customer-head-custom');
-      customHeadInput.value = '';
-      customHeadInput.classList.add('hidden');
 
       const sisaSekarang = item ? hitungSisaHari(item) : 0;
       document.getElementById('edit-current-sisa-badge').innerText = `Sisa Saat Ini: ${sisaSekarang} Hari`;
@@ -1354,23 +1126,12 @@
       const oldEmail = document.getElementById('edit-customer-old-email').value.trim();
       const newEmail = document.getElementById('edit-customer-new-email').value.trim();
       const newWaInput = document.getElementById('edit-customer-new-wa').value.trim();
-      const headSelectVal = document.getElementById('edit-customer-head-select').value;
-      const headCustomVal = document.getElementById('edit-customer-head-custom').value.trim();
       const extendUnit = document.getElementById('edit-extend-unit').value;
       const extendAmount = parseInt(document.getElementById('edit-extend-amount').value || 0);
 
       if (!newEmail || !newEmail.includes('@')) {
-        alert("Masukkan alamat Gmail pelanggan yang valid!");
+        alert("Masukkan alamat Gmail yang valid!");
         return;
-      }
-
-      let updatedHead = headSelectVal;
-      if (headSelectVal === '__custom__') {
-        if (!headCustomVal || !headCustomVal.includes('@')) {
-          alert("Masukkan alamat email Head Account manual yang valid!");
-          return;
-        }
-        updatedHead = headCustomVal;
       }
 
       if (extendUnit !== 'none' && (!extendAmount || extendAmount <= 0)) {
@@ -1400,18 +1161,12 @@
         }
 
         const updatedWa = newWaInput !== '' ? newWaInput : (targetItem.wa || '080000000000');
-        const oldHead = targetItem.headAccount || '-';
-
-        if (updatedHead && updatedHead !== '-' && updatedHead.includes('@')) {
-          registerHeadAccountLocally(updatedHead);
-        }
 
         if (oldEmail !== newEmail) {
           delete localOverrides[oldEmail];
         }
         localOverrides[newEmail] = {
           wa: updatedWa,
-          headAccount: updatedHead,
           durationMonths: updatedMonths,
           extraDays: updatedExtraDays
         };
@@ -1423,7 +1178,6 @@
               ...item,
               email: newEmail,
               wa: updatedWa,
-              headAccount: updatedHead,
               durationMonths: updatedMonths,
               extraDays: updatedExtraDays
             };
@@ -1431,7 +1185,6 @@
           return item;
         });
         localStorage.setItem('cache_active_db', JSON.stringify(activeDatabaseList));
-        syncSettingsToCloud();
 
         await fetch(`${API_URL}/api/gemini/admin/edit-email`, {
           method: "POST",
@@ -1440,29 +1193,20 @@
             oldEmail,
             newEmail,
             newWa: updatedWa,
-            headAccount: updatedHead,
             durationMonths: updatedMonths,
             extraDays: updatedExtraDays
           })
         }).catch(() => {});
 
-        if (updatedHead !== oldHead && updatedHead !== '-') {
-          await fetch(`${API_URL}/api/gemini/admin/accept`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: newEmail, headAccount: updatedHead })
-          }).catch(() => {});
-        }
-
         closeEditEmailModal();
         applyDatabaseFilters();
-        renderHeadAccounts();
         
         let msg = `Berhasil memperbarui data ${newEmail}!`;
-        if (updatedHead !== oldHead) msg += `\n(Head dipindah ke: ${updatedHead})`;
         if (extendUnit === 'days') msg += `\n(+${extendAmount} Hari masa aktif ditambahkan)`;
         if (extendUnit === 'months') msg += `\n(+${extendAmount} Bulan masa aktif ditambahkan)`;
         alert(msg);
+        
+        fetchAdminData();
       } catch (e) {
         alert("Perubahan disimpan secara lokal.");
       } finally {
@@ -1510,31 +1254,20 @@
       }
 
       const usage = getHeadAccountUsage();
-      let newHeads = '';
-      let partialHeads = '';
+      let optionsHtml = '';
       
       const reversedHeads = [...headAccounts].reverse();
       reversedHeads.forEach(h => {
           const used = usage[h] || 0;
           const remaining = 5 - used; 
           if (remaining > 0 && !manualFullHeads.includes(h)) {
-              if (remaining === 5) {
-                  newHeads += `<option value="${h}">[Baru] ${h} (Sisa 5 Slot)</option>`;
-              } else {
-                  partialHeads += `<option value="${h}">[Sisa ${remaining}] ${h}</option>`;
-              }
+              optionsHtml += `<option value="${h}">${h} (Sisa ${remaining} Slot)</option>`;
           }
       });
 
-      let optionsHtml = '';
-      if (newHeads !== '') optionsHtml += `<optgroup label="🌟 AKUN BARU (Sisa 5 Slot)">${newHeads}</optgroup>`;
-      if (partialHeads !== '') optionsHtml += `<optgroup label="⚡ ADA SISA SLOT">${partialHeads}</optgroup>`;
       optionsHtml += `<option value="__custom__">✍️ + Ketik Manual Akun Head...</option>`;
       
       document.getElementById('select-head-account').innerHTML = optionsHtml;
-      if (optionsHtml.startsWith('<option value="__custom__">')) {
-        document.getElementById('acc-head-custom').classList.remove('hidden');
-      }
       document.getElementById('btn-confirm-acc').disabled = false;
       document.getElementById('modal-select-head').classList.remove('hidden');
     }
@@ -1553,13 +1286,11 @@
           return;
         }
         selectedHead = customVal;
-      }
-
-      registerHeadAccountLocally(selectedHead);
-
-      if (deletedAccounts.includes(currentEmailToApprove)) {
-        deletedAccounts = deletedAccounts.filter(e => e !== currentEmailToApprove);
-        localStorage.setItem('digitalhub_deleted_accounts', JSON.stringify(deletedAccounts));
+        if (!headAccounts.includes(selectedHead)) {
+          headAccounts.push(selectedHead);
+          localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+          renderHeadAccounts();
+        }
       }
 
       const originalText = btn.innerHTML;
@@ -1576,42 +1307,8 @@
         const result = await res.json();
         
         if (result.success) {
-          const approvedItem = cachedPendingList.find(p => p.email === currentEmailToApprove);
-          cachedPendingList = cachedPendingList.filter(p => p.email !== currentEmailToApprove);
-          localStorage.setItem('cache_pending_db', JSON.stringify(cachedPendingList));
-
-          const nowIso = new Date().toISOString();
-          const newActiveItem = {
-            email: currentEmailToApprove,
-            wa: approvedItem ? approvedItem.wa : '',
-            headAccount: selectedHead,
-            productName: currentProdToApprove || 'Gemini Pro',
-            durationMonths: currentDurationToApprove || 1,
-            extraDays: 0,
-            status: "ACCEPTED",
-            acceptedAt: nowIso,
-            createdAt: approvedItem ? approvedItem.createdAt : nowIso
-          };
-
-          localOverrides[currentEmailToApprove] = {
-            headAccount: selectedHead,
-            durationMonths: currentDurationToApprove || 1
-          };
-          localStorage.setItem('digitalhub_local_overrides', JSON.stringify(localOverrides));
-          syncSettingsToCloud();
-
-          activeDatabaseList = activeDatabaseList.filter(a => a.email !== currentEmailToApprove);
-          activeDatabaseList.unshift(newActiveItem);
-          localStorage.setItem('cache_active_db', JSON.stringify(activeDatabaseList));
-
-          document.getElementById('stat-pending-count').innerText = cachedPendingList.length;
-          document.getElementById('badge-antrean').innerText = cachedPendingList.length;
-          document.getElementById('stat-active-count').innerText = activeDatabaseList.length;
-
-          renderAntrean(cachedPendingList);
-          applyDatabaseFilters();
-          renderHeadAccounts();
           closeAccModal(); 
+          fetchAdminData(); 
           
           let inviteLink = "https://myaccount.google.com/family/details";
           if(currentProdToApprove.toLowerCase().includes("canva")) inviteLink = "https://www.canva.com/settings/members";
@@ -1631,28 +1328,15 @@
     }
 
     async function rejectAction(email) {
-      if (confirm(`Yakin ingin menghapus / menolak email: ${email}?`)) {
-        activeDatabaseList = activeDatabaseList.filter(item => item && item.email !== email);
-        cachedPendingList = cachedPendingList.filter(item => item && item.email !== email);
+      if(confirm(`Yakin ingin menghapus / menolak email: ${email}?`)) {
+        activeDatabaseList = activeDatabaseList.filter(item => item.email !== email);
+        cachedPendingList = cachedPendingList.filter(item => item.email !== email);
         delete localOverrides[email];
         localStorage.setItem('digitalhub_local_overrides', JSON.stringify(localOverrides));
         localStorage.setItem('cache_active_db', JSON.stringify(activeDatabaseList));
         localStorage.setItem('cache_pending_db', JSON.stringify(cachedPendingList));
-        
-        if (!deletedAccounts.includes(email)) {
-          deletedAccounts.push(email);
-          localStorage.setItem('digitalhub_deleted_accounts', JSON.stringify(deletedAccounts));
-        }
-
-        syncSettingsToCloud(); 
-
-        document.getElementById('stat-pending-count').innerText = cachedPendingList.length;
-        document.getElementById('badge-antrean').innerText = cachedPendingList.length;
-        document.getElementById('stat-active-count').innerText = activeDatabaseList.length;
-
         applyDatabaseFilters();
         renderAntrean(cachedPendingList);
-        renderHeadAccounts();
 
         try {
           await fetch(`${API_URL}/api/gemini/admin/reject`, { 
@@ -1660,7 +1344,153 @@
             headers: { "Content-Type": "application/json" }, 
             body: JSON.stringify({ email }) 
           });
-        } catch (e) {}
+        } catch(e) {}
+        fetchAdminData();
+      }
+    }
+
+    function switchTab(tabName) {
+      ['antrean', 'database', 'head-accounts', 'paket'].forEach(tab => {
+          const btn = document.getElementById('tab-' + tab);
+          const sec = document.getElementById('section-' + tab);
+          if (tab === tabName) {
+              btn.className = "px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-black text-purple-700 bg-white rounded-2xl shadow-sm border border-purple-100 flex items-center gap-2 transition-all whitespace-nowrap" + (tab === 'paket' ? " sm:ml-auto" : "");
+              sec.classList.remove('hidden');
+          } else {
+              btn.className = "px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-white/80 rounded-2xl transition-all flex items-center gap-2 whitespace-nowrap" + (tab === 'paket' ? " sm:ml-auto" : "");
+              sec.classList.add('hidden');
+          }
+      });
+    }
+
+    async function generatePin() {
+      const prodSelect = document.getElementById('pin-product');
+      const durationSelect = document.getElementById('pin-duration');
+      const product = prodSelect.value;
+      
+      if(!durationSelect.value) { alert("Tidak ada durasi paket yang bisa dipilih!"); return; }
+      
+      const duration = durationSelect.value;
+      const durationLabel = durationSelect.options[durationSelect.selectedIndex]?.text || `${duration} Bulan`;
+      
+      const randomString = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const prefix = product === 'Canva Pro' ? 'CNV' : (product === 'YouTube Premium' ? 'YTB' : 'GEM');
+      const newPin = `${prefix}${duration}-${randomString}`;
+      
+      try {
+          await fetch(`${API_URL}/api/gemini/admin/generate-pin`, { 
+              method: "POST", headers: { "Content-Type": "application/json" }, 
+              body: JSON.stringify({ pin: newPin, durationMonths: duration, productName: product }) 
+          });
+          document.getElementById('pin-duration-label').innerText = `Paket: ${product} (${durationLabel})`;
+          document.getElementById('generated-pin').innerText = newPin;
+          document.getElementById('pin-result-modal').classList.remove('hidden');
+      } catch (e) { alert("Gagal menyimpan PIN ke database."); }
+    }
+    
+    function closePinModal() { document.getElementById('pin-result-modal').classList.add('hidden'); }
+    
+    function copyPin() {
+        copyToClipboard(document.getElementById('generated-pin').innerText);
+        document.getElementById('copy-status').classList.add('opacity-100');
+        setTimeout(() => { document.getElementById('copy-status').classList.remove('opacity-100'); }, 2000);
+    }
+
+    function toggleManualFull(email) {
+      if (manualFullHeads.includes(email)) {
+        manualFullHeads = manualFullHeads.filter(h => h !== email);
+      } else {
+        manualFullHeads.push(email);
+      }
+      localStorage.setItem('digitalhub_manual_full_heads', JSON.stringify(manualFullHeads));
+      renderHeadAccounts();
+    }
+
+    function renderHeadAccounts() {
+      const grid = document.getElementById('head-accounts-grid');
+      
+      if(headAccounts.length === 0) {
+        grid.innerHTML = `<p class="text-sm text-slate-400">Belum ada head account.</p>`;
+        return;
+      }
+      
+      const usage = getHeadAccountUsage();
+      let availableHtml = '';
+      let fullHtml = '';
+      
+      headAccounts.forEach((h, i) => {
+          const used = usage[h] || 0;
+          const max = 5;
+          const remaining = max - used;
+          const isManualFull = manualFullHeads.includes(h);
+          const isFull = remaining <= 0 || isManualFull;
+          
+          const cardHtml = `
+            <div class="bg-white border ${isFull ? 'border-rose-200 opacity-80' : 'border-slate-200'} p-5 rounded-2xl shadow-sm flex flex-col gap-3">
+               <div class="flex items-center justify-between">
+                   <div class="flex items-center gap-3 min-w-0">
+                     <div class="w-9 h-9 rounded-xl ${isFull ? 'bg-rose-50 text-rose-600' : 'bg-purple-50 text-purple-600'} flex items-center justify-center font-black text-xs shrink-0">H${i+1}</div>
+                     <div class="min-w-0 pr-2">
+                        <p class="font-black text-sm text-slate-800 break-all">${h}</p>
+                        <p class="text-[10px] font-bold ${isFull ? 'text-rose-500' : 'text-emerald-500'} mt-0.5">
+                          ${isManualFull ? 'Ditandai Penuh (Manual)' : (isFull ? 'Kapasitas Penuh' : `Sisa ${remaining} Slot`)}
+                        </p>
+                     </div>
+                   </div>
+                   <div class="flex items-center gap-1 shrink-0">
+                     <button onclick="toggleManualFull('${h}')" title="${isManualFull ? 'Buka Kunci Slot' : 'Tandai Sudah Penuh'}" class="p-1.5 rounded-lg text-xs font-bold transition ${isManualFull ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' : 'bg-slate-100 text-slate-500 hover:bg-rose-50 hover:text-rose-600'}">
+                       <i data-lucide="${isManualFull ? 'unlock' : 'lock'}" class="w-4 h-4"></i>
+                     </button>
+                     <button onclick="deleteHeadAccount('${h}')" class="text-slate-400 hover:text-rose-500 p-1.5 transition shrink-0" title="Hapus Akun"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                   </div>
+               </div>
+               <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden mt-1">
+                   <div class="h-2 rounded-full ${isFull ? 'bg-rose-500' : 'bg-purple-500'}" style="width: ${isManualFull ? 100 : (used/max)*100}%"></div>
+               </div>
+               <div class="flex justify-between items-center text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                 <span>${isManualFull ? 'Manual Lock' : 'Auto Count'}</span>
+                 <span>${isManualFull ? '5 / 5' : `${used} / ${max}`} Terpakai</span>
+               </div>
+            </div>
+          `;
+          if (isFull) { fullHtml += cardHtml; } else { availableHtml += cardHtml; }
+      });
+      
+      grid.innerHTML = `
+          <div class="col-span-full mb-1"><h4 class="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-100 pb-2">✅ Akun Tersedia</h4></div>
+          ${availableHtml || '<div class="col-span-full mb-4"><p class="text-xs text-slate-400">Tidak ada akun tersedia.</p></div>'}
+          <div class="col-span-full mt-6 mb-1"><h4 class="text-xs font-black text-rose-400 uppercase tracking-widest border-b border-rose-100 pb-2">⛔ Akun Penuh (Full Slot)</h4></div>
+          ${fullHtml || '<div class="col-span-full"><p class="text-xs text-slate-400">Belum ada akun yang penuh.</p></div>'}
+      `;
+      refreshIcons();
+    }
+
+    function addHeadAccount() {
+      const email = document.getElementById('new-head-email').value.trim();
+      if(!email || !email.includes('@')) { alert("Masukkan email yang valid!"); return; }
+      if(!headAccounts.includes(email)) {
+          headAccounts.push(email);
+          localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+      }
+      deletedHeads = deletedHeads.filter(h => h !== email);
+      localStorage.setItem('digitalhub_deleted_heads', JSON.stringify(deletedHeads));
+      
+      document.getElementById('new-head-email').value = "";
+      document.getElementById('modal-add-head').classList.add('hidden');
+      renderHeadAccounts();
+    }
+
+    function deleteHeadAccount(emailToDelete) {
+      if(confirm(`Hapus Head Account "${emailToDelete}" dari daftar?`)) {
+        headAccounts = headAccounts.filter(h => h !== emailToDelete);
+        localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+
+        if (!deletedHeads.includes(emailToDelete)) {
+          deletedHeads.push(emailToDelete);
+          localStorage.setItem('digitalhub_deleted_heads', JSON.stringify(deletedHeads));
+        }
+
+        renderHeadAccounts();
       }
     }
 
@@ -1683,32 +1513,21 @@
         document.getElementById('manual-head-custom').classList.add('hidden');
         
         const usage = getHeadAccountUsage();
-        let newHeads = '';
-        let partialHeads = '';
+        let optionsHtml = '';
         
         const reversedHeads = [...headAccounts].reverse();
         reversedHeads.forEach(h => {
             const used = usage[h] || 0;
             const remaining = 5 - used; 
             if (remaining > 0 && !manualFullHeads.includes(h)) {
-                if (remaining === 5) {
-                    newHeads += `<option value="${h}">[Baru] ${h} (Sisa 5 Slot)</option>`;
-                } else {
-                    partialHeads += `<option value="${h}">[Sisa ${remaining}] ${h}</option>`;
-                }
+                optionsHtml += `<option value="${h}">${h} (Sisa ${remaining} Slot)</option>`;
             }
         });
         
-        let optionsHtml = '';
-        if (newHeads !== '') optionsHtml += `<optgroup label="🌟 AKUN BARU (Sisa 5 Slot)">${newHeads}</optgroup>`;
-        if (partialHeads !== '') optionsHtml += `<optgroup label="⚡ ADA SISA SLOT">${partialHeads}</optgroup>`;
         optionsHtml += `<option value="__custom__">✍️ + Ketik Manual Akun Head...</option>`;
         
         const headSelect = document.getElementById('manual-head');
         headSelect.innerHTML = optionsHtml;
-        if (optionsHtml.startsWith('<option value="__custom__">')) {
-            document.getElementById('manual-head-custom').classList.remove('hidden');
-        }
         document.getElementById('btn-save-manual').disabled = false;
         
         document.getElementById('modal-add-manual').classList.remove('hidden');
@@ -1733,17 +1552,16 @@
                 return;
             }
             head = headCustomVal;
+            
+            if (!headAccounts.includes(head)) {
+                headAccounts.push(head);
+                localStorage.setItem('digitalhub_head_accounts', JSON.stringify(headAccounts));
+                renderHeadAccounts();
+            }
         }
 
         if (!email || !duration) { alert("Email dan Durasi wajib diisi!"); return; }
         if (!head) { alert("Pilih atau isi Head Account!"); return; }
-
-        registerHeadAccountLocally(head);
-
-        if (deletedAccounts.includes(email)) {
-          deletedAccounts = deletedAccounts.filter(e => e !== email);
-          localStorage.setItem('digitalhub_deleted_accounts', JSON.stringify(deletedAccounts));
-        }
 
         const btn = document.getElementById('btn-save-manual');
         const orig = btn.innerHTML;
@@ -1764,34 +1582,20 @@
                 body: JSON.stringify({email: email, headAccount: head})
             });
 
-            localOverrides[email] = {
-              wa: finalWa,
-              headAccount: head,
-              durationMonths: parseInt(duration),
-              extraDays: 0
-            };
-            localStorage.setItem('digitalhub_local_overrides', JSON.stringify(localOverrides));
-            syncSettingsToCloud();
-
-            activeDatabaseList = activeDatabaseList.filter(a => a && a.email !== email);
             activeDatabaseList.unshift({
               email: email,
               wa: finalWa,
               headAccount: head,
               productName: product,
-              durationMonths: parseInt(duration),
+              durationMonths: duration,
               extraDays: 0,
-              status: "ACCEPTED",
               acceptedAt: nowIso,
               createdAt: nowIso
             });
             localStorage.setItem('cache_active_db', JSON.stringify(activeDatabaseList));
 
-            document.getElementById('stat-active-count').innerText = activeDatabaseList.length;
-
             closeManualModal();
-            applyDatabaseFilters();
-            renderHeadAccounts();
+            fetchAdminData();
             alert(`Selesai! Akun ${email} berhasil diinput dengan Head: ${head}`);
         } catch(e) {
             alert("Terjadi kesalahan koneksi saat menyimpan manual.");
